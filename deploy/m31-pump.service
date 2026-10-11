@@ -1,0 +1,17 @@
+[Unit]
+Description=M31 pressure-based well pump control
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=m31pump
+Group=m31pump
+EnvironmentFile=/etc/default/m31-pump
+ExecStart=/opt/m31tool/.venv/bin/m31-pump --host ${M31_HOST} --port ${M31_PORT} --unit-id ${M31_UNIT_ID} --ai-address ${M31_AI_ADDRESS} --interval ${M31_INTERVAL}
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

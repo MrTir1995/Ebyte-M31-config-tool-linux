@@ -14,6 +14,75 @@ Ein ausführlicher Windows-Copilot-Auftrag für sichere Herstelleranalyse,
 Registermapping und evidenzbasierte Ergänzungen steht in der
 [Analyseanleitung](docs/windows-copilot-analysis-guide.md).
 
+## Brunnenpumpe druckabhängig steuern
+
+Das zusätzliche Ubuntu-Kommando `m31-pump` steuert DO1 mit einer Hysterese:
+unter **1,6 bar** einschalten, ab **3,0 bar** ausschalten, dazwischen den
+bisherigen Zustand halten. DI1 muss high sein; bei Motorstörung (DI1 low),
+ungültigem AI-Signal oder Modbusfehler wird DO1 ausgeschaltet beziehungsweise
+die Abschaltung bestmöglich versucht. DI2 wird als Betriebsmeldung mitgeloggt.
+Beim Beenden (SIGINT/SIGTERM) wird ebenfalls versucht, DO1 auszuschalten und
+die Rückmeldung zu prüfen.
+
+Die Zuordnung verwendet DI1/DI2 ab Discrete Input 0, DO1 als Coil 0 und den
+AI-Prozesswert ab Input Register 3000 (0x0BB8). Für den angegebenen
+4–20-mA-Messumformer mit 0–10 bar wird der M31-Prozesswert 0–27648 auf
+0–20 mA und anschließend auf 0–10 bar ab 4 mA skaliert. Register 3000 ist
+laut Registerinventar die Basis der AI-Prozesswerte; die Zuordnung von AI1 zu
+einem Erweiterungsmodul kann von den im Host installierten AI-Kanälen abhängen.
+Prüfe daher das AI-Register am konkreten Host/Erweiterungsaufbau und passe
+`--ai-address` an, bevor du DO1 freigibst.
+
+Nach Installation des Projekts in einer Python-Umgebung mit den
+Projektabhängigkeiten:
+
+```sh
+m31-pump --host 192.168.3.7
+```
+
+Optionen: `--port` (Standard 502), `--unit-id` (1), `--ai-address` (3000),
+`--interval` (1 Sekunde) und `--timeout` (2 Sekunden). Zwischen 1,6 und 3 bar
+wird der zuletzt gelesene DO1-Zustand beibehalten, auch nach einem Neustart des
+Programms.
+
+Für einen Systemdienst `/opt/m31tool` als Installationspfad verwenden, das
+Projekt dort in einer virtuellen Umgebung installieren und den Benutzer
+`m31pump` anlegen:
+
+```sh
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin m31pump
+sudo install -d -o m31pump -g m31pump /opt/m31tool
+python3 -m venv /opt/m31tool/.venv
+/opt/m31tool/.venv/bin/pip install /path/to/Ebyte-M31-config-tool-linux
+```
+
+`deploy/m31-pump.service` nach `/etc/systemd/system/m31-pump.service` kopieren
+und `/etc/default/m31-pump` mit der tatsächlichen Konfiguration anlegen:
+
+```sh
+M31_HOST=192.168.3.7
+M31_PORT=502
+M31_UNIT_ID=1
+M31_AI_ADDRESS=3000
+M31_INTERVAL=1
+```
+
+Anschließend den Dienst aktivieren:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable --now m31-pump
+```
+
+**Sicherheit:** Diese Software ist keine zertifizierte Sicherheitssteuerung.
+Hardwareseitiger Motorschutz, Trockenlaufschutz, Druckbegrenzung und ein
+unabhängiger Not-Aus müssen erhalten bleiben. Das Verhalten bei
+Kommunikationsausfall kann die Pumpe nur dann abschalten, wenn DO1 noch
+erreichbar ist; bei längerer Unterbrechung ist der sichere Zustand durch
+Hardware/Schützbeschaltung sicherzustellen. Vor Automatikbetrieb die
+Registerzuordnung, Eingangslogik, Druckskalierung und Schützfunktion ohne
+angeschlossene Pumpe und anschließend fachgerecht vor Ort prüfen.
+
 Dies ist **kein vollständiger Nachbau** der Windows-Anwendung. Der belegte
 Funktionsumfang, nicht eine uneingeschränkte Eins-zu-eins-Parität, ist das Ziel.
 Das Projekt ist unabhängig und inoffiziell; es ist weder mit Ebyte verbunden

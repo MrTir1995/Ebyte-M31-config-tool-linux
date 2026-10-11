@@ -17,6 +17,7 @@ dependencies = [
 
 [project.scripts]
 m31tool = "m31tool.__main__:main"
+m31-pump = "m31tool.pump:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
