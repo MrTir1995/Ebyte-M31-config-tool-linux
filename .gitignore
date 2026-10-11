@@ -1,0 +1,15 @@
+.venv/
+.wheel-venv/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+*.xlsx
+*.csv
+*.m31profile.json

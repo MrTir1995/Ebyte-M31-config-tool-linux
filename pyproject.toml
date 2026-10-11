@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "m31tool"
+version = "0.2.0"
+description = "Linux-Desktop-Werkzeug für dokumentierte M31-Modbus-Funktionen"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = [
+    "pymodbus>=3.10,<4",
+    "pyserial>=3.5,<4",
+    "openpyxl>=3.1,<4",
+]
+
+[project.scripts]
+m31tool = "m31tool.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["m31tool", "m31tool.*"]
+exclude = ["tests", "tests.*"]
+
+[tool.setuptools]
+license-files = ["LICENSE"]
