@@ -103,6 +103,43 @@ class GUISafetyTests(unittest.TestCase):
         self.assertEqual(self.app._error.call_count, 3)
         self.app._run.assert_not_called()
 
+    def test_auto_refresh_schedules_only_read_callbacks_and_can_be_cancelled(self):
+        self.app.auto_refresh = variable(True)
+        self.app.refresh_interval = variable("0.5")
+        self.app.auto_refresh_after = None
+        self.app.root = Mock()
+        self.app.root.after.return_value = "refresh-timer"
+        self.app._cancel_auto_refresh = M31App._cancel_auto_refresh.__get__(self.app)
+        self.app._schedule_auto_refresh = M31App._schedule_auto_refresh.__get__(self.app)
+        self.app._auto_refresh = M31App._auto_refresh.__get__(self.app)
+        M31App._toggle_auto_refresh(self.app)
+        self.app.root.after.assert_called_once()
+        self.assertEqual(self.app.root.after.call_args.args[0], 500)
+        callback = self.app.root.after.call_args.args[1]
+        self.assertIs(callback.__self__, self.app)
+        self.assertIs(callback.__func__, M31App._auto_refresh)
+        self.assertEqual(self.app.auto_refresh_after, "refresh-timer")
+        self.app.auto_refresh.get.return_value = False
+        M31App._toggle_auto_refresh(self.app)
+        self.app.root.after_cancel.assert_called_once_with("refresh-timer")
+        self.assertIsNone(self.app.auto_refresh_after)
+
+    def test_auto_refresh_callback_never_runs_while_disconnected_or_closing(self):
+        self.app.auto_refresh = variable(True)
+        self.app.auto_refresh_after = "timer"
+        self.app.refresh_interval = variable("1.0")
+        self.app.root = Mock()
+        self.app._cancel_auto_refresh = M31App._cancel_auto_refresh.__get__(self.app)
+        self.app._schedule_auto_refresh = M31App._schedule_auto_refresh.__get__(self.app)
+        self.app._read = Mock()
+        for attribute, value in (("connected", False), ("closing", True)):
+            previous = getattr(self.app, attribute)
+            setattr(self.app, attribute, value)
+            M31App._auto_refresh(self.app)
+            setattr(self.app, attribute, previous)
+        self.app._read.assert_not_called()
+        self.app.root.after.assert_not_called()
+
     @patch("m31tool.app.load_csv")
     @patch("m31tool.app.filedialog", new_callable=Mock)
     def test_csv_import_is_local_only(self, dialog, load):

@@ -129,6 +129,48 @@ class DesktopGUITests(unittest.TestCase):
         self.root.update()
         self.assertEqual(len(self.simulator.requests), request_count)
 
+    def test_auto_refresh_polls_selected_range_read_only_and_stops_when_disabled(self):
+        import time
+
+        self.connect()
+        self.app.refresh_interval.set("0.1")
+        initial_requests = len(self.simulator.requests)
+        self.app.auto_refresh_button.invoke()
+        self.wait_for(
+            lambda: len(self.simulator.requests) >= initial_requests + 2
+            and not self.app.busy
+        )
+        self.assertTrue(self.app.auto_refresh.get())
+        self.assertTrue(all(request[1][0] == 3 for request in self.simulator.requests))
+        self.assertIn("Auto-refresh read", self.app.source.get())
+
+        self.app.auto_refresh_button.invoke()
+        request_count = len(self.simulator.requests)
+        deadline = time.monotonic() + 0.2
+        while time.monotonic() < deadline:
+            self.root.update()
+            time.sleep(0.01)
+        self.assertFalse(self.app.auto_refresh.get())
+        self.assertEqual(len(self.simulator.requests), request_count)
+
+    def test_auto_refresh_failure_disables_polling_instead_of_retrying(self):
+        import time
+
+        self.connect()
+        self.simulator.forced_exception = 2
+        self.app.refresh_interval.set("0.1")
+        self.app.auto_refresh_button.invoke()
+        self.wait_for(lambda: not self.app.busy and not self.app.auto_refresh.get())
+        self.assertIn("Auto refresh failed", self.app.status.get())
+        self.messagebox.showerror.assert_called_once()
+
+        request_count = len(self.simulator.requests)
+        deadline = time.monotonic() + 0.2
+        while time.monotonic() < deadline:
+            self.root.update()
+            time.sleep(0.01)
+        self.assertEqual(len(self.simulator.requests), request_count)
+
     def test_local_csv_import_export_never_touches_device(self):
         directory = Path(__file__).parent / (".desktop-test-" + uuid.uuid4().hex)
         directory.mkdir()

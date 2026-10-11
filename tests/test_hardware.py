@@ -4,21 +4,18 @@ Ordinary discovery never connects to hardware. Explicit invocation:
 
     M31_HARDWARE_READ_TEST=192.168.3.7 .venv/bin/python -m unittest tests.test_hardware -v
 
-Also set M31_HARDWARE_AI=1 to probe the three documented AI start addresses.
+Also set M31_HARDWARE_AI=1 to probe the three documented AI start addresses,
+and M31_HARDWARE_DEVICE_INFO=1 to read the documented parameter/status catalog.
 These are raw words, not an inferred extension map, channel map, or scaling.
-The endpoint is fixed at 192.168.3.7:502, unit 1; timeout is 2 seconds with
-no retries. Protocol exceptions are reported as unsupported/unproven reads.
-Transport failures abort the remaining reads and fail with endpoint details.
-No output, configuration, firmware, reset, or network writes are performed.
+The exact IPv4 endpoint must be explicitly supplied in M31_HARDWARE_READ_TEST;
+port 502 and unit 1 are used. Timeout is 2 seconds with no retries. Protocol
+exceptions are reported as unsupported/unproven reads. Transport failures
+abort the remaining reads and fail with endpoint details. No output,
+configuration, firmware, reset, or network writes are performed.
 
-2026-10-11 diagnostic: TCP connected, but DI0/count8/unit1 timed out.
-Core TX and an independent raw-socket request were byte-identical:
-00 01 00 00 00 06 01 02 00 00 00 08.
-Raw DI, holding3491/count1, and coils0/count8 each received zero bytes
-within two seconds on separate connections, without peer EOF. This is not
-evidence of a client framing mismatch or of valid extension addresses.
 """
 
+import ipaddress
 import os
 import unittest
 from unittest.mock import Mock
@@ -32,9 +29,10 @@ from m31tool.core import (
     ModbusResponseError,
     ModbusSession,
 )
+from m31tool.device import read_device_info
 
 
-HOST = "192.168.3.7"
+HOST = os.environ.get("M31_HARDWARE_READ_TEST", "192.168.3.7")
 PORT = 502
 UNIT_ID = 1
 ENDPOINT = f"{HOST}:{PORT} unit {UNIT_ID}"
@@ -72,11 +70,15 @@ def read_probe(session, *, include_ai=False, report=print):
 
 
 @unittest.skipUnless(
-    os.environ.get("M31_HARDWARE_READ_TEST") == HOST,
-    "Live M31 reads disabled; explicitly set M31_HARDWARE_READ_TEST=192.168.3.7.",
+    os.environ.get("M31_HARDWARE_READ_TEST"),
+    "Live M31 reads disabled; explicitly set M31_HARDWARE_READ_TEST to one IPv4 address.",
 )
 class ConnectedM31ReadTests(unittest.TestCase):
     def test_bounded_documented_reads(self):
+        try:
+            ipaddress.IPv4Address(HOST)
+        except ipaddress.AddressValueError as exc:
+            self.fail(f"M31_HARDWARE_READ_TEST must be one IPv4 address: {exc}")
         session = ModbusSession(unit_id=UNIT_ID, timeout=2.0)
         self.addCleanup(session.close)
         try:
@@ -91,10 +93,21 @@ class ConnectedM31ReadTests(unittest.TestCase):
         for label in ("host DI", "host DO"):
             self.assertIn(label, results, f"{ENDPOINT}: {label} unproven: {errors}")
             self.assertEqual(len(results[label]), 8)
+        if os.environ.get("M31_HARDWARE_DEVICE_INFO") == "1":
+            info = read_device_info(session)
+            self.assertTrue(info["read_only"])
+            print("Documented device parameters/status (raw words):", flush=True)
+            for field in info["fields"]:
+                print(
+                    f"  {field['key']} @ 0x{field['address']:04X}: "
+                    f"{field['raw_hex']} ({field['decoded'] or 'raw only'})",
+                    flush=True,
+                )
         print(
             "Acceptance: host DI/DO reads succeeded. Optional register exceptions "
-            "do not prove an extension layout. No writes, physical I/O effects, "
-            "RTU, AI scaling/word order, or Windows parity were tested.",
+            "do not prove an extension layout. AI words and expansion bitmap are "
+            "raw; no channel map is inferred. No writes, physical I/O effects, "
+            "RTU, AI scaling/word order, or full Windows parity were tested.",
             flush=True,
         )
 

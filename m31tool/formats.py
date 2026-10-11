@@ -14,7 +14,8 @@ import math
 import struct
 from zipfile import BadZipFile
 
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
+from openpyxl.reader.excel import ExcelReader
 from openpyxl.utils.exceptions import InvalidFileException
 
 
@@ -28,6 +29,27 @@ PROFILE_FIELDS = (
     "stopbits", "unit_id", "timeout", "object_type", "address", "count",
 )
 _MAX_PROFILE_BYTES = 65_536
+
+
+class _TrackedZipArchive:
+    def __init__(self, archive):
+        self.archive = archive
+        self.opened_files = []
+
+    def open(self, *args, **kwargs):
+        handle = self.archive.open(*args, **kwargs)
+        self.opened_files.append(handle)
+        return handle
+
+    def close(self):
+        try:
+            for handle in self.opened_files:
+                handle.close()
+        finally:
+            self.archive.close()
+
+    def __getattr__(self, name):
+        return getattr(self.archive, name)
 
 
 def _integer(value, name: str, minimum: int, maximum: int) -> int:
@@ -93,10 +115,15 @@ def _row(row, line: int, *, excel: bool = False) -> tuple[str, int, int]:
 def load_xlsx(path) -> list[tuple[str, int, int]]:
     """Load a strictly validated workbook without evaluating formulas or links."""
     workbook = None
+    iterator = None
+    reader = None
     try:
-        workbook = load_workbook(
+        reader = ExcelReader(
             path, read_only=True, data_only=False, keep_links=False,
         )
+        reader.archive = _TrackedZipArchive(reader.archive)
+        reader.read()
+        workbook = reader.wb
         if len(workbook.sheetnames) != 1 or len(workbook.worksheets) != 1:
             raise ValueError("XLSX must contain exactly one worksheet.")
         sheet = workbook.worksheets[0]
@@ -120,8 +147,14 @@ def load_xlsx(path) -> list[tuple[str, int, int]]:
     except (InvalidFileException, BadZipFile, SyntaxError, KeyError) as exc:
         raise ValueError("Invalid XLSX workbook.") from exc
     finally:
-        if workbook is not None:
-            workbook.close()
+        try:
+            if iterator is not None:
+                iterator.close()
+        finally:
+            if workbook is not None:
+                workbook.close()
+            elif reader is not None:
+                reader.archive.close()
 
 
 def save_xlsx(path, rows) -> None:

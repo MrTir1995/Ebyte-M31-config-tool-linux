@@ -16,8 +16,10 @@ zur Beschreibung der Gerätekompatibilität verwendet.
 
 ## Vergleich mit dem Windows-Programm
 
-Der Vergleich basiert auf der bisherigen statischen EXE-Untersuchung und
-dem M31-Handbuch, nicht auf einem parallelen Windows-Testlauf.
+Der Vergleich verbindet das M31-Handbuch und die bisherige statische
+EXE-Untersuchung mit einer direkten, rein lesenden UI-Prüfung von
+`Configuration Tool V1.3` am Windows-Rechner. Ein vollständiger Geräte-
+und Protokollvergleich ist damit weiterhin nicht belegt.
 
 ### Öffentlich recherchierte Herstellerquellen
 
@@ -25,7 +27,7 @@ dem M31-Handbuch, nicht auf einem parallelen Windows-Testlauf.
 - [M31-Handbuch V1.1, 63 Seiten](https://www.cdebyte.com/pdf-down.aspx?id=3402):
   Modbus-Registertabellen in Abschnitt 4.8, Windows-Bedienablauf in Kapitel 5.
 - [Offizielles Windows-Tool-Paket](https://www.cdebyte.com/pdf-down.aspx?id=3403):
-  `Configuration Tool V1.3.exe`; nur statisch untersucht, nicht ausgeführt.
+  `Configuration Tool V1.3.exe`.
 
 Die Internetrecherche bestätigt Netzwerk-/Seriellsuche, Parameterverwaltung,
 Neustartablauf und Erweiterungsadressverhandlung. Statische Symbole bestätigen
@@ -35,6 +37,35 @@ geratenen Port ist deshalb keine implementierte Hersteller-Discovery.
 Das Handbuch nennt außerdem Einschränkungen älterer Host-Firmware beim
 Zusammenspiel mit einigen Erweiterungen einschließlich GXAXX0800 (V2.0);
 Firmwarekompatibilität muss für die tatsächlichen Geräte bestätigt werden.
+
+### Direkt beobachtete Windows-Oberfläche
+
+Am 11.10.2026 wurde die laufende Herstelleranwendung über Windows UI
+Automation geprüft. Es war kein Gerät in der Geräteliste ausgewählt. Die
+Ansichten **IO Status** und **Config** wurden geöffnet; weder **Search** noch
+eine Bestätigungs-, Schreib-, Reset-, Neustart-, Export- oder
+Firmwarefunktion wurde betätigt. Damit sind die folgenden Punkte
+Oberflächenbeobachtungen, keine Behauptung erfolgreicher Gerätekommunikation:
+
+- **IO Status:** Bereiche DO, AI, AO und DI; optionales automatisches
+  Aktualisieren mit einstellbarem Intervall von 100 ms bis 5 s.
+- **Config:** Modbus-Softwareadresse, Baudrate, Parität, DI-/AI-Filter,
+  DHCP, lokale IP, Subnetz, Gateway, DNS, Modbus-on-net, Betriebsmodus,
+  lokale/Remote-Ports und Remote-IP/Domain; außerdem AI-/AO-Bereiche sowie
+  modellabhängige Wireless-Parameter. Ein **Save**-Bedienelement ist sichtbar.
+- **Info:** Modbus-Adresse, Schnittstelle, MAC-Adresse, Firmwareversion,
+  DI- und AI-Ausstattung.
+- **Gerätesuche/-aktionen:** Auswahl Serial Port/Ethernet, Ergebnisliste für
+  Modell/IP oder Slave-Adresse/Typ sowie **Restore**, **Export**,
+  **Negotiation** und **Reboot**.
+
+Die Linux-GUI bildet das automatische Aktualisieren des ausgewählten
+Modbus-Lesebereichs nun optional und ausschließlich lesend ab. Eine
+vollständige modulare I/O-Ansicht, die Hersteller-Konfigurationsmaske,
+**Save**, Info-Firmwarekennung, Hersteller-Exportdatei, Restore, Reboot,
+proprietäre Suche und Firmware-Upgrade sind weiterhin nicht implementiert.
+Insbesondere werden unbekannte Geräte-/Firmwaretelegramme nicht aus den
+sichtbaren Schaltflächen abgeleitet.
 
 ### Ergänzende Video-Beobachtungen
 
@@ -70,12 +101,12 @@ die Auswertung beruht auf sichtbaren Bildern und Einblendungen.
 | Mehrgerätebetrieb | Explizite generische Modbus-Suche und Auswahl logischer Endpunkte; keine proprietäre UDP-Erkennung |
 | Einzelne Coils/Register schreiben (05/06) | Implementiert; Host-Coil 0 live mit Rückstellung geprüft, übrige Schreibtests am Simulator |
 | Mehrfachschreiben (0F/10) | Implementiert mit vollständiger Bestätigung und Rücklesen; am Simulator geprüft |
-| I/O-Ansicht | Rohregister-Explorer, Adresskatalog und IEEE754-Anzeige mit expliziter Wortreihenfolge; kein vollständiger modularer Gerätebaum |
+| I/O-Ansicht / Aktualisieren | Rohregister-Explorer, Adresskatalog, IEEE754-Anzeige und optionales Auto-Refresh des gewählten Lesebereichs; kein vollständiger modularer Gerätebaum |
 | Messwerte speichern/laden | Lokaler CSV-/XLSX-Austausch; kein Geräte-Konfigurationsimport |
 | XLSX/QXlsx | Eigenes geprüftes Messwertschema; Windows-Konfigurationskompatibilität nicht bestätigt |
 | Clientprofile speichern/laden | Versioniertes JSON für Linux-Verbindungseinstellungen; kein Geräte-Konfigurationsformat |
 | Vollständiger Modbus-Assistent | Generischer Explorer bietet alle acht Standardfunktionscodes; vollständiges Windows-Verhalten nicht bestätigt |
-| Geräteparameter-/Fehlerstatus | Dokumentierte Holdingregister explizit lesbar, unsichere Byteinterpretationen bleiben roh |
+| Geräteparameter-/Fehlerstatus | Dokumentierte Holdingregister explizit lesbar, unsichere Byteinterpretationen bleiben roh; Firmwareversion und vollständige Infoansicht fehlen |
 | Erweiterungsadressverhandlung | Dokumentierter Ablauf implementiert, separat bestätigt; am Fake-Gerät geprüft, nicht live ausgelöst |
 | Netzwerk-/Seriellparameter im Gerät speichern, Neustart | Nicht implementiert; Verbindungseinstellungen verändern nur den Linux-Client |
 | Proprietäre UDP-Erkennung, Firmware-Update | Aus Sicherheitsgründen ohne dokumentiertes Protokoll nicht implementiert |
@@ -356,19 +387,28 @@ Kein Gerät muss erreichbar sein.
 Kommunikation mit dem lokalen Simulator. Ohne verfügbare grafische Sitzung
 werden diese Desktop-Tests ausdrücklich übersprungen.
 
-Der getrennte Hardware-Lesetest ist standardmäßig deaktiviert. Er wird nur
-für den hier angeschlossenen Host an `192.168.3.7:502`, Unit-ID 1, aktiviert:
+Der getrennte Hardware-Lesetest ist standardmäßig deaktiviert. Nur eine
+explizit angegebene einzelne IPv4-Adresse wird an Port 502, Unit-ID 1,
+gelesen. Für den vom Nutzer benannten Host mit Erweiterungskarte:
 
 ```sh
-M31_HARDWARE_READ_TEST=192.168.3.7 python -m unittest tests.test_hardware -v
+M31_HARDWARE_READ_TEST=192.2.2.15 M31_HARDWARE_AI=1 M31_HARDWARE_DEVICE_INFO=1 python -m unittest tests.test_hardware -v
 ```
 
-Optional untersucht `M31_HARDWARE_AI=1` zusätzlich dokumentierte AI-Adressen.
-Das bestätigt noch keine Adresszuordnung der Erweiterungen.
+`M31_HARDWARE_AI=1` liest zusätzlich dokumentierte AI-Startadressen;
+`M31_HARDWARE_DEVICE_INFO=1` liest den dokumentierten Parameter-/Statuskatalog
+einschließlich der rohen Erweiterungs-Bitmap. Beides bestätigt noch keine
+Kanal-/Adresszuordnung der Erweiterungen.
 Der Test schreibt keine Gerätewerte, wiederholt fehlgeschlagene
 Kommunikation nicht automatisch und bricht bei Transportfehlern ab.
 Erfolgreicher TCP-Verbindungsaufbau allein ist keine bestandene
 Modbus-Abnahme: dafür muss eine gültige Modbus-Antwort empfangen werden.
+Bei einer erneuten Probe am 11.10.2026 mit `192.2.2.15:502`, Unit-ID 1,
+war TCP erreichbar, aber die dokumentierte DI-Leseanfrage ab Adresse 0
+lieferte keine Modbus-Antwort. Der Test brach wie vorgesehen ab; AI- und
+Geräteparameter-Lesezugriffe wurden nicht mehr ausgeführt. Es gab keine
+Schreibzugriffe. Für dieses Modul ist damit weiterhin keine Modbus-
+Parametervalidierung bestätigt.
 
 Das gebaute Wheel in einer **separaten Umgebung** prüfen:
 

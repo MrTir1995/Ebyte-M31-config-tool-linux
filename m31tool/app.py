@@ -165,6 +165,9 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.object_type = tk.StringVar(value=OBJECT_TYPES[2])
         self.address = tk.StringVar(value="0")
         self.count = tk.StringVar(value="1")
+        self.auto_refresh = tk.BooleanVar(value=False)
+        self.refresh_interval = tk.StringVar(value="1.0")
+        self.auto_refresh_after = None
         self.write_type = tk.StringVar(value="Holding registers")
         self.write_address = tk.StringVar(value="0")
         self.write_value = tk.StringVar(value="0")
@@ -362,8 +365,25 @@ class M31App(ttk.Frame if ttk is not None else object):
             read_bar, text="Read", command=self._read, style="Primary.TButton"
         )
         self.read_button.pack(side="left", padx=8)
+        self.auto_refresh_button = ttk.Checkbutton(
+            read_bar, text="Auto-refresh read only", variable=self.auto_refresh,
+            command=self._toggle_auto_refresh,
+        )
+        self.auto_refresh_button.pack(side="left", padx=(4, 0))
+        self.controls.append((self.auto_refresh_button, "normal"))
+        ttk.Label(read_bar, text="Every").pack(side="left", padx=(8, 3))
+        refresh_values = tuple(f"{tenths / 10:.1f}" for tenths in range(1, 51))
+        self.refresh_interval_combo = self._combo(
+            read_bar, self.refresh_interval, refresh_values, 5
+        )
+        self.refresh_interval_combo.pack(side="left")
+        self.refresh_interval_combo.bind(
+            "<<ComboboxSelected>>", lambda event: self._change_auto_refresh_interval()
+        )
+        ttk.Label(read_bar, text="s").pack(side="left", padx=(3, 0))
         self._wrapped_label(explorer, text="Zero-based protocol addresses · "
-                            "Read only · Enter in Address or Count to read.")
+                            "Read only · Enter in Address or Count to read. Auto-refresh "
+                            "polls this range and stops on communication errors.")
         self._wrapped_label(explorer, textvariable=self.source)
 
         self.results = self._tree(
@@ -822,6 +842,12 @@ class M31App(ttk.Frame if ttk is not None else object):
             self.read_button, self.write_button, self.device_read_button, self.negotiate_button,
         ):
             button.configure(state="normal" if self.connected and not blocked else "disabled")
+        self.auto_refresh_button.configure(
+            state="normal" if self.connected and not blocked else "disabled"
+        )
+        self.refresh_interval_combo.configure(
+            state="readonly" if self.connected and not blocked else "disabled"
+        )
         self.import_button.configure(state="disabled" if blocked else "normal")
         self.export_button.configure(state="normal" if self.rows and not blocked else "disabled")
         self.import_xlsx_button.configure(state="disabled" if blocked else "normal")
@@ -895,6 +921,9 @@ class M31App(ttk.Frame if ttk is not None else object):
                 self.root.destroy()
                 return
             if error is not None:
+                if label == "Auto refresh":
+                    self.auto_refresh.set(False)
+                    self._cancel_auto_refresh()
                 self._error(label, error)
             else:
                 try:
@@ -902,6 +931,7 @@ class M31App(ttk.Frame if ttk is not None else object):
                 except Exception as exc:
                     self._error(label, exc)
             self._refresh_controls()
+            self._schedule_auto_refresh()
             if self.closing:
                 self._finish_close()
         self.root.after(75, self._poll)
@@ -951,6 +981,9 @@ class M31App(ttk.Frame if ttk is not None else object):
 
     def _disconnect(self) -> None:
         if not self.busy and not self.closing:
+            self.auto_refresh.set(False)
+            self._cancel_auto_refresh()
+            self._refresh_controls()
             self._run("Disconnect", self.session.close, lambda _: self.status.set("Disconnected."))
 
     def _display(self, rows, source) -> None:
@@ -995,7 +1028,41 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.decoded_view.insert("1.0", self.decoded.get())
         self.decoded_view.configure(state="disabled")
 
-    def _read(self) -> None:
+    def _cancel_auto_refresh(self) -> None:
+        if self.auto_refresh_after is not None:
+            self.root.after_cancel(self.auto_refresh_after)
+            self.auto_refresh_after = None
+
+    def _schedule_auto_refresh(self) -> None:
+        self._cancel_auto_refresh()
+        if self.auto_refresh.get() and self.connected and not self.busy and not self.closing:
+            delay = int(float(self.refresh_interval.get()) * 1000)
+            self.auto_refresh_after = self.root.after(delay, self._auto_refresh)
+
+    def _auto_refresh(self) -> None:
+        self.auto_refresh_after = None
+        if not self.auto_refresh.get() or not self.connected or self.closing:
+            return
+        if self.busy:
+            self._schedule_auto_refresh()
+            return
+        self._read(automatic=True)
+
+    def _toggle_auto_refresh(self) -> None:
+        if self.auto_refresh.get():
+            if not self.connected or self.busy or self.closing:
+                self.auto_refresh.set(False)
+                return
+            self.status.set("Auto-refresh enabled — selected range only; read-only.")
+            self._schedule_auto_refresh()
+        else:
+            self._cancel_auto_refresh()
+            self.status.set("Auto-refresh disabled.")
+
+    def _change_auto_refresh_interval(self) -> None:
+        self._schedule_auto_refresh()
+
+    def _read(self, *, automatic: bool = False) -> None:
         if not self.connected or self.busy or self.closing:
             return
         try:
@@ -1017,9 +1084,13 @@ class M31App(ttk.Frame if ttk is not None else object):
 
         def success(rows):
             self._display(rows, "Live device read (raw values).")
-            self.status.set(f"Read complete — {count} {kind.lower()} at {address}.")
+            if automatic:
+                self.source.set("Auto-refresh read (raw values; no device writes).")
+                self.status.set(f"Auto-refresh complete — {count} {kind.lower()} at {address}.")
+            else:
+                self.status.set(f"Read complete — {count} {kind.lower()} at {address}.")
 
-        self._run("Read", operation, success)
+        self._run("Auto refresh" if automatic else "Read", operation, success)
 
     def _read_device_info(self) -> None:
         if not self.connected or self.busy or self.closing:
@@ -1300,6 +1371,8 @@ class M31App(ttk.Frame if ttk is not None else object):
         if self.closing:
             return
         self.closing = True
+        self.auto_refresh.set(False)
+        self._cancel_auto_refresh()
         if self.scan_cancel is not None:
             self.scan_cancel.set()
         self._refresh_controls()
