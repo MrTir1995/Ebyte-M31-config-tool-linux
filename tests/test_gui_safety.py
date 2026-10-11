@@ -18,6 +18,7 @@ class GUISafetyTests(unittest.TestCase):
             destination="TCP 127.0.0.1:502, unit 1",
             write_type=variable("Holding registers"), write_address=variable("0"),
             write_value=variable("42"), session=Mock(), _run=Mock(),
+            write_encoding=variable("Raw unsigned values"), write_word_order=variable(""),
             _error=Mock(), _display=Mock(), status=Mock(),
             object_type=variable("Holding registers"), address=variable("0"),
             count=variable("1"),
@@ -102,6 +103,63 @@ class GUISafetyTests(unittest.TestCase):
                 M31App._read(self.app)
         self.assertEqual(self.app._error.call_count, 3)
         self.app._run.assert_not_called()
+
+    def refresh_fixture(self):
+        self.app.auto_refresh = variable(True)
+        self.app.refresh_interval = variable("0.5")
+        self.app.auto_refresh_after = None
+        self.app.root = Mock()
+        self.app.root.after.return_value = "refresh-timer"
+        for name in ("_cancel_auto_refresh", "_schedule_auto_refresh", "_auto_refresh"):
+            setattr(self.app, name, getattr(M31App, name).__get__(self.app))
+
+    def test_auto_refresh_schedules_read_only_callback_and_cancels(self):
+        self.refresh_fixture()
+        M31App._toggle_auto_refresh(self.app)
+        self.app.root.after.assert_called_once_with(500, self.app._auto_refresh)
+        self.app.auto_refresh.get.return_value = False
+        M31App._toggle_auto_refresh(self.app)
+        self.app.root.after_cancel.assert_called_once_with("refresh-timer")
+        self.assertIsNone(self.app.auto_refresh_after)
+        self.assertEqual(self.app.session.mock_calls, [])
+
+    def test_auto_refresh_never_reads_disconnected_busy_or_closing(self):
+        self.refresh_fixture()
+        self.app._read = Mock()
+        for attribute, value in (("connected", False), ("busy", True), ("closing", True)):
+            previous = getattr(self.app, attribute)
+            setattr(self.app, attribute, value)
+            self.app._auto_refresh()
+            setattr(self.app, attribute, previous)
+        self.app._read.assert_not_called()
+        self.app.root.after.assert_not_called()
+
+    def test_auto_refresh_invalid_address_or_count_stops_and_cancels(self):
+        self.refresh_fixture()
+        for address, count in (("bad", "1"), ("65535", "2"), ("0", "126"), ("0", "0")):
+            with self.subTest(address=address, count=count):
+                self.app.auto_refresh_after = "timer"
+                self.app.auto_refresh.reset_mock()
+                self.app.address, self.app.count = variable(address), variable(count)
+                M31App._read(self.app, automatic=True)
+                self.app.auto_refresh.set.assert_called_once_with(False)
+                self.assertIsNone(self.app.auto_refresh_after)
+        self.assertEqual(self.app._error.call_count, 4)
+        self.app._run.assert_not_called()
+        self.assertEqual(self.app.session.mock_calls, [])
+
+    def test_auto_refresh_invalid_interval_stops_without_io(self):
+        self.refresh_fixture()
+        for value in ("bad", "nan", "inf", "0.09", "5.1"):
+            with self.subTest(interval=value):
+                self.app.auto_refresh.reset_mock()
+                self.app.refresh_interval = variable(value)
+                self.app._schedule_auto_refresh()
+                self.app.auto_refresh.set.assert_called_once_with(False)
+                self.assertIsNone(self.app.auto_refresh_after)
+        self.assertEqual(self.app._error.call_count, 5)
+        self.app.root.after.assert_not_called()
+        self.assertEqual(self.app.session.mock_calls, [])
 
     @patch("m31tool.app.load_csv")
     @patch("m31tool.app.filedialog", new_callable=Mock)

@@ -111,6 +111,63 @@ class ParitySafetyTests(unittest.TestCase):
         ])
         self.assertIn("0F.", self.dialog.askyesno.call_args.args[1])
 
+    def test_float_write_uses_explicit_order_and_complete_raw_readback(self):
+        self.app.write_encoding = variable("IEEE754 float32")
+        self.app.write_word_order = variable("little")
+        self.app.write_address = variable("1000")
+        self.app.write_value = variable("123.25, -2.5")
+        words = [0x8000, 0x42F6, 0, 0xC020]
+        self.app.session.read_holding_registers.return_value = words
+        M31App._write(self.app)
+        self.operation()()
+        self.assertEqual(self.app.session.mock_calls, [
+            call.write_registers(1000, words), call.read_holding_registers(1000, 4),
+        ])
+        text = self.dialog.askyesno.call_args.args[1]
+        for detail in ("IEEE754", "little", "123.25", "-2.5", "1000–1003",
+                       "32768, 17142, 0, 49184", "NOT inferred"):
+            self.assertIn(detail, text)
+        self.assertEqual(self.dialog.askyesno.call_args.kwargs["default"], "no")
+
+    def test_float_invalid_order_type_value_and_span_never_start_io(self):
+        self.app.write_encoding = variable("IEEE754 float32")
+        for kind, address, text, order in (
+            ("Holding registers", "1000", "1.0", ""),
+            ("Holding registers", "1000", "1.0", "BIG"),
+            ("Coils", "0", "1.0", "big"),
+            ("Holding registers", "1000", "NaN", "big"),
+            ("Holding registers", "1000", "1e40", "little"),
+            ("Holding registers", "65535", "1.0", "big"),
+        ):
+            with self.subTest(kind=kind, address=address, text=text, order=order):
+                self.app.write_type = variable(kind)
+                self.app.write_address = variable(address)
+                self.app.write_value = variable(text)
+                self.app.write_word_order = variable(order)
+                M31App._write(self.app)
+        self.assertEqual(self.app._error.call_count, 6)
+        self.dialog.askyesno.assert_not_called()
+        self.app._run.assert_not_called()
+        self.assertEqual(self.app.session.mock_calls, [])
+
+    def test_float_cancelled_write_and_failed_readback_are_not_success(self):
+        self.app.write_encoding = variable("IEEE754 float32")
+        self.app.write_word_order = variable("big")
+        self.app.write_value = variable("1.0")
+        self.dialog.askyesno.return_value = False
+        M31App._write(self.app)
+        self.app._run.assert_not_called()
+        self.assertEqual(self.app.session.mock_calls, [])
+        self.dialog.askyesno.return_value = True
+        self.app.session.read_holding_registers.return_value = [0x3F80, 1]
+        M31App._write(self.app)
+        with self.assertRaisesRegex(RuntimeError, "verification failed"):
+            self.operation()()
+        self.assertEqual(self.app.session.mock_calls, [
+            call.write_registers(0, [0x3F80, 0]), call.read_holding_registers(0, 2),
+        ])
+        self.app._display.assert_not_called()
+
     def test_multivalue_invalid_input_rejected_before_confirmation(self):
         for kind, address, values in (
             ("Holding registers", "65535", "1,2"),
@@ -174,10 +231,65 @@ class ParitySafetyTests(unittest.TestCase):
         self.assertEqual(self.app.session.mock_calls, [])
 
 
-@unittest.skipUnless(desktop.HAS_DISPLAY, "A graphical display is required for Tk tests.")
+@unittest.skipUnless(desktop.tk is not None, "Tk is required for desktop tests.")
 class ParityDesktopTests(unittest.TestCase):
     setUp = desktop.DesktopGUITests.setUp
     tearDown = desktop.DesktopGUITests.tearDown
+
+    def test_float_input_real_tk_loopback_has_two_word_write_and_readback(self):
+        self.connect()
+        self.assertEqual(self.app.write_encoding.get(), "Raw unsigned values")
+        self.assertEqual(self.app.write_word_order.get(), "")
+        self.app.write_encoding.set("IEEE754 float32")
+        self.app.write_word_order.set("little")
+        self.app.write_address.set("1000")
+        self.app.write_value.set("123.25")
+        self.simulator.holding_registers.update({1000: 0, 1001: 0})
+        self.messagebox.askyesno.return_value = False
+        self.app._write()
+        self.assertEqual(self.simulator.requests, [])
+        self.messagebox.askyesno.return_value = True
+        self.app._write()
+        self.wait_for(lambda: not self.app.busy)
+        self.assertIn("Write verified", self.app.status.get())
+        self.assertEqual(self.app.rows, [
+            ("Holding registers", 1000, 0x8000), ("Holding registers", 1001, 0x42F6),
+        ])
+        self.assertEqual(self.simulator.requests, [
+            (1, bytes.fromhex("1003e8000204800042f6")),
+            (1, bytes.fromhex("0303e80002")),
+        ])
+        self.assertEqual(self.simulator.holding_registers[1000], 0x8000)
+        self.assertEqual(self.simulator.holding_registers[1001], 0x42F6)
+
+    def test_trace_refresh_copy_clear_are_local_and_show_actual_callback_bytes(self):
+        self.app._refresh_trace()
+        self.assertEqual(self.app.trace_rows, [])
+        self.assertEqual(self.simulator.requests, [])
+        self.connect()
+        self.app.address.set("0")
+        self.app.count.set("1")
+        self.app._read()
+        self.wait_for(lambda: not self.app.busy)
+        requests = list(self.simulator.requests)
+        records = self.app.session.trace_snapshot()
+        self.assertTrue(records)
+        self.app._refresh_trace()
+        self.assertEqual(len(self.app.trace_rows), len(records))
+        self.assertEqual(
+            [row[-1] for row in self.app.trace_rows],
+            [record.data.hex(" ") for record in records],
+        )
+        self.app._copy_trace()
+        copied = self.root.clipboard_get()
+        for detail in ("NOT packet capture", "TX attempt", "RX buffer", "unit 1"):
+            self.assertIn(detail, copied)
+        for record in records:
+            self.assertIn(record.data.hex(" "), copied)
+        self.app._clear_trace()
+        self.assertEqual(self.app.trace_rows, [])
+        self.assertEqual(self.app.session.trace_snapshot(), ())
+        self.assertEqual(self.simulator.requests, requests)
     wait_for = desktop.DesktopGUITests.wait_for
     connect = desktop.DesktopGUITests.connect
 
@@ -311,22 +423,83 @@ class ParityDesktopTests(unittest.TestCase):
         self.assertEqual(self.simulator.requests, [])
 
     def test_catalog_float_prepares_two_word_read_without_io(self):
-        index = next(i for i, entry in enumerate(M31_REGISTERS) if entry.key == "ai_float")
-        item = self.app.catalog_tree.get_children()[index]
-        self.app.catalog_tree.identify_row = Mock(return_value=item)
-        self.app._select_catalog(Mock(y=0))
-        self.assertEqual(self.app.address.get(), "1000")
-        self.assertEqual(self.app.count.get(), "2")
-        self.assertEqual(self.app.object_type.get(), "Input registers")
-        self.assertEqual(self.app.interpretation.get(), "Raw unsigned 16-bit")
+        for key, kind in (("ai_float", "Input registers"), ("ao_float", "Holding registers")):
+            index = next(i for i, entry in enumerate(M31_REGISTERS) if entry.key == key)
+            item = self.app.catalog_tree.get_children()[index]
+            self.app.catalog_tree.identify_row = Mock(return_value=item)
+            self.app._select_catalog(Mock(y=0))
+            self.assertEqual(self.app.address.get(), "1000")
+            self.assertEqual(self.app.count.get(), "2")
+            self.assertEqual(self.app.object_type.get(), kind)
+            self.assertEqual(self.app.interpretation.get(), "Raw unsigned 16-bit")
+        self.assertEqual(self.simulator.requests, [])
+
+    def test_range_catalog_prepares_reads_only_and_keeps_ao_conflict_visible(self):
+        for key, address in (("ai_range", 0x0DAC), ("ao_range", 0x1194)):
+            index = next(i for i, entry in enumerate(M31_REGISTERS) if entry.key == key)
+            entry = M31_REGISTERS[index]
+            self.assertIn("lesen", entry.label)
+            if key == "ao_range":
+                self.assertIn("widersprüchlich", entry.description)
+                self.assertIn("0x0DAC", entry.description)
+            item = self.app.catalog_tree.get_children()[index]
+            self.app.catalog_tree.identify_row = Mock(return_value=item)
+            self.app._select_catalog(Mock(y=0))
+            self.assertEqual(self.app.address.get(), str(address))
+            self.assertEqual(self.app.count.get(), "1")
+            self.assertEqual(self.app.object_type.get(), "Holding registers")
+        self.assertEqual(self.simulator.requests, [])
+
+    def test_complete_non_u_read_catalog_prepares_exact_device_field_widths(self):
+        entries = self.app.catalog_entries
+        self.assertEqual(len(entries), len(M31_REGISTERS) + len(DEVICE_REGISTER_CATALOG))
+        self.assertEqual(len({entry.key for entry in entries}), len(entries))
+        addresses = {entry.address for entry in entries}
+        self.assertNotIn(0x7585, addresses)
+        self.assertNotIn(0x753F, addresses)
+        self.assertNotIn(0x7540, addresses)
+        for candidate in (0x0C1D, 0x0C1E, 0x0C1F, 0x0C20, 0x0C2C, 0x0C80, 0x0D80):
+            self.assertNotIn(candidate, addresses)
+        self.app.write_address.set("17")
+        self.app.write_value.set("42")
+        for offset, spec in enumerate(DEVICE_REGISTER_CATALOG, len(M31_REGISTERS)):
+            with self.subTest(field=spec.key):
+                item = self.app.catalog_tree.get_children()[offset]
+                self.app.catalog_tree.selection_set(item)
+                self.app._show_catalog_detail()
+                self.assertIn("read only", self.app.catalog_detail.get())
+                self.assertIn("§4.8", self.app.catalog_detail.get())
+                self.app._prepare_selected_catalog()
+                self.assertEqual(self.app.address.get(), str(spec.address))
+                self.assertEqual(self.app.count.get(), str(spec.count))
+                self.assertEqual(self.app.object_type.get(), "Holding registers")
+        self.assertEqual(self.app.write_address.get(), "17")
+        self.assertEqual(self.app.write_value.get(), "42")
         self.assertEqual(self.simulator.requests, [])
 
     def test_minimum_window_keeps_write_and_status_visible(self):
         self.root.geometry("850x680")
-        self.root.update_idletasks()
-        for widget in (self.app.write_button, self.app.winfo_children()[-1]):
-            bottom = widget.winfo_rooty() - self.root.winfo_rooty() + widget.winfo_height()
-            self.assertLessEqual(bottom, self.root.winfo_height())
+        tab = self.app.write_button
+        while tab.master != self.app.notebook:
+            tab = tab.master
+        self.app.notebook.select(tab)
+        self.root.update()
+        self.app.write_button.focus_force()
+        self.root.update()
+        self.assertEqual(self.app.notebook.tab(tab, "text"), "Device writes")
+        self.assertEqual((self.root.winfo_width(), self.root.winfo_height()), (850, 680))
+        for widget in (self.app.write_button, self.app.status_label, self.app.progress):
+            self.assertTrue(widget.winfo_ismapped(), str(widget))
+            self.assertGreater(widget.winfo_height(), 8)
+            parent = widget.master
+            while parent is not None:
+                self.assertGreaterEqual(widget.winfo_rootx(), parent.winfo_rootx())
+                self.assertGreaterEqual(widget.winfo_rooty(), parent.winfo_rooty())
+                self.assertLessEqual(widget.winfo_rootx() + widget.winfo_width(),
+                                     parent.winfo_rootx() + parent.winfo_width())
+                self.assertLessEqual(widget.winfo_rooty() + widget.winfo_height(),
+                                     parent.winfo_rooty() + parent.winfo_height())
+                parent = parent.master
         self.assertEqual(self.simulator.requests, [])
 
     def test_local_xlsx_import_export_works_while_connected_without_io(self):

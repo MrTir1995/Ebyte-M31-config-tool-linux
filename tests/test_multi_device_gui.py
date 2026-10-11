@@ -1,6 +1,6 @@
 """Device-list callbacks use mocks and one explicit loopback discovery, never hardware."""
 
-import os
+import gc
 import threading
 import time
 from types import MethodType, SimpleNamespace
@@ -11,6 +11,7 @@ import weakref
 from m31tool.app import M31App, tk
 from m31tool.discovery import DeviceTarget, DiscoveryError, DiscoveryResult
 from tests.modbus_simulator import running_simulator
+from tests.tk_lifecycle import release_tk_fixture
 
 
 class Variable:
@@ -192,13 +193,14 @@ class DeviceListCallbacks(unittest.TestCase):
         self.dialogs.showerror.assert_called_once()
 
 
-@unittest.skipUnless(tk is not None and os.environ.get("DISPLAY"), "Native Tk display required.")
+@unittest.skipUnless(tk is not None, "Tk is required for native desktop tests.")
 class NativeDeviceListTests(unittest.TestCase):
     def setUp(self):
         try:
             self.root = tk.Tk()
         except tk.TclError as exc:
             self.skipTest(str(exc))
+        self.addCleanup(release_tk_fixture, self)
         self.sessions = patch("m31tool.app.ModbusSession").start()
         def session_factory(**kwargs):
             session = Mock(connected=False, unit_id=kwargs["unit_id"])
@@ -236,8 +238,8 @@ class NativeDeviceListTests(unittest.TestCase):
             time.sleep(0.01)
         self.fail(self.app.status.get())
 
-    def test_initialization_has_seventh_tab_and_no_search_or_device_io(self):
-        self.assertEqual(len(self.app.notebook.tabs()), 7)
+    def test_initialization_has_device_and_trace_tabs_without_device_io(self):
+        self.assertEqual(len(self.app.notebook.tabs()), 8)
         self.assertEqual(self.app.scan_hosts.get(), "")
         self.assertEqual(self.app.scan_units.get(), "1-247")
         self.assertEqual(self.app.device_targets, {})
@@ -328,6 +330,23 @@ class NativeDeviceListTests(unittest.TestCase):
         self.assertEqual(set(finalized_threads), {threading.get_ident()})
         self.assertIsNone(self.app.worker_thread)
         self.assertEqual(self.app.controls, [])
+
+    def test_dialog_mock_cycles_release_destroyed_root_on_main_thread(self):
+        root = tk.Tk()
+        fixture = SimpleNamespace(root=root, dialog=Mock())
+        fixture.dialog.showerror("Read", "bad response", parent=root)
+        finalized_threads = []
+        reference = weakref.ref(root, lambda _: finalized_threads.append(threading.get_ident()))
+        root.destroy()
+        del root
+        self.assertIsNotNone(reference())
+        release_tk_fixture(fixture)
+        self.assertIsNone(reference())
+        self.assertEqual(finalized_threads, [threading.get_ident()])
+        collector = threading.Thread(target=gc.collect)
+        collector.start()
+        collector.join()
+        self.assertEqual(finalized_threads, [threading.get_ident()])
 
     def test_real_loopback_discovery_deduplicates_manual_target_and_prepares_tcp(self):
         with running_simulator() as simulator:

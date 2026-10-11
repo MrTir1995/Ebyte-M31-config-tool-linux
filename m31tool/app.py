@@ -15,13 +15,16 @@ except ModuleNotFoundError as exc:
     tk = None
     filedialog = messagebox = ttk = None
 
-from m31tool.core import M31_REGISTERS, ModbusSession, RegisterKind
-from m31tool.device import negotiate_addresses, read_device_info
+from m31tool.core import M31_REGISTERS, ModbusSession, RegisterKind, RegisterSpec
+from m31tool.device import (
+    DEVICE_MANUAL_SOURCE, DEVICE_REGISTER_CATALOG, negotiate_addresses, read_device_info,
+)
 from m31tool.discovery import (
     DeviceTarget, discover_rtu, discover_tcp, parse_hosts, parse_unit_ids,
 )
 from m31tool.formats import (
     PROFILE_FIELDS, decode_float32, load_profile, load_xlsx, save_profile, save_xlsx,
+    parse_float32_write,
 )
 
 
@@ -39,6 +42,7 @@ READ_METHODS = (
 )
 CSV_FIELDS = ("object_type", "address", "value")
 INTERPRETATIONS = ("Raw unsigned 16-bit", "IEEE754 float32")
+WRITE_ENCODINGS = ("Raw unsigned values", "IEEE754 float32")
 TK_REQUIREMENT = (
     "Tkinter is unavailable. Install your Linux distribution's Tkinter package "
     "(Debian/Ubuntu: sudo apt install python3-tk; Fedora: sudo dnf install "
@@ -151,6 +155,9 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.close_started = False
         self.events: queue.Queue = queue.Queue()
         self.worker_thread = None
+        self._poll_after = None
+        self._focus_binding = None
+        self._destroyed = False
         self.rows: list[tuple[str, int, int]] = []
         self.controls: list[tuple[ttk.Widget, str]] = []
         self.transport = tk.StringVar(value="TCP")
@@ -165,9 +172,14 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.object_type = tk.StringVar(value=OBJECT_TYPES[2])
         self.address = tk.StringVar(value="0")
         self.count = tk.StringVar(value="1")
+        self.auto_refresh = tk.BooleanVar(value=False)
+        self.refresh_interval = tk.StringVar(value="1.0")
+        self.auto_refresh_after = None
         self.write_type = tk.StringVar(value="Holding registers")
         self.write_address = tk.StringVar(value="0")
         self.write_value = tk.StringVar(value="0")
+        self.write_encoding = tk.StringVar(value=WRITE_ENCODINGS[0])
+        self.write_word_order = tk.StringVar(value="")
         self.interpretation = tk.StringVar(value=INTERPRETATIONS[0])
         self.word_order = tk.StringVar(value="big")
         self.decoded = tk.StringVar(value="Raw table/export is never converted.")
@@ -184,14 +196,36 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.scan_units = tk.StringVar(value="1-247")
         self.scan_timeout = tk.StringVar(value="0.3")
         self.scan_status = tk.StringVar(value="No search performed. Device list is local to this window.")
+        self.trace_source = tk.StringVar(value="No transport observations displayed. Refresh explicitly.")
+        self.trace_rows = []
         self.pack(fill="both", expand=True)
         self._build()
         self._refresh_controls()
         self.root.protocol("WM_DELETE_WINDOW", self._request_close)
-        self.root.after(75, self._poll)
+        self._poll_after = self.root.after(75, self._poll)
 
     def destroy(self) -> None:
         """Release owned Tk objects on Tk's thread, not later worker-thread GC."""
+        if self._destroyed:
+            return
+        self._destroyed = True
+        self._cancel_auto_refresh()
+        if self._poll_after is not None:
+            self.root.after_cancel(self._poll_after)
+            self._poll_after = None
+        if self._focus_binding is not None:
+            self.root.unbind("<FocusIn>", self._focus_binding)
+            self._focus_binding = None
+        # Direct root/frame destruction must not orphan queued Tk callbacks.
+        # Normal close already waits for I/O in _poll; this covers owner teardown.
+        if self.worker_thread is not None:
+            self.worker_thread.join()
+            self.worker_thread = None
+        while True:
+            try:
+                self.events.get_nowait()
+            except queue.Empty:
+                break
         super().destroy()
         self.controls.clear()
         self.connection_controls.clear()
@@ -215,7 +249,7 @@ class M31App(ttk.Frame if ttk is not None else object):
         return widget
 
     def _wrapped_label(self, parent, **options):
-        label = ttk.Label(parent, anchor="w", justify="left", wraplength=760, **options)
+        label = ttk.Label(parent, anchor="w", justify="left", width=1, wraplength=760, **options)
         label.pack(fill="x", pady=(0, 8))
         label.bind(
             "<Configure>",
@@ -229,6 +263,64 @@ class M31App(ttk.Frame if ttk is not None else object):
             return "break"
         widget.bind("<Return>", invoke)
         widget.bind("<KP_Enter>", invoke)
+
+    def _build_viewport(self):
+        viewport = ttk.Frame(self)
+        viewport.pack(fill="both", expand=True)
+        canvas = tk.Canvas(viewport, highlightthickness=0, background="#f4f5f7")
+        vertical = ttk.Scrollbar(viewport, command=canvas.yview)
+        horizontal = ttk.Scrollbar(viewport, orient="horizontal", command=canvas.xview)
+        canvas.configure(yscrollcommand=vertical.set, xscrollcommand=horizontal.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        viewport.rowconfigure(0, weight=1)
+        viewport.columnconfigure(0, weight=1)
+        body = ttk.Frame(canvas)
+        window = canvas.create_window(0, 0, window=body, anchor="nw")
+
+        def resize(event=None):
+            # Native fonts/DPI can require more space than the minimum window.
+            width = max(canvas.winfo_width(), body.winfo_reqwidth())
+            height = max(canvas.winfo_height(), body.winfo_reqheight())
+            canvas.itemconfigure(window, width=width, height=height)
+            canvas.configure(scrollregion=(0, 0, width, height))
+            if width > canvas.winfo_width():
+                horizontal.grid(row=1, column=0, sticky="ew")
+            else:
+                horizontal.grid_remove()
+                canvas.xview_moveto(0)
+            if height > canvas.winfo_height():
+                vertical.grid(row=0, column=1, sticky="ns")
+            else:
+                vertical.grid_remove()
+                canvas.yview_moveto(0)
+
+        body.bind("<Configure>", resize)
+        canvas.bind("<Configure>", resize)
+        self.content_canvas = canvas
+        self.content_body = body
+        self._focus_binding = self.root.bind("<FocusIn>", self._reveal_control, add="+")
+        return viewport, body
+
+    def _reveal_control(self, event):
+        widget = event.widget
+        parent = widget
+        while parent is not self.content_body:
+            parent = getattr(parent, "master", None)
+            if parent is None:
+                return
+        if not widget.winfo_ismapped():
+            return
+        canvas = self.content_canvas
+        for position, origin, size, viewport_size, content_size, view, move in (
+            (widget.winfo_rootx(), canvas.winfo_rootx(), widget.winfo_width(), canvas.winfo_width(),
+             self.content_body.winfo_width(), canvas.xview, canvas.xview_moveto),
+            (widget.winfo_rooty(), canvas.winfo_rooty(), widget.winfo_height(), canvas.winfo_height(),
+             self.content_body.winfo_height(), canvas.yview, canvas.yview_moveto),
+        ):
+            offset = position - origin
+            if size <= viewport_size and (offset < 0 or offset + size > viewport_size):
+                target = offset if offset < 0 else offset + size - viewport_size
+                move(view()[0] + target / content_size)
 
     def _build(self) -> None:
         self.root.title("M31 Modbus Tool — Unofficial — Disconnected")
@@ -263,16 +355,17 @@ class M31App(ttk.Frame if ttk is not None else object):
         style.configure("Treeview.Heading", font="TkHeadingFont", padding=(8, 6))
         style.configure("TNotebook.Tab", padding=(10, 7))
         style.map("TNotebook.Tab", foreground=[("selected", "#10467f")])
+        viewport, body = self._build_viewport()
         ttk.Label(
-            self, text="M31 Modbus Tool · Unofficial community client", style="Heading.TLabel"
+            body, text="M31 Modbus Tool · Unofficial community client", style="Heading.TLabel"
         ).pack(anchor="w", pady=(0, 8))
         self._wrapped_label(
-            self, text="Safety: writes can energize loads. Verify wiring, module addresses "
+            body, text="Safety: writes can energize loads. Verify wiring, module addresses "
             "and analog ranges first.", style="Warning.TLabel",
         )
-        self._wrapped_label(self, textvariable=self.connection_summary, style="Heading.TLabel")
+        self._wrapped_label(body, textvariable=self.connection_summary, style="Heading.TLabel")
 
-        connection = ttk.LabelFrame(self, text="Connection", padding=12)
+        connection = ttk.LabelFrame(body, text="Connection", padding=12)
         connection.pack(fill="x")
         ttk.Label(connection, text="Transport").grid(row=0, column=0, sticky="w")
         selector = self._combo(connection, self.transport, ("TCP", "RTU"), 7)
@@ -326,7 +419,7 @@ class M31App(ttk.Frame if ttk is not None else object):
         )
         self._show_transport()
         self.connection_controls = {widget for widget, _ in self.controls}
-        notebook = ttk.Notebook(self)
+        notebook = ttk.Notebook(body)
         notebook.pack(fill="both", expand=True, pady=8)
         explorer = ttk.Frame(notebook, padding=8)
         catalog = ttk.Frame(notebook, padding=8)
@@ -346,6 +439,9 @@ class M31App(ttk.Frame if ttk is not None else object):
         devices_tab = ttk.Frame(notebook, padding=8)
         notebook.add(devices_tab, text="Device list")
         self._build_device_list(devices_tab)
+        trace_tab = ttk.Frame(notebook, padding=8)
+        notebook.add(trace_tab, text="Modbus trace")
+        self._build_trace(trace_tab)
 
         read_bar = ttk.Frame(explorer)
         read_bar.pack(fill="x")
@@ -362,8 +458,27 @@ class M31App(ttk.Frame if ttk is not None else object):
             read_bar, text="Read", command=self._read, style="Primary.TButton"
         )
         self.read_button.pack(side="left", padx=8)
+        refresh_bar = ttk.Frame(explorer)
+        refresh_bar.pack(fill="x", pady=(0, 8))
+        self.auto_refresh_button = ttk.Checkbutton(
+            refresh_bar, text="Auto-refresh read only", variable=self.auto_refresh,
+            command=self._toggle_auto_refresh,
+        )
+        self.auto_refresh_button.pack(side="left", padx=(4, 0))
+        self.controls.append((self.auto_refresh_button, "normal"))
+        ttk.Label(refresh_bar, text="Every").pack(side="left", padx=(8, 3))
+        self.refresh_interval_combo = self._combo(
+            refresh_bar, self.refresh_interval,
+            tuple(f"{tenths / 10:.1f}" for tenths in range(1, 51)), 5,
+        )
+        self.refresh_interval_combo.pack(side="left")
+        self.refresh_interval_combo.bind(
+            "<<ComboboxSelected>>", lambda event: self._schedule_auto_refresh()
+        )
+        ttk.Label(refresh_bar, text="s").pack(side="left", padx=(3, 0))
         self._wrapped_label(explorer, text="Zero-based protocol addresses · "
-                            "Read only · Enter in Address or Count to read.")
+                            "Read only · Enter in Address or Count to read. Auto-refresh "
+                            "polls this range and stops on errors.")
         self._wrapped_label(explorer, textvariable=self.source)
 
         self.results = self._tree(
@@ -416,19 +531,29 @@ class M31App(ttk.Frame if ttk is not None else object):
         ).grid(row=0, column=0, sticky="w", padx=(0, 12))
         ttk.Label(write_box, text="Address").grid(row=0, column=1, padx=(0, 6))
         self._entry(write_box, self.write_address, 9).grid(row=0, column=2)
-        ttk.Label(write_box, text="Raw value(s)").grid(row=1, column=0, sticky="w", pady=(12, 0))
+        ttk.Label(write_box, text="Value encoding").grid(row=1, column=0, sticky="w", pady=(12, 0))
+        self._combo(write_box, self.write_encoding, WRITE_ENCODINGS, 22).grid(
+            row=1, column=1, columnspan=3, sticky="w", pady=(12, 0)
+        )
+        ttk.Label(write_box, text="Float word order").grid(row=2, column=0, sticky="w", pady=(12, 0))
+        self._combo(write_box, self.write_word_order, ("big", "little"), 12).grid(
+            row=2, column=1, columnspan=3, sticky="w", pady=(12, 0)
+        )
+        ttk.Label(write_box, text="Value(s)").grid(row=3, column=0, sticky="w", pady=(12, 0))
         self._entry(write_box, self.write_value, 22).grid(
-            row=1, column=1, columnspan=3, sticky="ew", pady=(12, 0)
+            row=3, column=1, columnspan=3, sticky="w", pady=(12, 0)
         )
         self.write_button = ttk.Button(
             write_box, text="Confirm device write…", command=self._write, style="Danger.TButton"
         )
-        self.write_button.grid(row=2, column=0, columnspan=4, sticky="e", pady=(12, 0))
+        self.write_button.grid(row=4, column=0, columnspan=4, sticky="e", pady=(12, 0))
         self._wrapped_label(
             write_tab,
             text="Comma-separated raw values: coils 0=OFF / 1=ON; registers 0–65535. "
             "Single: 05/06; multiple: 0F/10. Read-back verifies every stored value, "
-            "not the physical load.",
+            "not the physical load. Float input: holding registers only, two words per value; "
+            "explicitly select the documented word order. Addresses, units and analog "
+            "ranges are never inferred.",
         )
 
         self._wrapped_label(
@@ -506,6 +631,8 @@ class M31App(ttk.Frame if ttk is not None else object):
         )
         decoded_frame = ttk.Frame(interpretation_tab)
         decoded_frame.pack(fill="both", expand=True)
+        decoded_frame.configure(width=1, height=64)
+        decoded_frame.pack_propagate(False)
         self.decoded_view = tk.Text(
             decoded_frame, height=8, wrap="word", state="disabled", font="TkTextFont",
             background="#ffffff", foreground="#202735", highlightcolor="#1659a5",
@@ -521,17 +648,22 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.progress = ttk.Progressbar(self, mode="indeterminate", takefocus=False)
         self.progress.pack(fill="x", pady=(0, 6))
         self.status_label = self._wrapped_label(self, textvariable=self.status)
-        notebook.pack_forget()
+        viewport.pack_forget()
         separator.pack_forget()
         self.progress.pack_forget()
         self.status_label.pack_configure(side="bottom")
         self.progress.pack(side="bottom", fill="x", pady=(0, 6))
         separator.pack(side="bottom", fill="x", pady=4)
-        notebook.pack(fill="both", expand=True, pady=8)
+        viewport.pack(fill="both", expand=True)
 
     def _tree(self, parent, columns, headings, horizontal=False):
         frame = ttk.Frame(parent)
         frame.pack(fill="both", expand=True)
+        # Let data panes shrink; their column widths must not force the whole
+        # notebook wider than the controls (the trees have their own scrollbars).
+        frame.configure(width=1, height=88)
+        frame.pack_propagate(False)
+        frame.grid_propagate(False)
         tree = ttk.Treeview(frame, columns=columns, show="headings", height=10)
         for column, heading in zip(columns, headings):
             tree.heading(column, text=heading)
@@ -554,8 +686,99 @@ class M31App(ttk.Frame if ttk is not None else object):
             scrollbar.pack(side="right", fill="y")
         return tree
 
+    def _build_trace(self, parent):
+        self._wrapped_label(
+            parent,
+            text="Local pymodbus transport-hook observations, NOT a packet capture. "
+            "TX attempt is observed before sending, not proof of delivery. "
+            "RX buffer can contain partial or cumulative data, not one frame per row. "
+            "No replay or arbitrary command sending.",
+        )
+        toolbar = ttk.Frame(parent)
+        toolbar.pack(fill="x", pady=(0, 8))
+        self.trace_refresh_button = ttk.Button(
+            toolbar, text="Refresh trace", command=self._refresh_trace
+        )
+        self.trace_refresh_button.pack(side="left")
+        self.trace_copy_button = ttk.Button(
+            toolbar, text="Copy displayed trace", command=self._copy_trace
+        )
+        self.trace_copy_button.pack(side="left", padx=8)
+        self.trace_clear_button = ttk.Button(
+            toolbar, text="Clear local trace", command=self._clear_trace
+        )
+        self.trace_clear_button.pack(side="left")
+        self._wrapped_label(parent, textvariable=self.trace_source)
+        self.trace_tree = self._tree(
+            parent, ("sequence", "time", "transport", "target", "direction", "hex"),
+            ("Sequence", "Monotonic seconds", "Transport", "Endpoint / unit", "Observation", "Hex bytes"),
+            horizontal=True,
+        )
+        for column, width in (("sequence", 80), ("time", 150), ("transport", 90),
+                              ("target", 260), ("direction", 120), ("hex", 600)):
+            self.trace_tree.column(column, width=width)
+
+    def _refresh_trace(self):
+        if self.busy or self.closing:
+            return
+        records = self.session.trace_snapshot()
+        self.trace_rows = [
+            (str(record.sequence), f"{record.timestamp:.6f}", record.transport,
+             f"{record.endpoint}, unit {record.unit_id}", record.direction,
+             record.data.hex(" "))
+            for record in records
+        ]
+        for item in self.trace_tree.get_children():
+            self.trace_tree.delete(item)
+        for row in self.trace_rows:
+            self.trace_tree.insert("", "end", values=row)
+        self.trace_source.set(
+            f"Local snapshot: {len(records)} transport-hook observations; "
+            f"{self.session.trace_dropped} older observations discarded by the bounded log. "
+            "Refresh explicitly after operations. No physical capture/delivery proof."
+        )
+        self._refresh_controls()
+
+    def _copy_trace(self):
+        if self.busy or self.closing or not self.trace_rows:
+            return
+        text = (
+            "M31Tool local pymodbus transport-hook observations (NOT packet capture).\n"
+            "TX attempt: before sending; RX buffer: possibly partial/cumulative.\n"
+            "Sequence\tMonotonic seconds\tTransport\tEndpoint / unit\tObservation\tHex bytes\n"
+            + "\n".join("\t".join(row) for row in self.trace_rows)
+        )
+        try:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(text)
+        except tk.TclError as exc:
+            self._error("Copy transport trace", exc)
+            return
+        self.status.set(f"Copied {len(self.trace_rows)} displayed transport observations locally.")
+
+    def _clear_trace(self):
+        if self.busy or self.closing:
+            return
+        self.session.clear_trace()
+        self._refresh_trace()
+        self.status.set("Local transport trace cleared — no device operations.")
+
     def _populate_catalog(self) -> None:
-        for entry in M31_REGISTERS:
+        # Only existing non-U read definitions enter the operational catalog.
+        # Research candidates and the separately implemented trigger stay inert.
+        self.catalog_entries = tuple(M31_REGISTERS) + tuple(
+            RegisterSpec(
+                f"device_{entry.key}", entry.label, "holding_registers", entry.address,
+                f"{DEVICE_MANUAL_SOURCE}; {entry.count} word(s). "
+                f"{entry.decode_note} "
+                + ("; ".join(f"{value}: {label}" for value, label in entry.enumerations)
+                   if entry.enumerations else "No value/byte-order interpretation inferred.")
+                + " Catalog selection prepares a read only; no configuration is applied.",
+                words_per_value=entry.count,
+            )
+            for entry in DEVICE_REGISTER_CATALOG
+        )
+        for entry in self.catalog_entries:
             self.catalog_tree.insert(
                 "", "end",
                 values=(entry.label, CATALOG_TYPES[entry.kind], entry.address, entry.description),
@@ -591,7 +814,7 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.object_type.set(kind)
         self.address.set(str(value))
         entry = next(
-            (entry for entry in M31_REGISTERS
+            (entry for entry in self.catalog_entries
              if entry.address == value and CATALOG_TYPES[entry.kind] == kind
              and entry.label == self.catalog_tree.item(item, "values")[0]),
             None,
@@ -822,6 +1045,12 @@ class M31App(ttk.Frame if ttk is not None else object):
             self.read_button, self.write_button, self.device_read_button, self.negotiate_button,
         ):
             button.configure(state="normal" if self.connected and not blocked else "disabled")
+        self.auto_refresh_button.configure(
+            state="normal" if self.connected and not blocked else "disabled"
+        )
+        self.refresh_interval_combo.configure(
+            state="readonly" if self.connected and not blocked else "disabled"
+        )
         self.import_button.configure(state="disabled" if blocked else "normal")
         self.export_button.configure(state="normal" if self.rows and not blocked else "disabled")
         self.import_xlsx_button.configure(state="disabled" if blocked else "normal")
@@ -836,6 +1065,11 @@ class M31App(ttk.Frame if ttk is not None else object):
             state="normal" if self.scan_cancel is not None and self.busy else "disabled"
         )
         self.device_tree.state(["disabled"] if blocked or self.connected else ["!disabled"])
+        self.trace_refresh_button.configure(state="disabled" if blocked else "normal")
+        self.trace_clear_button.configure(state="disabled" if blocked else "normal")
+        self.trace_copy_button.configure(
+            state="normal" if self.trace_rows and not blocked else "disabled"
+        )
 
     def _error(self, title: str, error: Exception) -> None:
         detail = f"{type(error).__name__}: {error}"
@@ -858,6 +1092,7 @@ class M31App(ttk.Frame if ttk is not None else object):
     def _run(self, label, operation, success) -> None:
         if self.busy:
             return
+        self._cancel_auto_refresh()
         self.busy = True
         self.status.set(f"{label}…")
         self._refresh_controls()
@@ -868,6 +1103,21 @@ class M31App(ttk.Frame if ttk is not None else object):
                 result = operation()
             except Exception as exc:
                 error = exc
+                # Tracebacks retain this worker frame and its Tk-owning closures.
+                # Keep the exception/chain for reporting, but not those frames:
+                # a later worker's cyclic GC must never finalize an old Tk root.
+                pending = [error]
+                seen = set()
+                while pending:
+                    failure = pending.pop()
+                    if id(failure) in seen:
+                        continue
+                    seen.add(id(failure))
+                    failure.__traceback__ = None
+                    pending.extend(
+                        linked for linked in (failure.__cause__, failure.__context__)
+                        if linked is not None
+                    )
             self.events.put((label, result, error, bool(self.session.connected), success))
 
         self.worker_thread = threading.Thread(
@@ -876,6 +1126,9 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.worker_thread.start()
 
     def _poll(self) -> None:
+        self._poll_after = None
+        if self._destroyed:
+            return
         try:
             label, result, error, connected, success = self.events.get_nowait()
         except queue.Empty:
@@ -895,16 +1148,24 @@ class M31App(ttk.Frame if ttk is not None else object):
                 self.root.destroy()
                 return
             if error is not None:
+                if label == "Auto refresh":
+                    self.auto_refresh.set(False)
+                    self._cancel_auto_refresh()
                 self._error(label, error)
             else:
                 try:
                     success(result)
                 except Exception as exc:
+                    if label == "Auto refresh":
+                        self.auto_refresh.set(False)
+                        self._cancel_auto_refresh()
                     self._error(label, exc)
             self._refresh_controls()
+            self._schedule_auto_refresh()
             if self.closing:
                 self._finish_close()
-        self.root.after(75, self._poll)
+        if not self._destroyed:
+            self._poll_after = self.root.after(75, self._poll)
 
     def _connect(self) -> None:
         if self.busy or self.connected or self.closing:
@@ -951,6 +1212,8 @@ class M31App(ttk.Frame if ttk is not None else object):
 
     def _disconnect(self) -> None:
         if not self.busy and not self.closing:
+            self.auto_refresh.set(False)
+            self._cancel_auto_refresh()
             self._run("Disconnect", self.session.close, lambda _: self.status.set("Disconnected."))
 
     def _display(self, rows, source) -> None:
@@ -995,7 +1258,44 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.decoded_view.insert("1.0", self.decoded.get())
         self.decoded_view.configure(state="disabled")
 
-    def _read(self) -> None:
+    def _cancel_auto_refresh(self) -> None:
+        if self.auto_refresh_after is not None:
+            self.root.after_cancel(self.auto_refresh_after)
+            self.auto_refresh_after = None
+
+    def _schedule_auto_refresh(self) -> None:
+        self._cancel_auto_refresh()
+        if not self.auto_refresh.get() or not self.connected or self.busy or self.closing:
+            return
+        try:
+            interval = float(self.refresh_interval.get())
+            if not 0.1 <= interval <= 5.0:
+                raise ValueError("Auto-refresh interval must be between 0.1 and 5 seconds.")
+        except ValueError as exc:
+            self.auto_refresh.set(False)
+            self._error("Auto-refresh settings", exc)
+            return
+        self.auto_refresh_after = self.root.after(int(interval * 1000), self._auto_refresh)
+
+    def _auto_refresh(self) -> None:
+        self.auto_refresh_after = None
+        if not self.auto_refresh.get() or not self.connected or self.busy or self.closing:
+            return
+        self._read(automatic=True)
+
+    def _toggle_auto_refresh(self) -> None:
+        if self.auto_refresh.get():
+            if not self.connected or self.busy or self.closing:
+                self.auto_refresh.set(False)
+                return
+            self._schedule_auto_refresh()
+            if self.auto_refresh.get():
+                self.status.set("Auto-refresh enabled — selected range only; read-only.")
+        else:
+            self._cancel_auto_refresh()
+            self.status.set("Auto-refresh disabled.")
+
+    def _read(self, *, automatic: bool = False) -> None:
         if not self.connected or self.busy or self.closing:
             return
         try:
@@ -1006,6 +1306,9 @@ class M31App(ttk.Frame if ttk is not None else object):
             if address + count > 65536:
                 raise ValueError("Read range exceeds address 65535.")
         except ValueError as exc:
+            if automatic:
+                self.auto_refresh.set(False)
+                self._cancel_auto_refresh()
             self._error("Read settings", exc)
             return
 
@@ -1017,9 +1320,13 @@ class M31App(ttk.Frame if ttk is not None else object):
 
         def success(rows):
             self._display(rows, "Live device read (raw values).")
-            self.status.set(f"Read complete — {count} {kind.lower()} at {address}.")
+            if automatic:
+                self.source.set("Auto-refresh read (raw values; no device writes).")
+                self.status.set(f"Auto-refresh complete — {count} {kind.lower()} at {address}.")
+            else:
+                self.status.set(f"Read complete — {count} {kind.lower()} at {address}.")
 
-        self._run("Read", operation, success)
+        self._run("Auto refresh" if automatic else "Read", operation, success)
 
     def _read_device_info(self) -> None:
         if not self.connected or self.busy or self.closing:
@@ -1117,15 +1424,30 @@ class M31App(ttk.Frame if ttk is not None else object):
             if kind not in ("Coils", "Holding registers"):
                 raise ValueError("Only coils and holding registers can be written.")
             address = _integer(self.write_address.get(), "Write address", 0, 65535)
-            texts = self.write_value.get().split(",")
-            limit = 1968 if kind == "Coils" else 123
-            if len(texts) > limit:
-                raise ValueError(f"At most {limit} values may be written at once.")
-            values = [
-                _integer(text, f"Write value {offset + 1}", 0,
-                         1 if kind == "Coils" else 65535)
-                for offset, text in enumerate(texts)
-            ]
+            encoding = self.write_encoding.get()
+            encoding_note = ""
+            if encoding == WRITE_ENCODINGS[1]:
+                if kind != "Holding registers":
+                    raise ValueError("Float values can only be written to holding registers.")
+                order = self.write_word_order.get()
+                values = parse_float32_write(self.write_value.get(), order)
+                encoding_note = (
+                    f"IEEE754 float32 input(s): {self.write_value.get()}\n"
+                    f"Explicit word order: {order}; two registers per float.\n"
+                    "Channel addresses, engineering units and ranges are NOT inferred.\n"
+                )
+            elif encoding == WRITE_ENCODINGS[0]:
+                texts = self.write_value.get().split(",")
+                limit = 1968 if kind == "Coils" else 123
+                if len(texts) > limit:
+                    raise ValueError(f"At most {limit} values may be written at once.")
+                values = [
+                    _integer(text, f"Write value {offset + 1}", 0,
+                             1 if kind == "Coils" else 65535)
+                    for offset, text in enumerate(texts)
+                ]
+            else:
+                raise ValueError("Select a supported write encoding.")
             count = len(values)
             end_address = address + count - 1
             if end_address > 65535:
@@ -1143,6 +1465,7 @@ class M31App(ttk.Frame if ttk is not None else object):
             f"Write {kind}, zero-based addresses {address}–{end_address}, "
             f"{count} raw value(s)?\n"
             f"Function code: {function_code}.\n\n"
+            f"{encoding_note}"
             "This can change outputs and energize relay loads. Verify wiring, module "
             "address mapping, and analog ranges first.\n\n"
             "A mandatory read-back follows. A failure does NOT undo a write.\n\n"
@@ -1300,6 +1623,8 @@ class M31App(ttk.Frame if ttk is not None else object):
         if self.closing:
             return
         self.closing = True
+        self.auto_refresh.set(False)
+        self._cancel_auto_refresh()
         if self.scan_cancel is not None:
             self.scan_cancel.set()
         self._refresh_controls()

@@ -1,0 +1,310 @@
+{
+  "retrieved_at": "2026-10-11",
+  "address_convention": "Hexadecimal numbers are zero-based Modbus PDU addresses. A table prefix 0/1/3/4 denotes coils/discrete-input/input-register/holding-register space, not an address digit. Decimal reference columns usually add one, but contain documented inconsistencies; never convert those columns blindly.",
+  "firmware_scope_warning": "Manual revision is NOT firmware revision. No manual provides a complete per-register minimum-firmware availability matrix.",
+  "sources": [
+    {
+      "id": "m31_non_u_en_v1_1",
+      "title": "M31 Series Distributed IO Host User Manual V1.1-EN",
+      "url": "https://www.cdebyte.com/pdf-down.aspx?id=3402",
+      "sha256": "d6fc301f2f248642a5928003479e8e3b1195a2df7edb653fe6cd5d7afaa58545",
+      "pdf_pages": 63,
+      "printed_body_pages": "1..59; cover and I..III precede",
+      "revision_date": "2026-01-29",
+      "language": "English",
+      "series": "M31 non-U",
+      "extraction": "pdftotext -layout; all body pages OCR-screened; ambiguous key tables/images visually checked",
+      "short_quote_policy": "Only short relevant line excerpts; factual technical transcription, not manual reproduction",
+      "revision": "1.1"
+    },
+    {
+      "id": "N1",
+      "url": "https://www.ebyte.com/downpdf/2086.html",
+      "title": "M31 series distributed IO host user manual, Chinese",
+      "models": "Non-U Ethernet/RS485 M31; 12 host models listed on PDF p5 / printed p2",
+      "revision": "1.1",
+      "revision_date": "2026-01-29",
+      "revision_evidence": "PDF p53 / printed p50: 1.1 2026.1.29 修改外观图",
+      "pages": 53,
+      "sha256": "8b9cd1f120ac2fd71574955daed130254d634ed75bea46c8bb97a7df24e79009",
+      "pdf_creation_date": "2026-02-03",
+      "lineage": "non-U host manual"
+    },
+    {
+      "id": "E1",
+      "url": "https://www.ebyte.com/downpdf/2101.html",
+      "title": "Distributed IO expansion modules user manual, Chinese",
+      "models": "Non-U M31-GAAAX4440 through M31-GXGXX0800, 12 listed models; shared manual despite endpoint being 8AI model",
+      "revision": "1.1",
+      "revision_date": "2026-01-29",
+      "revision_evidence": "PDF p38 / printed p35: 1.1 2026.1.29 修改外观、型号名",
+      "pages": 38,
+      "sha256": "cd85c73801fd79247955d0425e7df1e575b4327f08edb575a7824425d6c7c35a",
+      "lineage": "non-U expansion manual; substantial shared text with N1; NOT an independent device observation"
+    },
+    {
+      "id": "U0",
+      "url": "https://www.ebyte.com/Uploadfiles/Files/2025-5-7/2025571054433756.pdf",
+      "title": "M31-U high-performance distributed IO host user manual, Chinese",
+      "revision": "1.0",
+      "revision_date": "2025-05-06",
+      "revision_evidence": "PDF p38 / printed p35: 1.0 2025-5-6 初始版本",
+      "models": "M31-U only; table examples M31-AFAX4440G-U",
+      "pages": 38,
+      "sha256": "e66fd9439605341ddce796adc79fa20faaa2d8c95e9d0611f438705e73976b0d",
+      "lineage": "older U host manual"
+    },
+    {
+      "id": "U0EN",
+      "url": "https://www.cdebyte.com/Uploadfiles/Files/2025-5-29/2025529157331126.pdf",
+      "title": "M31-U high-performance distributed IO host user manual, English",
+      "models": "M31-U only",
+      "revision": "English companion of older U manual; publication directory 2025-05-29",
+      "pages": 40,
+      "sha256": "b4c82ba634278c5670b0b5017b2ce84414bebee744fd37b8fe9bbb3dca14d1d8",
+      "lineage": "translation of older U host manual; NOT independent evidence",
+      "identity_pages": "PDF pp32-34 / printed pp31-33"
+    },
+    {
+      "id": "U1",
+      "url": "https://www.ebyte.com/downpdf/2460.html",
+      "title": "M31-U high-performance distributed IO host user manual, Chinese, current",
+      "models": "14 U host models listed on PDF p6 / printed p2, including M31-XDXX0600G-U PT100 and current/voltage AO",
+      "revision": "1.4",
+      "revision_date": "2026-05-19",
+      "revision_evidence": "PDF p73 / printed p69: 1.4 2026-5-19 新增网页配置、固件升级教程",
+      "pages": 73,
+      "sha256": "fb33b2589e94044c5d5b58cdfee643d0329d9e64e10cf6b6af4a90df5f8f9547",
+      "lineage": "revision of U0; NOT an independent firmware experiment"
+    },
+    {
+      "id": "UE1",
+      "url": "https://www.ebyte.com/downpdf/2462.html",
+      "title": "U series distributed IO expansion modules user manual, Chinese",
+      "models": "U expansions only, including PT100 and current/voltage AO",
+      "revision": "1.3",
+      "revision_date": "2026-01-29",
+      "revision_evidence": "PDF p52 / printed p49: 1.3 2026-1-29 新增型号、修改外观、型号名",
+      "pages": 52,
+      "sha256": "f94a134a78fb5c245cc4fbe413c393b33e9bf6163639e37cbf5ebbf4168c39aa",
+      "lineage": "U expansion manual; extensive shared text with U1; NOT independent device evidence"
+    },
+    {
+      "id": "L1",
+      "url": "https://www.ebyte.com/downpdf/2307.html",
+      "title": "Wireless LoRa distributed IO host M31 series user manual, Chinese",
+      "models": "M31-xxxxxxxxG-L and -L9; endpoint M31-XAXA0404G-L",
+      "revision": "1.1",
+      "revision_date": "2025-07-02",
+      "revision_evidence": "PDF p62 / printed p59: 1.1 2025-7-2 初始版本",
+      "pages": 62,
+      "sha256": "9dec443a9a799ab2e1fa4730dfb694d56ab8715dca9e82201bad17dcb065eab2",
+      "lineage": "LoRa host manual, with copied non-U register sections; NOT a third independent hardware test"
+    },
+    {
+      "id": "S1",
+      "url": "https://www.es-ebyte.com/pdf-down.aspx?id=5094",
+      "discovery_url": "https://www.es-ebyte.com/products/M31-AAAX4440G/4",
+      "title": "M31 series Distributed I/O Master, English document on Spanish official site",
+      "models": "Non-U",
+      "revision": "1.1",
+      "revision_date": "2026-01-29",
+      "pages": 63,
+      "sha256": "d6fc301f2f248642a5928003479e8e3b1195a2df7edb653fe6cd5d7afaa58545",
+      "lineage": "English non-U manual hosted by another official language site; NOT Spanish technical text, NOT independent corroboration",
+      "baseline_note": "Parent's English baseline id3402 was not downloaded or re-extracted here. Compare text/hash in parent; no independent-support credit."
+    },
+    {
+      "id": "F1",
+      "url": "https://www.ebyte.com/pdf-down/3538.html",
+      "discovery_url": "https://www.ebyte.com/product/2086.html",
+      "title": "M31 host upgrade tutorial ZIP",
+      "version_evidence": "DOCX: 主机版本:V1.2 / 上位机版本:V1.2",
+      "contents": [
+        "M31主机系列升级教程.docx",
+        "固件/M31-MASTER-V1.2.ebin"
+      ],
+      "inspection": "ZIP directory and DOCX XML text only; firmware not executed, installed or transmitted",
+      "lineage": "Non-U host upgrade procedure; no binary protocol or register specification"
+    }
+  ],
+  "negative_coverage": [
+    "No verified non-U identity/firmware Modbus addresses found in N1 or E1.",
+    "No save-to-flash command register found in inspected manuals/tutorial.",
+    "No UDP discovery request/response wire format or authoritative discovery port found.",
+    "No complete minimum-firmware register availability matrix found.",
+    "CAN, EtherCAT and Profinet manuals discovered as distinct variants but not treated as Modbus evidence.",
+    "No EXE execution or Defender-block bypass. No hardware access. No third-party submission of private content. No Ollama inference needed."
+  ],
+  "schema_version": 1,
+  "evidence_policy": {
+    "hardware_verified": false,
+    "runtime_enabled": false,
+    "automatic_probe_allowed": false,
+    "automatic_write_allowed": false,
+    "scope": "Offline evidence only; not a runtime address allowlist or hardware authorization."
+  },
+  "primary_inventory": "non-u-en-v1.1.json",
+  "artifacts": {
+    "cross_model_comparison": "cross-model-comparison.csv",
+    "u_only_fields": "u-only-registers.csv",
+    "candidates": "hypotheses.json",
+    "community": "community-evidence.json"
+  },
+  "counts": {
+    "cross_model_features": 25,
+    "u_only_field_definitions": 64,
+    "candidate_groups": 6,
+    "public_community_sources": 4,
+    "community_register_claims": 25,
+    "independent_hardware_verifications": 0
+  },
+  "source_relationships": [
+    {
+      "source_ids": [
+        "m31_non_u_en_v1_1",
+        "S1"
+      ],
+      "relationship": "Identical SHA256; one English document, not independent corroboration."
+    },
+    {
+      "source_ids": [
+        "U0",
+        "U0EN",
+        "U1"
+      ],
+      "relationship": "One U host manual lineage: translation and revisions, not independent device tests."
+    },
+    {
+      "source_ids": [
+        "N1",
+        "E1",
+        "L1"
+      ],
+      "relationship": "One vendor, shared register text; expansion and LoRa are distinct scopes, not independent hardware verification."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "P1",
+      "claim": "Channels append by installed channel count within their own DI/AI/DO/AO stream, not by fixed module stride.",
+      "citations": [
+        "N1 PDF40-44 printed37-41",
+        "E1 PDF29-33 printed26-30",
+        "U1 PDF51-58 printed47-54"
+      ],
+      "counterexample": "An 8DI expansion does not shift AI, DO or AO addresses."
+    },
+    {
+      "id": "P2",
+      "claim": "Numeric base 0 recurs in four separate Modbus tables; float families use two words and stride two.",
+      "citations": [
+        "N1 PDF41-44 printed38-41",
+        "U1 PDF52-58 printed48-54"
+      ],
+      "counterexample": "AI process IR0x0BB8 differs from AO process HR0x01F4; PT100 IR0x0DAC differs from AI range HR0x0DAC."
+    },
+    {
+      "id": "P3",
+      "claim": "Detailed networking/negotiation block repeats across non-U, U and LoRa documents.",
+      "citations": [
+        "N1 PDF47-48 printed44-45",
+        "U0 PDF32-33 printed29-30",
+        "U1 PDF65-67 printed61-63",
+        "L1 PDF56-57 printed53-54"
+      ],
+      "support_counts": {
+        "document_variant_families": 3,
+        "vendors": 1,
+        "independent_device_observations": 0
+      },
+      "counterexample": "Shared base does not preserve all write function codes, filter addresses or per-channel scope."
+    }
+  ],
+  "counterexamples": [
+    {
+      "id": "di_filter_generation",
+      "claim": "Non-U HR0x0DA3 is global, 1..16; U HR0x1388 is per-channel, table 1..65535.",
+      "citations": [
+        "N1 PDF41 printed38",
+        "U1 PDF52 printed48"
+      ]
+    },
+    {
+      "id": "ai_filter_generation",
+      "claim": "Non-U HR0x0DA2 is global, 1..16; U table HR0x0FA0 is per-channel, 0..4, while U prose still says 0x0DA2. U0 default6 is outside its own table range; U1 default0.",
+      "citations": [
+        "N1 PDF44 printed41",
+        "U1 PDF47 printed43",
+        "U1 PDF56 printed52"
+      ]
+    },
+    {
+      "id": "negotiation_function_code",
+      "claim": "N1/L1 document W06/W10 at 0x7584/0x7585; U0/U1 list W06 only.",
+      "citations": [
+        "N1 PDF48 printed45",
+        "U0 PDF33 printed30",
+        "U1 PDF67 printed63"
+      ]
+    },
+    {
+      "id": "ao_range_prose",
+      "claim": "Non-U/expansion/LoRa prose0x0DAC conflicts with table0x1194; U prose/table agree0x1194. This favors a copied prose error, not verified non-U hardware.",
+      "citations": [
+        "N1 PDF39 printed36",
+        "N1 PDF46 printed43",
+        "E1 PDF29 printed26",
+        "E1 PDF35 printed32",
+        "L1 PDF49 printed46",
+        "L1 PDF55 printed52",
+        "U1 PDF48 printed44",
+        "U1 PDF58 printed54"
+      ]
+    },
+    {
+      "id": "capacity",
+      "claim": "U maximum16 including host, 32 model/firmware slots, 16 storage flags and 32 bitmap bits are not interchangeable capacities.",
+      "citations": [
+        "U1 PDF64-65 printed60-61",
+        "U1 PDF68 printed64",
+        "U1 PDF72 printed68"
+      ]
+    }
+  ],
+  "frame_and_reference_findings": {
+    "primary_examples": {
+      "count": 5,
+      "rtu_crc_matches": true,
+      "tcp_lengths_match": true,
+      "tcp_rtu_pdus_match": true,
+      "hardware_verified": false,
+      "citation": "m31_non_u_en_v1_1 PDF13 printed9"
+    },
+    "reference_conflicts": [
+      {
+        "claim": "Printed 8DI continuation0x0008..0x0010 has nine addresses; eight channels end0x000F.",
+        "citations": [
+          "m31_non_u_en_v1_1 PDF48 printed44",
+          "N1 PDF40 printed37"
+        ]
+      },
+      {
+        "claim": "Non-U AO process prints3-0501 while table/FC identify holding registers; normalized4-0501 is computed, not a replacement quote.",
+        "citations": [
+          "m31_non_u_en_v1_1 PDF54 printed50",
+          "N1 PDF46 printed43"
+        ]
+      },
+      {
+        "claim": "U decimal reference fields omit/duplicate +1; online error table0x7587/4-30087 conflicts with detailed4-30088.",
+        "citations": [
+          "U1 PDF59-60 printed55-56",
+          "U1 PDF61-64 printed57-60",
+          "U1 PDF50 printed46",
+          "U1 PDF67 printed63"
+        ]
+      }
+    ]
+  }
+}

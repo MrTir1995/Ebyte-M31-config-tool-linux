@@ -301,3 +301,239 @@ Keine Firmwareaktion, kein Hardware-Reset, keine Änderung aus geratenen
 Telegrammen. Datei und Frames bleiben außerhalb des öffentlichen Projekts.
 README dokumentiert die Beobachtungen und deren Grenzen; keine neue
 Funktionsgleichheit oder automatische Tontranskription wird behauptet.
+
+## Native Windows-Fehler und blockierte Herstellerreferenz
+
+Die neue EXE ist laut lokalem Vergleich bytegleich zur bisherigen
+`Configuration Tool V1.3.exe` (SHA256 siehe README). Windows Defender
+blockiert ihre Ausführung. Schutz, Registrierung und Betriebssystem-
+Lizenzbedingungen werden nicht umgangen; ohne lauffähige autorisierte
+Referenz bleibt die Laufzeit-Paritätsabnahme blockiert.
+
+Der Testlauf unserer Python-Anwendung in der Windows-VM ist keine
+Herstellerreferenzprüfung. Er findet ohne M31-Hardware statt. Die erste
+native Prüfung fand einen XLSX-Handlefehler sowie ein Minimumfensterproblem.
+Nach deren Korrektur meldete der vollständige Windows-Gegenlauf einen
+Font-Overflow-Testfehler und `Tcl_AsyncDelete` mit Prozessabbruch. Ein
+Windows-Gesamterfolg wird nicht aus Linux-Tests oder Standalone-Smokes
+abgeleitet.
+
+Aktuelles Arbeitspaket:
+
+1. Worker-Exception-Tracebackketten vor der Übergabe an den Tk-Thread lösen,
+   damit alte Tk-Interpreter nicht durch spätere Worker-GC finalisiert werden.
+   Fehlerklasse, Fehlermeldung und Exception-Verkettung bleiben erhalten.
+2. App-eigene Timer und Root-Fokusbindung bei Zerstörung entfernen.
+   Testfixtures einschließlich zyklischer Dialog-Mockreferenzen nach allen
+   Patch-Cleanups auf dem Tk-Hauptthread freigeben. Keine ausgeblendeten Tests,
+   keine Abschaltung der Worker-GC und keine Test-pro-Test-Prozessisolation.
+3. Der separate Windows-Traceback zeigt verbleibenden vertikalen Overflow
+   nach Anforderung von 1600x1200. Der Test hatte dabei weiterhin 24px-Fonts
+   und Skalierung 2.0 aktiv; er prüfte keine Rückkehr zum normalen Layout.
+   Jetzt stellt er die tatsächlichen ursprünglichen Fonts, Skalierung und
+   Status zurück und prüft scrollfreie Erholung auch bei auf 1280x800
+   begrenzter Maximalgeometrie. Die exakten Scroll-/Bounds-Assertions bleiben
+   erhalten; native Windows-Geometriemessungen und Gegenlauf stehen aus.
+4. Linux-Gesamtsuite, Kompilierung, Abhängigkeiten und Wheel prüfen; danach
+   den vollständigen nativen Windows-Lauf erneut ausführen lassen.
+
+Undokumentierte Discovery-/Firmware-/Recovery-Telegramme, Geräteparameter-
+Speicherung, Neustart/Reset und Windows-Konfigurationsdateischemata bleiben
+offene Inventarlücken. Es werden keine Befehle aus UI-Bildern oder ähnlichen
+Geräteserien erfunden.
+
+### Bestätigte native Windows-Abnahme des korrigierten Stands 0.3.0
+
+Am 11.10.2026 meldete der Windows-Prüfagent den vollständigen Lauf:
+185 Tests in 90,982 Sekunden, 184 bestanden und ein Hardwaretest
+übersprungen. Kein Tcl-Abbruch; Großschriftprüfung erfolgreich. Kompilierung,
+Abhängigkeiten, Wheel-Build sowie GUI-Start/-Ende waren ebenfalls erfolgreich.
+Eingefrorene Gastquelle: `frozen-source-20261011-080337`,
+gemeldeter Quellarchiv-SHA256:
+`85aff5f2391d610d292968f6fe7d347e1c8ef91880870a1977015c0bd025c0c3`.
+Das Windows-Wheel ist nicht als byteidentisch zum Linux-Wheel ausgewiesen.
+
+Die alte native Font-Messprobe belegte die fehlerhafte Testprämisse:
+1600x1200 war angefordert, aber tatsächlich 1284x781 bei 1280x800 Bildschirm
+und `maxsize=1284x781`. Canvas: 1245x647; benötigter Inhalt: 1131x890 bei
+Skalierung ca.2.0. Verbleibender Overflow bei weiterhin großen Fonts war
+damit korrekt, kein Beleg für einen stale Scrollbereich. Der korrigierte
+Test stellt Fonts/Skalierung zurück und prüft echte Layout-Erholung.
+Diese Abnahme gilt nicht automatisch für spätere Funktionsergänzungen.
+
+## Belegter Funktionsabgleich und Ergänzungen 0.4.0
+
+Nutzerauftrag: Funktionsumfang mit dem offiziellen Tool abgleichen und
+belegte Lücken ergänzen. Drei gezielte Sub-Agent-Pakete wurden tatsächlich
+ausgeführt: Primärhandbuch/Upgrade-Dokumentation, lokale Float-Schreibkodierung,
+echte Transportbeobachtung. Die Implementierungsbeiträge wurden integriert.
+Hardware und Hersteller-EXE bleiben getrennte Nachweisgrenzen.
+
+| Oberfläche | Vorhanden / ergänzt | Offene Grenze |
+| --- | --- | --- |
+| TCP/RTU und Geräteauswahl | Alle acht Standard-FCs, explizite begrenzte Suche und logische Endpunkte | Keine garantierte physische Gerätezählung, keine proprietäre UDP-Erkennung |
+| DI/DO | Rohwert-Lesen, bestätigtes Einzel-/Mehrfachschreiben mit Rücklesen | Gerätebaum und aktuelle elektrische Hardwareabnahme fehlen |
+| AI/AO | Roh-/IEEE754-Lesen; neue Float-Schreibeingabe mit ausdrücklich gewählter Wortreihenfolge und zwei Registern je Wert | Keine automatische Kanal-/Einheiten-/Modellerkennung |
+| Filter / Messbereiche | DI/AI-Filterbounds bereits geprüft; neue AI-/AO-Rohwert-Leseeinträge mit Quellenhinweisen | Kein Messbereich-Setter ohne Modellbeleg; AO-Adresswiderspruch bleibt offen |
+| Modell / Erweiterungen | Dokumentierter Fehlerstatus und Rohbitmap, bestätigungspflichtige Adressverhandlung | Kein Modell-/Firmware-/Kanalanzahlregister belegt; keine Bitmap-Kanalzuordnung geraten |
+| Netzwerk / seriell | Clientparameter und dokumentierte Geräte-Rohwerte/Enums lesbar | Kein sicherer Hersteller-Speichern-/Neustart-/Resetablauf oder ungeklärte IP-Byteordnung |
+| Profile / XLSX / CSV | Eigenes Client-JSON und lokale Rohwertformate | Kein nachgewiesenes Windows-Geräte-Konfigurationsschema |
+| Modbus-Assistent | Neue lokale Refresh-/Copy-/Clear-Ansicht echter pymodbus-Transport-Hooks | TX-Versuch/RX-Puffer sind kein PCAP oder physischer Zustellnachweis; keine beliebigen Telegramme |
+| Firmware / Recovery | Offizielle Anleitung statisch gelesen | Keine Transfer-/Discovery-/Recovery-Spezifikation; keine Firmwareaktion implementiert |
+
+Float-Akzeptanz: keine implizite Wortreihenfolge, nur Holdingregister,
+1–61 endliche Dezimalwerte, vollständige Vorschau der Kodierung, genau
+FC10-Schreiben plus FC03-Rücklesen aller Rohworte. Abbruch/ungültige Eingabe
+verursachen keine I/O; Abweichung, Timeout oder Fehler sind kein Erfolg und
+lösen keine automatische Wiederholung aus.
+
+Trace-Akzeptanz: ausschließlich tatsächliche Bibliotheks-Hookbytes unverändert
+zurückgeben, TX-Versuch/RX-Puffer ausdrücklich benennen, 500 Einträge begrenzen
+und Verlust zählen; Anzeigen/Kopieren/Löschen bleiben lokal. Simulatorprüfungen
+vergleichen beobachtete ADUs mit unabhängig erzeugten erwarteten Modbusbytes.
+
+AI-Messbereichsbasis 0x0DAC ist in §4.4.1/§4.8.3 konsistent; erlaubte
+elektrische Modellklassen sind nicht zuverlässig einem beliebigen Modellnamen
+zugeordnet. AO-Tabelle §4.8.4 nennt 0x1194, AO-Fließtext §4.5.1 dagegen
+0x0DAC. Keine ungeprüfte Auflösung dieses Konflikts und keine automatische
+Expansionsoffsetannahme. Die neuen Katalogeinträge bereiten nur Lesen vor.
+
+Das offizielle Upgrade-Notes-Archiv (id=3509) enthält ein DOCX-Tutorial,
+eine v1.2-EXE und eine .ebin-Datei. Nur Dokumenttext/Bilder wurden statisch
+gelesen: keine Protokollspezifikation, dafür ausdrückliche Warnung vor
+Konfigurationsverlust nach Firmwareupgrade. Keine EXE-/Firmwareausführung
+oder Veröffentlichung von Herstellerartefakten.
+
+Abnahmefolge: gezielte neue Codec-/Core-/GUI-Tests, Linux-Gesamtsuite,
+Tk-GC-/Großschriftregression, Build/Installations-Smoke; danach erneuten
+vollständigen nativen Windows-Lauf auf dem neuen eingefrorenen Stand.
+Keine produktiven Hardwarezugriffe, bis das aktuelle Modulziel und die
+Verbindungs-/Modellparameter ausdrücklich geklärt sind.
+
+### Bestätigte Abnahme der Erweiterungen 0.4.0
+
+Linux: vollständige Suite mit 215 Tests, 214 bestanden, ein expliziter
+Hardwaretest übersprungen. Zusätzlich 122 GUI-Prüfungen in einem Prozess
+mit paralleler Worker-GC bestanden. Kompilierung, Abhängigkeiten und
+Wheel-Build erfolgreich. Das separat installierte Wheel wurde mit acht
+Ansichten, exakt kodiertem Float-Schreiben/Rücklesen am Loopback-Simulator,
+echtem Trace-Kopieren/-Löschen und sauberem Worker-/Tk-Ende geprüft.
+
+Der vollständige native Windows-Gegenlauf bestand ebenfalls:
+215 Tests in 107,764 Sekunden, 214 bestanden und ein Hardwaretest
+übersprungen, kein `Tcl_AsyncDelete`. Tests, Abhängigkeitsprüfung,
+Kompilierung, Wheel-Build und GUI-Start/-Ende meldeten jeweils Exitcode 0.
+Gastquelle: `C:\M31Tests\frozen-source-20261011-082005`,
+gemeldeter Quellarchiv-SHA256:
+`957a8723b2c375a16f7fc6a9cd88bca01645c463e810e484a9786aa91c5c0ecd`.
+Windows-Wheel: 48.798 Bytes, SHA256
+`fbdb2489ac0ef0a350567e9dc459ead8a24304ae6bfa824964a95f90bc7790cb`.
+Keine Bytegleichheit zum Linux-Wheel behauptet. Nach dieser Abnahme wurden
+nur README/PLAN um die Ergebnisse ergänzt, keine Laufzeit-/Testquellen verändert.
+
+Damit sind die belegten 0.4.0-Ergänzungen geprüft, **nicht die vollständige
+Hersteller-Parität**. Proprietäre Discovery, Firmware/Recovery, Modell-
+Identifikations-/Gerätebaumprotokoll, Windows-Geräteprofilschema, Parameter-
+Persistenz/Neustart/Reset, sichere vollständige Messbereich-Konfiguration
+und aktuelle reale Hardware-/RS485-Abnahme bleiben offen. Keine Geräte-
+Schreibzugriffe oder erneute Hersteller-EXE-Ausführung in dieser Abnahme.
+
+## Detailrecherche und Registerinventar 0.5.0
+
+Nutzerauftrag: alle bekannten M31-Register detailliert recherchieren,
+wiederkehrende Muster vergleichen und Hinweise aus GitHub/Foren einbeziehen.
+Der Koordinator beauftragte drei unabhängige Recherchepakete
+(englisches nicht-U-Vollinventar, chinesische/alternative Modellreihen,
+GitHub-/Forenbefunde). Nach deren Abschluss wurde ein gezielter Integrations-
+Sub-Agent für maschinenlesbare Artefakte und deren Regressionstests eingesetzt.
+Keine Recherche wurde als reale Hardwareprüfung ausgegeben.
+
+Umfang: vollständige 13 Tabellen der englischen nicht-U-Primärquelle,
+30 reguläre Definitionen plus eine AO-Konfliktbehauptung; separate
+Quellen-/Modellvergleiche und inerte Hypothesengruppen. U-spezifische
+Register und Community-Code bleiben getrennt, niemals automatisch
+nicht-U-Schreiboptionen. Mehrfach vorkommende Quellentexte und Spiegel
+derselben PDF sind keine mehrfach unabhängigen Bestätigungen.
+
+Implementierung: die 17 bereits gelesenen Geräteparameter werden auch im
+Lesevorbereitungs-Katalog sichtbar, mit genauen Mehrwortlängen und
+Quellenhinweisen. Bestehende drei Geräte-Readspans bleiben unverändert;
+Verhandlungsauslöser 0x7585 und undefinierte Lücken 0x753F/0x7540 werden
+nicht in die Lesevorbereitung aufgenommen. DHCP-Codes 0/1 sind als
+belegtes Enum lesbar. Analog-Katalogtexte benennen dokumentierte Formate,
+Strides und Konflikte, ohne Messwerte automatisch neu zu skalieren.
+Keine neue Bereichs-/Parameter-Schreibfunktion, keine RawWrite-Umstellung.
+
+Abnahme: Artefakte auf Adresskonventionen, Quellen-/Modellbindung,
+vollständige Tabelle-/Definitionenabdeckung, Kanalstrides und sichere
+Hypothesentrennung prüfen. GUI-Auswahl aller Gerätefelder muss korrekte
+Readadresse/-länge vorbereiten und null I/O erzeugen; aktive Befehle,
+U-Identitätskandidaten und Reservierungen bleiben ausgeschlossen.
+Danach Linux-Gesamtsuite, Build/Installations-Smoke und vollständiger
+nativer Windows-Gegenlauf auf dem neuen eingefrorenen Stand.
+
+### Abnahme des Registerinventars 0.5.0
+
+Linux-Gesamtsuite: 229 Tests, 228 bestanden und ein Hardwaretest übersprungen.
+Die 13 Offline-Inventartests prüfen Quellenbindung, Adresskonventionen,
+Modell-/Kanalzahlen, Strides, Konflikte, Community-/U-Abgrenzung, inerte
+Hypothesen und lokale CRC-/Framebeispiele. Der separat installierte
+0.5.0-Wheel-Smoke bestätigte alle 29 Katalogeinträge, die korrekten
+Wortanzahlen der 17 Gerätefelder, Auswahl ohne Gerätekommunikation und
+sauberes Schließen.
+
+Der erste native Windows-Lauf fand eine Test-Portabilitätslücke: ein
+README-Artefakt wurde ohne explizite UTF-8-Kodierung gelesen. Diese eng
+begrenzte Stelle wurde korrigiert; andere Artefaktreads waren bereits
+explizit UTF-8. Keine globale UTF-8-Modusänderung oder Runtime-Umgehung.
+13 Inventartests bestanden auch mit simuliertem Windows-Textdefault.
+
+Der vollständige korrigierte native Windows-Lauf bestand am 11.10.2026:
+**229 Tests in 103,377 Sekunden, 228 bestanden, ein Hardwaretest übersprungen**,
+mit normalem Windows-ACP ohne UTF-8-Override und ohne Tcl-Abbruch.
+Tests, Abhängigkeiten, Kompilierung, Wheel-Build sowie GUI-Start/-Ende
+meldeten jeweils Exitcode 0. Gastquelle:
+`frozen-source-20261011-090849`, Quellarchiv-SHA256
+`2990cab9874fd5420ea175506d74527b16473375cd8c8a4798ea9dfe6185b9ad`.
+Alle Registerartefakte waren im Prüfarchiv enthalten.
+Windows-Wheel: 50.331 Bytes, SHA256
+`d8c96899485e055a16cb9cd5ab383eb448d83e3a5caa069a12227869c4517c14`;
+keine Bytegleichheit zum Linux-Wheel behauptet.
+Nach dieser Abnahme wurden ausschließlich Ergebnisdokumentationen ergänzt.
+
+Damit ist der beauftragte belegte Registervergleich einschließlich
+separater Musterhypothesen abgeschlossen. Verborgene Firmwareadressen,
+aktuelle Hardwareverifikation und vollständige Hersteller-Parität
+werden nicht behauptet. Keine EXE-Ausführung oder Hardwarezugriffe
+waren Teil dieser Recherche und Integration.
+
+## Selektive Feature-Integration aus 0109f9a
+
+Der dokumentarische Main-Commit 36d0a1b enthält keine Programmänderungen.
+Ein separater Branch 0109f9a ergänzt read-only Auto-refresh. Arbeitsteilung:
+isolierte Branch-Abnahme, separater Main-Test-/Build-Agent und lokale
+Integration mit installiertem GUI-Smoke. Bestehende uncommittete Float-,
+Trace-, Registerinventar- und Tk-Lifecycle-Arbeit bleibt erhalten; kein
+Dateiersatz, Checkout oder History-Merge.
+
+Begrenzte Integration: optionales Auto-refresh samt Intervall, serieller
+Worker-Ausführung, Fehlerabschaltung, Timerfreigabe bei Trennen/Schließen/
+direktem Destroy und Regression für ungültige Adresse/Anzahl/Intervall.
+Der vorhandene XLSX-ExitStack bleibt: die isolierten adversarial Prüfungen
+belegten kein zusätzliches OS-Dateideskriptorleck durch fehlenden ZIP-Wrapper.
+Hardware-Test-Gate-Erweiterungen sind nicht Teil dieses begrenzten Pakets.
+Akzeptanz: fokussierte GUI/Safety/Layout-Tests, vollständige Suite,
+Kompilierung, pip check, Wheel-Build und Installations-Smoke. Keine Hardware
+oder Hersteller-EXE ausführen. Die frühere Windows-Abnahme 0.5.0 gilt nicht
+automatisch für diesen erweiterten Stand.
+
+Linux-Integrationsabnahme: 31 fokussierte Tests in 12,102 Sekunden bestanden;
+vollständige Suite mit 236 Tests in 38,743 Sekunden, 235 bestanden und ein
+expliziter Hardwaretest übersprungen. Unittest, compileall, pip check,
+Wheel-Build und diff check jeweils Exitcode 0. Das separat installierte
+Wheel bestand den realen Tk-/Loopback-Smoke mit deaktiviertem Startzustand,
+read-only Wiederholung, Invalid-Input-Abschaltung und sauberer Timerfreigabe.
+Die Runtime-Dateien im Wheel stimmen mit den geprüften Quellen überein.
+Erneute native Windows-Abnahme dieses Auto-refresh-Stands steht aus.
+Keine Hardwareaktion, kein Commit und kein Push; vor Veröffentlichung wird
+die vollständige Liste einschließlich der älteren lokalen Arbeit vorgelegt.

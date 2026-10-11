@@ -1,0 +1,4992 @@
+{
+  "schema_version": 1,
+  "source": {
+    "id": "m31_non_u_en_v1_1",
+    "title": "M31 Series Distributed IO Host User Manual V1.1-EN",
+    "url": "https://www.cdebyte.com/pdf-down.aspx?id=3402",
+    "sha256": "d6fc301f2f248642a5928003479e8e3b1195a2df7edb653fe6cd5d7afaa58545",
+    "pdf_pages": 63,
+    "printed_body_pages": "1..59; cover and I..III precede",
+    "revision_date": "2026-01-29",
+    "language": "English",
+    "series": "M31 non-U",
+    "extraction": "pdftotext -layout; all body pages OCR-screened; ambiguous key tables/images visually checked",
+    "short_quote_policy": "Only short relevant line excerpts; factual technical transcription, not manual reproduction",
+    "revision": "1.1"
+  },
+  "address_conventions": {
+    "wire": "zero-based PDU address",
+    "vendor": "printed area prefix plus wire+1; not a wire address",
+    "prefixes": {
+      "coils": "0",
+      "discrete_inputs": "1",
+      "input_registers": "3",
+      "holding_registers": "4"
+    },
+    "evidence": [
+      {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 53,
+        "pdf_page_one_based": 57,
+        "section": "4.8.5",
+        "table_or_figure": null,
+        "quote": "register (the 10 base in the table has been +1)."
+      }
+    ],
+    "example": {
+      "wire": "0x0DA2",
+      "decimal_zero_based": 3490,
+      "vendor_one_based": 3491
+    }
+  },
+  "models": [
+    {
+      "model": "M31-AAAX4440G",
+      "host_channels": {
+        "DI": 4,
+        "AI": 4,
+        "DO": 4,
+        "AO": 0
+      },
+      "ai_classification": "single_ended_current",
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 1,
+          "pdf_page_one_based": 5,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-AAAX4440G"
+        }
+      ]
+    },
+    {
+      "model": "M31-AXXX8000G",
+      "host_channels": {
+        "DI": 8,
+        "AI": 0,
+        "DO": 0,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-AXXX8000G 8DI"
+        }
+      ]
+    },
+    {
+      "model": "M31-XXAX0080G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 0,
+        "DO": 8,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XXAX0080G 8DO"
+        }
+      ]
+    },
+    {
+      "model": "M31-AXAX4040G",
+      "host_channels": {
+        "DI": 4,
+        "AI": 0,
+        "DO": 4,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-AXAX4040G 4DI+4DO"
+        }
+      ]
+    },
+    {
+      "model": "M31-AXXXA000G",
+      "host_channels": {
+        "DI": 16,
+        "AI": 0,
+        "DO": 0,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-AXXXA000G 16DI"
+        }
+      ]
+    },
+    {
+      "model": "M31-XXAX00A0G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 0,
+        "DO": 16,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XXAX00A0G 16DO"
+        }
+      ]
+    },
+    {
+      "model": "M31-AXAX8080G",
+      "host_channels": {
+        "DI": 8,
+        "AI": 0,
+        "DO": 8,
+        "AO": 0
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-AXAX8080G 8DI+8DO"
+        }
+      ]
+    },
+    {
+      "model": "M31-XAXX0800G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 8,
+        "DO": 0,
+        "AO": 0
+      },
+      "ai_classification": "single_ended_current",
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XAXX0800G 8AI(Single-ended current)"
+        }
+      ]
+    },
+    {
+      "model": "M31-XXXA0008G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 0,
+        "DO": 0,
+        "AO": 8
+      },
+      "ai_classification": null,
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XXXA0008G 8AO(Current output)"
+        }
+      ]
+    },
+    {
+      "model": "M31-XAXA0404G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 4,
+        "DO": 0,
+        "AO": 4
+      },
+      "ai_classification": "single_ended_current",
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XAXA0404G"
+        }
+      ]
+    },
+    {
+      "model": "M31-XFXX0800G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 8,
+        "DO": 0,
+        "AO": 0
+      },
+      "ai_classification": "differential_current",
+      "status": "documented",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XFXX0800G 8AI(Differential Current)"
+        }
+      ]
+    },
+    {
+      "model": "M31-XGXX0800G",
+      "host_channels": {
+        "DI": 0,
+        "AI": 8,
+        "DO": 0,
+        "AO": 0
+      },
+      "ai_classification": "differential_current_as_printed_unresolved",
+      "status": "conflict",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 2,
+          "pdf_page_one_based": 6,
+          "section": "1.3",
+          "table_or_figure": "Product Model List",
+          "quote": "M31-XGXX0800G 8AI(Differential Current)"
+        }
+      ]
+    }
+  ],
+  "model_code_pattern": {
+    "channel_type_character_positions": [
+      "DI",
+      "AI",
+      "DO",
+      "AO"
+    ],
+    "channel_count_character_positions": [
+      "DI",
+      "AI",
+      "DO",
+      "AO"
+    ],
+    "known_count_symbols": {
+      "0": 0,
+      "4": 4,
+      "8": 8,
+      "A": 16
+    },
+    "status": "derived_from_all12_listed_models_not_a_vendor_nomenclature_spec",
+    "forbidden_inference": "Do not generalize other type letters, unlisted models, XGXX voltage, or arbitrary hex count symbols."
+  },
+  "definitions": [
+    {
+      "id": "di_status",
+      "name": "DI status",
+      "kind": "channel_family",
+      "modbus_table": "discrete_inputs",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "1-0001",
+      "word_count_per_value": 0,
+      "bit_count_per_value": 1,
+      "address_stride": 1,
+      "type_encoding": "boolean bit",
+      "read_function_codes": [
+        "0x02"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": [
+        0,
+        1
+      ],
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "DI",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-AXXX8000G",
+          "M31-AXAX4040G",
+          "M31-AXXXA000G",
+          "M31-AXAX8080G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.DI + sum(negotiated_expansions.DI)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "0 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "0 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 65536,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Status Registers",
+          "quote": "DI1 host 0x0000 1-0001 Zone 1 R：0x02 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Status Registers",
+          "quote": "DI2 host 0x0001 1-0002 Zone 1 R：0x02 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Status Registers",
+          "quote": "DI3 host 0x0002 1-0003 Zone 1 R：0x02 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Status Registers",
+          "quote": "DI4 host 0x0003 1-0004 Zone 1 R：0x02 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Status Registers",
+          "quote": "DI5 expansion 0x0004 1-0005 Zone 1 R：0x02 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "di_status.ch1",
+          "definition_id": "di_status",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0000",
+          "wire_decimal_zero_based": 0,
+          "vendor_number_one_based": 1,
+          "vendor_reference_normalized": "1-0001",
+          "vendor_reference_as_printed": "1-0001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.1",
+              "table_or_figure": "DI Status Registers",
+              "quote": "DI1 host 0x0000 1-0001 Zone 1 R：0x02 0"
+            }
+          ]
+        },
+        {
+          "id": "di_status.ch2",
+          "definition_id": "di_status",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0001",
+          "wire_decimal_zero_based": 1,
+          "vendor_number_one_based": 2,
+          "vendor_reference_normalized": "1-0002",
+          "vendor_reference_as_printed": "1-0002",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.1",
+              "table_or_figure": "DI Status Registers",
+              "quote": "DI2 host 0x0001 1-0002 Zone 1 R：0x02 0"
+            }
+          ]
+        },
+        {
+          "id": "di_status.ch3",
+          "definition_id": "di_status",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0002",
+          "wire_decimal_zero_based": 2,
+          "vendor_number_one_based": 3,
+          "vendor_reference_normalized": "1-0003",
+          "vendor_reference_as_printed": "1-0003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.1",
+              "table_or_figure": "DI Status Registers",
+              "quote": "DI3 host 0x0002 1-0003 Zone 1 R：0x02 0"
+            }
+          ]
+        },
+        {
+          "id": "di_status.ch4",
+          "definition_id": "di_status",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0003",
+          "wire_decimal_zero_based": 3,
+          "vendor_number_one_based": 4,
+          "vendor_reference_normalized": "1-0004",
+          "vendor_reference_as_printed": "1-0004",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.1",
+              "table_or_figure": "DI Status Registers",
+              "quote": "DI4 host 0x0003 1-0004 Zone 1 R：0x02 0"
+            }
+          ]
+        },
+        {
+          "id": "di_status.ch5",
+          "definition_id": "di_status",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0004",
+          "wire_decimal_zero_based": 4,
+          "vendor_number_one_based": 5,
+          "vendor_reference_normalized": "1-0005",
+          "vendor_reference_as_printed": "1-0005",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.1",
+              "table_or_figure": "DI Status Registers",
+              "quote": "DI5 expansion 0x0004 1-0005 Zone 1 R：0x02 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "do_status",
+      "name": "DO status/control",
+      "kind": "channel_family",
+      "modbus_table": "coils",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "0-0001",
+      "word_count_per_value": 0,
+      "bit_count_per_value": 1,
+      "address_stride": 1,
+      "type_encoding": "boolean coil",
+      "read_function_codes": [
+        "0x01"
+      ],
+      "write_function_codes": [
+        "0x05",
+        "0x0F"
+      ],
+      "access": "RW",
+      "value_range": [
+        0,
+        1
+      ],
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "DO",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-XXAX0080G",
+          "M31-AXAX4040G",
+          "M31-XXAX00A0G",
+          "M31-AXAX8080G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.DO + sum(negotiated_expansions.DO)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "0 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "0 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 65536,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.2",
+          "table_or_figure": "DI Status Registers [DO table mislabeled]",
+          "quote": "DO1 host 0x0000 0-0001 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.2",
+          "table_or_figure": "DI Status Registers [DO table mislabeled]",
+          "quote": "DO2 host 0x0001 0-0002 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.2",
+          "table_or_figure": "DI Status Registers [DO table mislabeled]",
+          "quote": "DO3 host 0x0002 0-0003 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.2",
+          "table_or_figure": "DI Status Registers [DO table mislabeled]",
+          "quote": "DO4 host 0x0003 0-0004 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.2",
+          "table_or_figure": "DI Status Registers [DO table mislabeled]",
+          "quote": "DO5 expansion 0x0004 0-0005 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "do_status.ch1",
+          "definition_id": "do_status",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0000",
+          "wire_decimal_zero_based": 0,
+          "vendor_number_one_based": 1,
+          "vendor_reference_normalized": "0-0001",
+          "vendor_reference_as_printed": "0-0001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.2",
+              "table_or_figure": "DI Status Registers [DO table mislabeled]",
+              "quote": "DO1 host 0x0000 0-0001 Zone 0 0"
+            }
+          ]
+        },
+        {
+          "id": "do_status.ch2",
+          "definition_id": "do_status",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0001",
+          "wire_decimal_zero_based": 1,
+          "vendor_number_one_based": 2,
+          "vendor_reference_normalized": "0-0002",
+          "vendor_reference_as_printed": "0-0002",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.2",
+              "table_or_figure": "DI Status Registers [DO table mislabeled]",
+              "quote": "DO2 host 0x0001 0-0002 Zone 0 0"
+            }
+          ]
+        },
+        {
+          "id": "do_status.ch3",
+          "definition_id": "do_status",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0002",
+          "wire_decimal_zero_based": 2,
+          "vendor_number_one_based": 3,
+          "vendor_reference_normalized": "0-0003",
+          "vendor_reference_as_printed": "0-0003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.2",
+              "table_or_figure": "DI Status Registers [DO table mislabeled]",
+              "quote": "DO3 host 0x0002 0-0003 Zone 0 0"
+            }
+          ]
+        },
+        {
+          "id": "do_status.ch4",
+          "definition_id": "do_status",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0003",
+          "wire_decimal_zero_based": 3,
+          "vendor_number_one_based": 4,
+          "vendor_reference_normalized": "0-0004",
+          "vendor_reference_as_printed": "0-0004",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 45,
+              "pdf_page_one_based": 49,
+              "section": "4.8.2",
+              "table_or_figure": "DI Status Registers [DO table mislabeled]",
+              "quote": "DO4 host 0x0003 0-0004 Zone 0 0"
+            }
+          ]
+        },
+        {
+          "id": "do_status.ch5",
+          "definition_id": "do_status",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0004",
+          "wire_decimal_zero_based": 4,
+          "vendor_number_one_based": 5,
+          "vendor_reference_normalized": "0-0005",
+          "vendor_reference_as_printed": "0-0005",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.2",
+              "table_or_figure": "DI Status Registers [DO table mislabeled]",
+              "quote": "DO5 expansion 0x0004 0-0005 Zone 0 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ai_integer",
+      "name": "AI engineering integer",
+      "kind": "channel_family",
+      "modbus_table": "input_registers",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "3-0001",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "16-bit integer; signed two's-complement needed for differential negative values; single-ended current nonnegative",
+      "read_function_codes": [
+        "0x04"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": {
+        "single_ended_current": [
+          0,
+          20000
+        ],
+        "differential_current": [
+          -20000,
+          20000
+        ],
+        "differential_voltage": [
+          -10000,
+          10000
+        ],
+        "units": "current integer uA; voltage integer requires unit conflict review"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AI",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-XAXX0800G",
+          "M31-XAXA0404G",
+          "M31-XFXX0800G",
+          "M31-XGXX0800G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AI + sum(negotiated_expansions.AI)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "0 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "0 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 65536,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.3",
+          "table_or_figure": "AI Quantity Shaping Value Register",
+          "quote": "AI1 host 0x0000 3-0001 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.3",
+          "table_or_figure": "AI Quantity Shaping Value Register",
+          "quote": "AI2 host 0x0001 3-0002 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.3",
+          "table_or_figure": "AI Quantity Shaping Value Register",
+          "quote": "AI3 host 0x0002 3-0003 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.3",
+          "table_or_figure": "AI Quantity Shaping Value Register",
+          "quote": "AI4 host 0x0003 3-0004 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 46,
+          "pdf_page_one_based": 50,
+          "section": "4.8.3",
+          "table_or_figure": "AI Quantity Shaping Value Register",
+          "quote": "DO5 expansion 0x0004 0-0005 Zone 0 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 38,
+          "pdf_page_one_based": 42,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "quantity integer value register is 0x0000, the register type is the input register, and the read function code is 0x04."
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 39,
+          "pdf_page_one_based": 43,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "Differential Current: The read value is -20000~20000. The method of calculating the current size is -20000~20000,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 39,
+          "pdf_page_one_based": 43,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "Differential voltage: The value read is -10000~10000. The method of calculating the voltage size is -10000~10000,"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ai_integer.ch1",
+          "definition_id": "ai_integer",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0000",
+          "wire_decimal_zero_based": 0,
+          "vendor_number_one_based": 1,
+          "vendor_reference_normalized": "3-0001",
+          "vendor_reference_as_printed": "3-0001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.3",
+              "table_or_figure": "AI Quantity Shaping Value Register",
+              "quote": "AI1 host 0x0000 3-0001 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_integer.ch2",
+          "definition_id": "ai_integer",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0001",
+          "wire_decimal_zero_based": 1,
+          "vendor_number_one_based": 2,
+          "vendor_reference_normalized": "3-0002",
+          "vendor_reference_as_printed": "3-0002",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.3",
+              "table_or_figure": "AI Quantity Shaping Value Register",
+              "quote": "AI2 host 0x0001 3-0002 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_integer.ch3",
+          "definition_id": "ai_integer",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0002",
+          "wire_decimal_zero_based": 2,
+          "vendor_number_one_based": 3,
+          "vendor_reference_normalized": "3-0003",
+          "vendor_reference_as_printed": "3-0003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.3",
+              "table_or_figure": "AI Quantity Shaping Value Register",
+              "quote": "AI3 host 0x0002 3-0003 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_integer.ch4",
+          "definition_id": "ai_integer",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0003",
+          "wire_decimal_zero_based": 3,
+          "vendor_number_one_based": 4,
+          "vendor_reference_normalized": "3-0004",
+          "vendor_reference_as_printed": "3-0004",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.3",
+              "table_or_figure": "AI Quantity Shaping Value Register",
+              "quote": "AI4 host 0x0003 3-0004 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_integer.ch5",
+          "definition_id": "ai_integer",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0004",
+          "wire_decimal_zero_based": 4,
+          "vendor_number_one_based": 5,
+          "vendor_reference_normalized": "3-0005",
+          "vendor_reference_as_printed": "0-0005",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 46,
+              "pdf_page_one_based": 50,
+              "section": "4.8.3",
+              "table_or_figure": "AI Quantity Shaping Value Register",
+              "quote": "DO5 expansion 0x0004 0-0005 Zone 0 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ai_float",
+      "name": "AI engineering float",
+      "kind": "channel_family",
+      "modbus_table": "input_registers",
+      "wire_hex_zero_based": "0x03E8",
+      "wire_decimal_zero_based": 1000,
+      "vendor_number_one_based": 1001,
+      "vendor_reference_normalized": "3-1001",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": 2,
+      "type_encoding": {
+        "format": "IEEE754 binary32",
+        "unit": "mA for current; voltage unit not explicitly given",
+        "register_word_order": "not documented",
+        "byte_order_within_modbus_word": "Modbus convention, not independently specified"
+      },
+      "read_function_codes": [
+        "0x04"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": null,
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AI",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-XAXX0800G",
+          "M31-XAXA0404G",
+          "M31-XFXX0800G",
+          "M31-XGXX0800G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AI + sum(negotiated_expansions.AI)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "1000 + 2 * (channel_one_based - 1)",
+        "last_address_formula": "1000 + 2 * (live_channel_count - 1) + 1",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 32268,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI floating-point value registers",
+          "quote": "AI1 host 0x03E8 3-1001 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI floating-point value registers",
+          "quote": "AI2 host 0x03EA 3-1003 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI floating-point value registers",
+          "quote": "AI3 host 0x03EC 3-1005 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI floating-point value registers",
+          "quote": "AI4 host 0x03EE 3-1007 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI floating-point value registers",
+          "quote": "AI5 expansion 0x03F0 3-1009 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 39,
+          "pdf_page_one_based": 43,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "AI quantity integer value register is 0x03E8, the register type is the input register, and the read function code is 0x04."
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ai_float.ch1",
+          "definition_id": "ai_float",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x03E8",
+          "wire_decimal_zero_based": 1000,
+          "vendor_number_one_based": 1001,
+          "vendor_reference_normalized": "3-1001",
+          "vendor_reference_as_printed": "3-1001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI floating-point value registers",
+              "quote": "AI1 host 0x03E8 3-1001 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_float.ch2",
+          "definition_id": "ai_float",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x03EA",
+          "wire_decimal_zero_based": 1002,
+          "vendor_number_one_based": 1003,
+          "vendor_reference_normalized": "3-1003",
+          "vendor_reference_as_printed": "3-1003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI floating-point value registers",
+              "quote": "AI2 host 0x03EA 3-1003 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_float.ch3",
+          "definition_id": "ai_float",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x03EC",
+          "wire_decimal_zero_based": 1004,
+          "vendor_number_one_based": 1005,
+          "vendor_reference_normalized": "3-1005",
+          "vendor_reference_as_printed": "3-1005",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI floating-point value registers",
+              "quote": "AI3 host 0x03EC 3-1005 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_float.ch4",
+          "definition_id": "ai_float",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x03EE",
+          "wire_decimal_zero_based": 1006,
+          "vendor_number_one_based": 1007,
+          "vendor_reference_normalized": "3-1007",
+          "vendor_reference_as_printed": "3-1007",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI floating-point value registers",
+              "quote": "AI4 host 0x03EE 3-1007 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_float.ch5",
+          "definition_id": "ai_float",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x03F0",
+          "wire_decimal_zero_based": 1008,
+          "vendor_number_one_based": 1009,
+          "vendor_reference_normalized": "3-1009",
+          "vendor_reference_as_printed": "3-1009",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI floating-point value registers",
+              "quote": "AI5 expansion 0x03F0 3-1009 Zone 3 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ai_process",
+      "name": "AI process integer",
+      "kind": "channel_family",
+      "modbus_table": "input_registers",
+      "wire_hex_zero_based": "0x0BB8",
+      "wire_decimal_zero_based": 3000,
+      "vendor_number_one_based": 3001,
+      "vendor_reference_normalized": "3-3001",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "int16 two's-complement, nominal full scale 27648; overflow/underflow values also documented",
+      "read_function_codes": [
+        "0x04"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": {
+        "nominal": [
+          -27648,
+          27648
+        ],
+        "sentinels": {
+          "overflow": 32767,
+          "underflow": -32768
+        },
+        "details_ref": "analog_process_tables"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AI",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-XAXX0800G",
+          "M31-XAXA0404G",
+          "M31-XFXX0800G",
+          "M31-XGXX0800G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AI + sum(negotiated_expansions.AI)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "3000 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "3000 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 62536,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI Process Registers",
+          "quote": "AI1 host 0x0BB8 3-3001 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI Process Registers",
+          "quote": "AI2 host 0x0BB9 3-3002 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI Process Registers",
+          "quote": "AI3 host 0x0BBA 3-3003 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI Process Registers",
+          "quote": "AI4 host 0x0BBB 3-3004 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 47,
+          "pdf_page_one_based": 51,
+          "section": "4.8.3",
+          "table_or_figure": "AI Process Registers",
+          "quote": "AI5 expansion 0x0BBC 3-3005 Zone 3 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 39,
+          "pdf_page_one_based": 43,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "AI quantity integer value register is 0x03E8, the register type is the input register, and the read function code is 0x04."
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 39,
+          "pdf_page_one_based": 43,
+          "section": "4.4.2",
+          "table_or_figure": null,
+          "quote": "That is: -27648~27648 represents -10V~+10V/-20ma~20ma"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ai_process.ch1",
+          "definition_id": "ai_process",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0BB8",
+          "wire_decimal_zero_based": 3000,
+          "vendor_number_one_based": 3001,
+          "vendor_reference_normalized": "3-3001",
+          "vendor_reference_as_printed": "3-3001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI Process Registers",
+              "quote": "AI1 host 0x0BB8 3-3001 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_process.ch2",
+          "definition_id": "ai_process",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0BB9",
+          "wire_decimal_zero_based": 3001,
+          "vendor_number_one_based": 3002,
+          "vendor_reference_normalized": "3-3002",
+          "vendor_reference_as_printed": "3-3002",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI Process Registers",
+              "quote": "AI2 host 0x0BB9 3-3002 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_process.ch3",
+          "definition_id": "ai_process",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0BBA",
+          "wire_decimal_zero_based": 3002,
+          "vendor_number_one_based": 3003,
+          "vendor_reference_normalized": "3-3003",
+          "vendor_reference_as_printed": "3-3003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI Process Registers",
+              "quote": "AI3 host 0x0BBA 3-3003 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_process.ch4",
+          "definition_id": "ai_process",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0BBB",
+          "wire_decimal_zero_based": 3003,
+          "vendor_number_one_based": 3004,
+          "vendor_reference_normalized": "3-3004",
+          "vendor_reference_as_printed": "3-3004",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI Process Registers",
+              "quote": "AI4 host 0x0BBB 3-3004 Zone 3 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_process.ch5",
+          "definition_id": "ai_process",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0BBC",
+          "wire_decimal_zero_based": 3004,
+          "vendor_number_one_based": 3005,
+          "vendor_reference_normalized": "3-3005",
+          "vendor_reference_as_printed": "3-3005",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 47,
+              "pdf_page_one_based": 51,
+              "section": "4.8.3",
+              "table_or_figure": "AI Process Registers",
+              "quote": "AI5 expansion 0x0BBC 3-3005 Zone 3 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ai_range",
+      "name": "AI sampling range",
+      "kind": "channel_family",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x0DAC",
+      "wire_decimal_zero_based": 3500,
+      "vendor_number_one_based": 3501,
+      "vendor_reference_normalized": "4-3501",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "uint16 enumerated range selector",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "table_example": {
+          "0": "0-20mA",
+          "1": "4-20mA"
+        },
+        "profiles_ref": "analog_profiles"
+      },
+      "default": {
+        "table_example": 0,
+        "single_ended_current": 0,
+        "differential_current": 0,
+        "differential_voltage": 5
+      },
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AI",
+        "host_models": [
+          "M31-AAAX4440G",
+          "M31-XAXX0800G",
+          "M31-XAXA0404G",
+          "M31-XFXX0800G",
+          "M31-XGXX0800G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-AAAX4440G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AI + sum(negotiated_expansions.AI)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "3500 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "3500 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 62036,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Sampling Range Registers",
+          "quote": "host 0x0DAC 4-3501 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Sampling Range Registers",
+          "quote": "host 0x0DAD 4-3502 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Sampling Range Registers",
+          "quote": "host 0x0DAE 4-3503 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Sampling Range Registers",
+          "quote": "host 0x0DAF 4-3504 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Sampling Range Registers",
+          "quote": "sion 0x0DB0 4-3505 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 38,
+          "pdf_page_one_based": 42,
+          "section": "4.4.1",
+          "table_or_figure": null,
+          "quote": "(2) The starting address of the AI channel sampling range parameter is 0x0DAC, the register type is the holding"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ai_range.ch1",
+          "definition_id": "ai_range",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0DAC",
+          "wire_decimal_zero_based": 3500,
+          "vendor_number_one_based": 3501,
+          "vendor_reference_normalized": "4-3501",
+          "vendor_reference_as_printed": "4-3501",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 48,
+              "pdf_page_one_based": 52,
+              "section": "4.8.3",
+              "table_or_figure": "AI Sampling Range Registers",
+              "quote": "host 0x0DAC 4-3501 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_range.ch2",
+          "definition_id": "ai_range",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0DAD",
+          "wire_decimal_zero_based": 3501,
+          "vendor_number_one_based": 3502,
+          "vendor_reference_normalized": "4-3502",
+          "vendor_reference_as_printed": "4-3502",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 48,
+              "pdf_page_one_based": 52,
+              "section": "4.8.3",
+              "table_or_figure": "AI Sampling Range Registers",
+              "quote": "host 0x0DAD 4-3502 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_range.ch3",
+          "definition_id": "ai_range",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0DAE",
+          "wire_decimal_zero_based": 3502,
+          "vendor_number_one_based": 3503,
+          "vendor_reference_normalized": "4-3503",
+          "vendor_reference_as_printed": "4-3503",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 48,
+              "pdf_page_one_based": 52,
+              "section": "4.8.3",
+              "table_or_figure": "AI Sampling Range Registers",
+              "quote": "host 0x0DAE 4-3503 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_range.ch4",
+          "definition_id": "ai_range",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0DAF",
+          "wire_decimal_zero_based": 3503,
+          "vendor_number_one_based": 3504,
+          "vendor_reference_normalized": "4-3504",
+          "vendor_reference_as_printed": "4-3504",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 48,
+              "pdf_page_one_based": 52,
+              "section": "4.8.3",
+              "table_or_figure": "AI Sampling Range Registers",
+              "quote": "host 0x0DAF 4-3504 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ai_range.ch5",
+          "definition_id": "ai_range",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0DB0",
+          "wire_decimal_zero_based": 3504,
+          "vendor_number_one_based": 3505,
+          "vendor_reference_normalized": "4-3505",
+          "vendor_reference_as_printed": "4-3505",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 48,
+              "pdf_page_one_based": 52,
+              "section": "4.8.3",
+              "table_or_figure": "AI Sampling Range Registers",
+              "quote": "sion 0x0DB0 4-3505 Zone 4 0"
+            }
+          ]
+        }
+      ],
+      "invalid_write_behavior": "Out-of-range value does not take effect, without Modbus error (§4.4.1).",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ao_integer",
+      "name": "AO engineering integer",
+      "kind": "channel_family",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "4-0001",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "uint16, current_mA = value / 1000, integer uA",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        0,
+        20000
+      ],
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AO",
+        "host_models": [
+          "M31-XXXA0008G",
+          "M31-XAXA0404G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-XAXA0404G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AO + sum(negotiated_expansions.AO)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "0 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "0 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 65536,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO Integer Value Register",
+          "quote": "AO1 host 0x0000 4-0001 Zone 4 20mA W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO Integer Value Register",
+          "quote": "AO2 host 0x0001 4-0002 Zone 4 20mA W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO Integer Value Register",
+          "quote": "AO3 host 0x0002 4-0003 Zone 4 20mA W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO Integer Value Register",
+          "quote": "AO4 host 0x0003 4-0004 Zone 4 20mA W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO Integer Value Register",
+          "quote": "AO5 expansion 0x0004 4-0005 Zone 4 20mA W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ao_integer.ch1",
+          "definition_id": "ao_integer",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x0000",
+          "wire_decimal_zero_based": 0,
+          "vendor_number_one_based": 1,
+          "vendor_reference_normalized": "4-0001",
+          "vendor_reference_as_printed": "4-0001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO Integer Value Register",
+              "quote": "AO1 host 0x0000 4-0001 Zone 4 20mA W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_integer.ch2",
+          "definition_id": "ao_integer",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x0001",
+          "wire_decimal_zero_based": 1,
+          "vendor_number_one_based": 2,
+          "vendor_reference_normalized": "4-0002",
+          "vendor_reference_as_printed": "4-0002",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO Integer Value Register",
+              "quote": "AO2 host 0x0001 4-0002 Zone 4 20mA W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_integer.ch3",
+          "definition_id": "ao_integer",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x0002",
+          "wire_decimal_zero_based": 2,
+          "vendor_number_one_based": 3,
+          "vendor_reference_normalized": "4-0003",
+          "vendor_reference_as_printed": "4-0003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO Integer Value Register",
+              "quote": "AO3 host 0x0002 4-0003 Zone 4 20mA W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_integer.ch4",
+          "definition_id": "ao_integer",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x0003",
+          "wire_decimal_zero_based": 3,
+          "vendor_number_one_based": 4,
+          "vendor_reference_normalized": "4-0004",
+          "vendor_reference_as_printed": "4-0004",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO Integer Value Register",
+              "quote": "AO4 host 0x0003 4-0004 Zone 4 20mA W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_integer.ch5",
+          "definition_id": "ao_integer",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x0004",
+          "wire_decimal_zero_based": 4,
+          "vendor_number_one_based": 5,
+          "vendor_reference_normalized": "4-0005",
+          "vendor_reference_as_printed": "4-0005",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO Integer Value Register",
+              "quote": "AO5 expansion 0x0004 4-0005 Zone 4 20mA W： 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ao_float",
+      "name": "AO engineering float",
+      "kind": "channel_family",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x03E8",
+      "wire_decimal_zero_based": 1000,
+      "vendor_number_one_based": 1001,
+      "vendor_reference_normalized": "4-1001",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": 2,
+      "type_encoding": {
+        "format": "IEEE754 binary32",
+        "unit": "mA",
+        "register_word_order": "not documented"
+      },
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "signal_nominal_mA": [
+          0,
+          20
+        ],
+        "float_write_validation": "not documented"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AO",
+        "host_models": [
+          "M31-XXXA0008G",
+          "M31-XAXA0404G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-XAXA0404G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AO + sum(negotiated_expansions.AO)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "1000 + 2 * (channel_one_based - 1)",
+        "last_address_formula": "1000 + 2 * (live_channel_count - 1) + 1",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 32268,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 49,
+          "pdf_page_one_based": 53,
+          "section": "4.8.4",
+          "table_or_figure": "AO floating-point value registers",
+          "quote": "AO1 host 0x03E8 4-1001 Zone 4 analog signal, W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO floating-point value registers",
+          "quote": "AO2 host 0x03EA 4-1003 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO floating-point value registers",
+          "quote": "AO3 host 0x03EC 4-1005 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO floating-point value registers",
+          "quote": "AO4 host 0x03EE 4-1007 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO floating-point value registers",
+          "quote": "AO5 expansion 0x03F0 4-1009 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 43,
+          "pdf_page_one_based": 47,
+          "section": "4.5.2",
+          "table_or_figure": null,
+          "quote": "registers start from 0x03E8, register type is hold register, read function code is 0x03, write function code 0x06, 0x10."
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ao_float.ch1",
+          "definition_id": "ao_float",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x03E8",
+          "wire_decimal_zero_based": 1000,
+          "vendor_number_one_based": 1001,
+          "vendor_reference_normalized": "4-1001",
+          "vendor_reference_as_printed": "4-1001",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 49,
+              "pdf_page_one_based": 53,
+              "section": "4.8.4",
+              "table_or_figure": "AO floating-point value registers",
+              "quote": "AO1 host 0x03E8 4-1001 Zone 4 analog signal, W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_float.ch2",
+          "definition_id": "ao_float",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x03EA",
+          "wire_decimal_zero_based": 1002,
+          "vendor_number_one_based": 1003,
+          "vendor_reference_normalized": "4-1003",
+          "vendor_reference_as_printed": "4-1003",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO floating-point value registers",
+              "quote": "AO2 host 0x03EA 4-1003 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_float.ch3",
+          "definition_id": "ao_float",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x03EC",
+          "wire_decimal_zero_based": 1004,
+          "vendor_number_one_based": 1005,
+          "vendor_reference_normalized": "4-1005",
+          "vendor_reference_as_printed": "4-1005",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO floating-point value registers",
+              "quote": "AO3 host 0x03EC 4-1005 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_float.ch4",
+          "definition_id": "ao_float",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x03EE",
+          "wire_decimal_zero_based": 1006,
+          "vendor_number_one_based": 1007,
+          "vendor_reference_normalized": "4-1007",
+          "vendor_reference_as_printed": "4-1007",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO floating-point value registers",
+              "quote": "AO4 host 0x03EE 4-1007 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_float.ch5",
+          "definition_id": "ao_float",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x03F0",
+          "wire_decimal_zero_based": 1008,
+          "vendor_number_one_based": 1009,
+          "vendor_reference_normalized": "4-1009",
+          "vendor_reference_as_printed": "4-1009",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO floating-point value registers",
+              "quote": "AO5 expansion 0x03F0 4-1009 Zone 4 W： 0"
+            }
+          ]
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ao_process",
+      "name": "AO process integer",
+      "kind": "channel_family",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x01F4",
+      "wire_decimal_zero_based": 500,
+      "vendor_number_one_based": 501,
+      "vendor_reference_normalized": "4-0501",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "16-bit integer, 0..27648 nominally maps to 0..20mA",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        0,
+        27648
+      ],
+      "default": 0,
+      "status": "conflict",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AO",
+        "host_models": [
+          "M31-XXXA0008G",
+          "M31-XAXA0404G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-XAXA0404G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AO + sum(negotiated_expansions.AO)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "500 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "500 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 65036,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO Process Quantity Registers",
+          "quote": "AO1 host 0x01F4 3-0501 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO Process Quantity Registers",
+          "quote": "AO2 host 0x01F5 3-0502 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO Process Quantity Registers",
+          "quote": "AO3 host 0x01F6 3-0503 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO Process Quantity Registers",
+          "quote": "AO4 host 0x01F7 3-0504 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 50,
+          "pdf_page_one_based": 54,
+          "section": "4.8.4",
+          "table_or_figure": "AO Process Quantity Registers",
+          "quote": "AO5 expansion 0x01F8 3-0505 Zone 4 W： 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 43,
+          "pdf_page_one_based": 47,
+          "section": "4.5.2",
+          "table_or_figure": null,
+          "quote": "（3） Read and control process quantity shaping values. The AO register starts from 0x01F4, the register type"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ao_process.ch1",
+          "definition_id": "ao_process",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x01F4",
+          "wire_decimal_zero_based": 500,
+          "vendor_number_one_based": 501,
+          "vendor_reference_normalized": "4-0501",
+          "vendor_reference_as_printed": "3-0501",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO Process Quantity Registers",
+              "quote": "AO1 host 0x01F4 3-0501 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_process.ch2",
+          "definition_id": "ao_process",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x01F5",
+          "wire_decimal_zero_based": 501,
+          "vendor_number_one_based": 502,
+          "vendor_reference_normalized": "4-0502",
+          "vendor_reference_as_printed": "3-0502",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO Process Quantity Registers",
+              "quote": "AO2 host 0x01F5 3-0502 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_process.ch3",
+          "definition_id": "ao_process",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x01F6",
+          "wire_decimal_zero_based": 502,
+          "vendor_number_one_based": 503,
+          "vendor_reference_normalized": "4-0503",
+          "vendor_reference_as_printed": "3-0503",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO Process Quantity Registers",
+              "quote": "AO3 host 0x01F6 3-0503 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_process.ch4",
+          "definition_id": "ao_process",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x01F7",
+          "wire_decimal_zero_based": 503,
+          "vendor_number_one_based": 504,
+          "vendor_reference_normalized": "4-0504",
+          "vendor_reference_as_printed": "3-0504",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO Process Quantity Registers",
+              "quote": "AO4 host 0x01F7 3-0504 Zone 4 W： 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_process.ch5",
+          "definition_id": "ao_process",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x01F8",
+          "wire_decimal_zero_based": 504,
+          "vendor_number_one_based": 505,
+          "vendor_reference_normalized": "4-0505",
+          "vendor_reference_as_printed": "3-0505",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 50,
+              "pdf_page_one_based": 54,
+              "section": "4.8.4",
+              "table_or_figure": "AO Process Quantity Registers",
+              "quote": "AO5 expansion 0x01F8 3-0505 Zone 4 W： 0"
+            }
+          ]
+        }
+      ],
+      "conflict_ids": [
+        "ao_process_vendor_zone"
+      ],
+      "notes": "Zone 4 and FC03/06/10 identify holding registers; decimal column prints 3-0501..3-0505. Both are preserved.",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false,
+      "conflict_policy": "Preserve both source claims; unresolved, no automatic correction or write authorization."
+    },
+    {
+      "id": "ao_range_table",
+      "name": "AO output range [table claim]",
+      "kind": "channel_family",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x1194",
+      "wire_decimal_zero_based": 4500,
+      "vendor_number_one_based": 4501,
+      "vendor_reference_normalized": "4-4501",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": 1,
+      "type_encoding": "uint16 enumerated range selector",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "0": "0-20mA",
+        "1": "4-20mA"
+      },
+      "default": 0,
+      "status": "conflict",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": {
+        "channel_type": "AO",
+        "host_models": [
+          "M31-XXXA0008G",
+          "M31-XAXA0404G"
+        ],
+        "expansion": "Same channel type continues after preceding host/expansion channels; ordered negotiated chain.",
+        "illustrative_host": "M31-XAXA0404G",
+        "host_with_zero_channels": "No local channels; expansion channels only if present."
+      },
+      "family_bounds": {
+        "channel_min_one_based": 1,
+        "channel_max_one_based": null,
+        "live_channel_count": "host.AO + sum(negotiated_expansions.AO)",
+        "documented_max_expansion_modules": 16,
+        "max_channels_per_expansion": null,
+        "address_formula": "4500 + 1 * (channel_one_based - 1)",
+        "last_address_formula": "4500 + 1 * (live_channel_count - 1) + 0",
+        "bounds_policy": "Only channels actually present. Unknown live count remains symbolic, not a fabricated fixed range.",
+        "transport_address_space_guard_max_channels": 61036,
+        "guard_is_not_hardware_capacity": true,
+        "explicit_table_channel_count": 5
+      },
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.4",
+          "table_or_figure": "AO Output Range Registers",
+          "quote": "host 0x1194 4-4501 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.4",
+          "table_or_figure": "AO Output Range Registers",
+          "quote": "host 0x1195 4-4502 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.4",
+          "table_or_figure": "AO Output Range Registers",
+          "quote": "host 0x1196 4-4503 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.4",
+          "table_or_figure": "AO Output Range Registers",
+          "quote": "host 0x1197 4-4504 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.4",
+          "table_or_figure": "AO Output Range Registers",
+          "quote": "sion 0x1198 4-4505 Zone 4 0"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 44,
+          "pdf_page_one_based": 48,
+          "section": "4.8",
+          "table_or_figure": null,
+          "quote": "1. DI, DO, AI, AO registers are continuous, such as an 8DI model host spliced with an 8DI model expansion module,"
+        }
+      ],
+      "explicit_instances": [
+        {
+          "id": "ao_range_table.ch1",
+          "definition_id": "ao_range_table",
+          "channel_one_based": 1,
+          "wire_hex_zero_based": "0x1194",
+          "wire_decimal_zero_based": 4500,
+          "vendor_number_one_based": 4501,
+          "vendor_reference_normalized": "4-4501",
+          "vendor_reference_as_printed": "4-4501",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 51,
+              "pdf_page_one_based": 55,
+              "section": "4.8.4",
+              "table_or_figure": "AO Output Range Registers",
+              "quote": "host 0x1194 4-4501 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_range_table.ch2",
+          "definition_id": "ao_range_table",
+          "channel_one_based": 2,
+          "wire_hex_zero_based": "0x1195",
+          "wire_decimal_zero_based": 4501,
+          "vendor_number_one_based": 4502,
+          "vendor_reference_normalized": "4-4502",
+          "vendor_reference_as_printed": "4-4502",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 51,
+              "pdf_page_one_based": 55,
+              "section": "4.8.4",
+              "table_or_figure": "AO Output Range Registers",
+              "quote": "host 0x1195 4-4502 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_range_table.ch3",
+          "definition_id": "ao_range_table",
+          "channel_one_based": 3,
+          "wire_hex_zero_based": "0x1196",
+          "wire_decimal_zero_based": 4502,
+          "vendor_number_one_based": 4503,
+          "vendor_reference_normalized": "4-4503",
+          "vendor_reference_as_printed": "4-4503",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 51,
+              "pdf_page_one_based": 55,
+              "section": "4.8.4",
+              "table_or_figure": "AO Output Range Registers",
+              "quote": "host 0x1196 4-4503 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_range_table.ch4",
+          "definition_id": "ao_range_table",
+          "channel_one_based": 4,
+          "wire_hex_zero_based": "0x1197",
+          "wire_decimal_zero_based": 4503,
+          "vendor_number_one_based": 4504,
+          "vendor_reference_normalized": "4-4504",
+          "vendor_reference_as_printed": "4-4504",
+          "illustrative_location": "host",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 51,
+              "pdf_page_one_based": 55,
+              "section": "4.8.4",
+              "table_or_figure": "AO Output Range Registers",
+              "quote": "host 0x1197 4-4504 Zone 4 0"
+            }
+          ]
+        },
+        {
+          "id": "ao_range_table.ch5",
+          "definition_id": "ao_range_table",
+          "channel_one_based": 5,
+          "wire_hex_zero_based": "0x1198",
+          "wire_decimal_zero_based": 4504,
+          "vendor_number_one_based": 4505,
+          "vendor_reference_normalized": "4-4505",
+          "vendor_reference_as_printed": "4-4505",
+          "illustrative_location": "IO expansion module",
+          "evidence": [
+            {
+              "source_id": "m31_non_u_en_v1_1",
+              "manual_page": 51,
+              "pdf_page_one_based": 55,
+              "section": "4.8.4",
+              "table_or_figure": "AO Output Range Registers",
+              "quote": "sion 0x1198 4-4505 Zone 4 0"
+            }
+          ]
+        }
+      ],
+      "conflict_ids": [
+        "ao_range_address"
+      ],
+      "invalid_write_behavior": "Prose says clamp to nearest 0/1 without Modbus error, but mixes AI/AO terminology and conflicting address; preserve as claim.",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false,
+      "conflict_policy": "Preserve both source claims; unresolved, no automatic correction or write authorization."
+    },
+    {
+      "id": "di_filter",
+      "name": "Shared DI filter",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x0DA3",
+      "wire_decimal_zero_based": 3491,
+      "vendor_number_one_based": 3492,
+      "vendor_reference_normalized": "4-3492",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        1,
+        16
+      ],
+      "default": 6,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "One shared parameter for all DI channels; not per-channel.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 45,
+          "pdf_page_one_based": 49,
+          "section": "4.8.1",
+          "table_or_figure": "DI Filter Registers",
+          "quote": "filtering 0x0DA3 4-3492 Hold registers W： 6"
+        }
+      ],
+      "invalid_write_behavior": "Not explicitly documented; do not transfer AI clamping rule.",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ai_filter",
+      "name": "Shared AI filter",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x0DA2",
+      "wire_decimal_zero_based": 3490,
+      "vendor_number_one_based": 3491,
+      "vendor_reference_normalized": "4-3491",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        1,
+        16
+      ],
+      "default": 6,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "One shared parameter for all AI channels; not per-channel.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 48,
+          "pdf_page_one_based": 52,
+          "section": "4.8.3",
+          "table_or_figure": "AI Filter Registers",
+          "quote": "filtering 0x0DA2 4-3491 Zone 4 W： 6"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 42,
+          "pdf_page_one_based": 46,
+          "section": "4.4.3",
+          "table_or_figure": null,
+          "quote": "(2) The AI channel filtering parameter address is 0x0DA2, and the register type is the holding register. Function code"
+        }
+      ],
+      "invalid_write_behavior": "Clamp to nearest 1..16; writing 0 becomes 1; no Modbus error per manual.",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "serial_baud",
+      "name": "Serial baud rate code",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7530",
+      "wire_decimal_zero_based": 30000,
+      "vendor_number_one_based": 30001,
+      "vendor_reference_normalized": "4-30001",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "1": 2400,
+        "2": 4800,
+        "3": 9600,
+        "4": 19200,
+        "5": 38400,
+        "6": 57600,
+        "7": 115200,
+        "8": 230400
+      },
+      "default": {
+        "code": 3,
+        "bps": 9600
+      },
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 51,
+          "pdf_page_one_based": 55,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7530 4-30001 Zone 4 1 R：0x03"
+        }
+      ],
+      "vendor_reference_as_printed": "4-30001",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7530",
+          "wire_decimal_zero_based": 30000,
+          "vendor_number_one_based": 30001,
+          "vendor_reference_normalized": "4-30001"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Baud rate 9600bps (8 options available)"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "serial_parity",
+      "name": "Serial parity",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7531",
+      "wire_decimal_zero_based": 30001,
+      "vendor_number_one_based": 30002,
+      "vendor_reference_normalized": "4-30002",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "0": "NONE",
+        "1": "ODD",
+        "2": "EVEN"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7531 4-30002 Zone 4 1 1：ODD W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30002",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7531",
+          "wire_decimal_zero_based": 30001,
+          "vendor_number_one_based": 30002,
+          "vendor_reference_normalized": "4-30002"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Check digit None (default), Odd, Even"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "network_mode",
+      "name": "Network working mode",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7532",
+      "wire_decimal_zero_based": 30002,
+      "vendor_number_one_based": 30003,
+      "vendor_reference_normalized": "4-30003",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "0": "TCPS",
+        "1": "TCPC",
+        "2": "UDPS",
+        "3": "UDPC"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7532 4-30003 Zone 4 1 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30003",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7532",
+          "wire_decimal_zero_based": 30002,
+          "vendor_number_one_based": 30003,
+          "vendor_reference_normalized": "4-30003"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Working Mode"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "dhcp",
+      "name": "DHCP",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7533",
+      "wire_decimal_zero_based": 30003,
+      "vendor_number_one_based": 30004,
+      "vendor_reference_normalized": "4-30004",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "0": "Off",
+        "1": "On"
+      },
+      "default": 0,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "DHCP 0X7533 4-30004 Zone 4 1 0: Off, 1: On W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30004",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7533",
+          "wire_decimal_zero_based": 30003,
+          "vendor_number_one_based": 30004,
+          "vendor_reference_normalized": "4-30004"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "DHCP closure"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "mac",
+      "name": "Device MAC",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7534",
+      "wire_decimal_zero_based": 30004,
+      "vendor_number_one_based": 30005,
+      "vendor_reference_normalized": "4-30005",
+      "word_count_per_value": 3,
+      "bit_count_per_value": 48,
+      "address_stride": null,
+      "type_encoding": "48-bit MAC; register/byte packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": null,
+      "default": "Determined by chip (fixed)",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "address of the 0X7534 4-30005 Zone 4 3 R：0x03"
+        }
+      ],
+      "vendor_reference_as_printed": "4-30005",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7534",
+          "wire_decimal_zero_based": 30004,
+          "vendor_number_one_based": 30005,
+          "vendor_reference_normalized": "4-30005"
+        },
+        {
+          "wire_hex_zero_based": "0x7535",
+          "wire_decimal_zero_based": 30005,
+          "vendor_number_one_based": 30006,
+          "vendor_reference_normalized": "4-30006"
+        },
+        {
+          "wire_hex_zero_based": "0x7536",
+          "wire_decimal_zero_based": 30006,
+          "vendor_number_one_based": 30007,
+          "vendor_reference_normalized": "4-30007"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Local MAC Determined by chip (fixed)"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "local_ip",
+      "name": "Local IPv4 address",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7537",
+      "wire_decimal_zero_based": 30007,
+      "vendor_number_one_based": 30008,
+      "vendor_reference_normalized": "4-30008",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": null,
+      "type_encoding": "IPv4, 4 bytes; octet packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": null,
+      "default": "192.168.3.7",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7537 4-30008 Zone 4 2 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30008",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7537",
+          "wire_decimal_zero_based": 30007,
+          "vendor_number_one_based": 30008,
+          "vendor_reference_normalized": "4-30008"
+        },
+        {
+          "wire_hex_zero_based": "0x7538",
+          "wire_decimal_zero_based": 30008,
+          "vendor_number_one_based": 30009,
+          "vendor_reference_normalized": "4-30009"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Network parameters Local IP 192.168.3.7"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "subnet",
+      "name": "Subnet mask",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7539",
+      "wire_decimal_zero_based": 30009,
+      "vendor_number_one_based": 30010,
+      "vendor_reference_normalized": "4-30010",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": null,
+      "type_encoding": "IPv4 mask, 4 bytes; octet packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": null,
+      "default": "255.255.255.0",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "Subnet mask 0X7539 4-30010 Zone 4 2 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30010",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7539",
+          "wire_decimal_zero_based": 30009,
+          "vendor_number_one_based": 30010,
+          "vendor_reference_normalized": "4-30010"
+        },
+        {
+          "wire_hex_zero_based": "0x753A",
+          "wire_decimal_zero_based": 30010,
+          "vendor_number_one_based": 30011,
+          "vendor_reference_normalized": "4-30011"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Subnet Mask 255.255.255.0"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "gateway",
+      "name": "Gateway IPv4 address",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x753B",
+      "wire_decimal_zero_based": 30011,
+      "vendor_number_one_based": 30012,
+      "vendor_reference_normalized": "4-30012",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": null,
+      "type_encoding": "IPv4, 4 bytes; octet packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": null,
+      "default": "192.168.3.1",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "Gateway address 0X753B 4-30012 Zone 4 2 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30012",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x753B",
+          "wire_decimal_zero_based": 30011,
+          "vendor_number_one_based": 30012,
+          "vendor_reference_normalized": "4-30012"
+        },
+        {
+          "wire_hex_zero_based": "0x753C",
+          "wire_decimal_zero_based": 30012,
+          "vendor_number_one_based": 30013,
+          "vendor_reference_normalized": "4-30013"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Gateway Address 192.168.3.1"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "dns",
+      "name": "DNS IPv4 address",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x753D",
+      "wire_decimal_zero_based": 30013,
+      "vendor_number_one_based": 30014,
+      "vendor_reference_normalized": "4-30014",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": null,
+      "type_encoding": "IPv4, 4 bytes; octet packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": null,
+      "default": "114.114.114.114",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X753D 4-30014 Zone 4 2 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30014",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x753D",
+          "wire_decimal_zero_based": 30013,
+          "vendor_number_one_based": 30014,
+          "vendor_reference_normalized": "4-30014"
+        },
+        {
+          "wire_hex_zero_based": "0x753E",
+          "wire_decimal_zero_based": 30014,
+          "vendor_number_one_based": 30015,
+          "vendor_reference_normalized": "4-30015"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "DNS Server 114.114.114.114"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "local_port",
+      "name": "Local port",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7541",
+      "wire_decimal_zero_based": 30017,
+      "vendor_number_one_based": 30018,
+      "vendor_reference_normalized": "4-30018",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        0,
+        65535
+      ],
+      "default": 502,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "Native port 0X7541 4-30018 Zone 4 1 0-65535 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30018",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7541",
+          "wire_decimal_zero_based": 30017,
+          "vendor_number_one_based": 30018,
+          "vendor_reference_normalized": "4-30018"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Local port 502"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "destination",
+      "name": "Destination IP/domain string",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7542",
+      "wire_decimal_zero_based": 30018,
+      "vendor_number_one_based": 30019,
+      "vendor_reference_normalized": "4-30019",
+      "word_count_per_value": 64,
+      "bit_count_per_value": 1024,
+      "address_stride": null,
+      "type_encoding": "up to 128-byte string; character encoding, terminator, padding and byte packing not stated",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": null,
+      "default": "192.168.3.3",
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7542 4-30019 Zone 4 64 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30019",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7542",
+          "wire_decimal_zero_based": 30018,
+          "vendor_number_one_based": 30019,
+          "vendor_reference_normalized": "4-30019"
+        },
+        {
+          "wire_hex_zero_based": "0x7543",
+          "wire_decimal_zero_based": 30019,
+          "vendor_number_one_based": 30020,
+          "vendor_reference_normalized": "4-30020"
+        },
+        {
+          "wire_hex_zero_based": "0x7544",
+          "wire_decimal_zero_based": 30020,
+          "vendor_number_one_based": 30021,
+          "vendor_reference_normalized": "4-30021"
+        },
+        {
+          "wire_hex_zero_based": "0x7545",
+          "wire_decimal_zero_based": 30021,
+          "vendor_number_one_based": 30022,
+          "vendor_reference_normalized": "4-30022"
+        },
+        {
+          "wire_hex_zero_based": "0x7546",
+          "wire_decimal_zero_based": 30022,
+          "vendor_number_one_based": 30023,
+          "vendor_reference_normalized": "4-30023"
+        },
+        {
+          "wire_hex_zero_based": "0x7547",
+          "wire_decimal_zero_based": 30023,
+          "vendor_number_one_based": 30024,
+          "vendor_reference_normalized": "4-30024"
+        },
+        {
+          "wire_hex_zero_based": "0x7548",
+          "wire_decimal_zero_based": 30024,
+          "vendor_number_one_based": 30025,
+          "vendor_reference_normalized": "4-30025"
+        },
+        {
+          "wire_hex_zero_based": "0x7549",
+          "wire_decimal_zero_based": 30025,
+          "vendor_number_one_based": 30026,
+          "vendor_reference_normalized": "4-30026"
+        },
+        {
+          "wire_hex_zero_based": "0x754A",
+          "wire_decimal_zero_based": 30026,
+          "vendor_number_one_based": 30027,
+          "vendor_reference_normalized": "4-30027"
+        },
+        {
+          "wire_hex_zero_based": "0x754B",
+          "wire_decimal_zero_based": 30027,
+          "vendor_number_one_based": 30028,
+          "vendor_reference_normalized": "4-30028"
+        },
+        {
+          "wire_hex_zero_based": "0x754C",
+          "wire_decimal_zero_based": 30028,
+          "vendor_number_one_based": 30029,
+          "vendor_reference_normalized": "4-30029"
+        },
+        {
+          "wire_hex_zero_based": "0x754D",
+          "wire_decimal_zero_based": 30029,
+          "vendor_number_one_based": 30030,
+          "vendor_reference_normalized": "4-30030"
+        },
+        {
+          "wire_hex_zero_based": "0x754E",
+          "wire_decimal_zero_based": 30030,
+          "vendor_number_one_based": 30031,
+          "vendor_reference_normalized": "4-30031"
+        },
+        {
+          "wire_hex_zero_based": "0x754F",
+          "wire_decimal_zero_based": 30031,
+          "vendor_number_one_based": 30032,
+          "vendor_reference_normalized": "4-30032"
+        },
+        {
+          "wire_hex_zero_based": "0x7550",
+          "wire_decimal_zero_based": 30032,
+          "vendor_number_one_based": 30033,
+          "vendor_reference_normalized": "4-30033"
+        },
+        {
+          "wire_hex_zero_based": "0x7551",
+          "wire_decimal_zero_based": 30033,
+          "vendor_number_one_based": 30034,
+          "vendor_reference_normalized": "4-30034"
+        },
+        {
+          "wire_hex_zero_based": "0x7552",
+          "wire_decimal_zero_based": 30034,
+          "vendor_number_one_based": 30035,
+          "vendor_reference_normalized": "4-30035"
+        },
+        {
+          "wire_hex_zero_based": "0x7553",
+          "wire_decimal_zero_based": 30035,
+          "vendor_number_one_based": 30036,
+          "vendor_reference_normalized": "4-30036"
+        },
+        {
+          "wire_hex_zero_based": "0x7554",
+          "wire_decimal_zero_based": 30036,
+          "vendor_number_one_based": 30037,
+          "vendor_reference_normalized": "4-30037"
+        },
+        {
+          "wire_hex_zero_based": "0x7555",
+          "wire_decimal_zero_based": 30037,
+          "vendor_number_one_based": 30038,
+          "vendor_reference_normalized": "4-30038"
+        },
+        {
+          "wire_hex_zero_based": "0x7556",
+          "wire_decimal_zero_based": 30038,
+          "vendor_number_one_based": 30039,
+          "vendor_reference_normalized": "4-30039"
+        },
+        {
+          "wire_hex_zero_based": "0x7557",
+          "wire_decimal_zero_based": 30039,
+          "vendor_number_one_based": 30040,
+          "vendor_reference_normalized": "4-30040"
+        },
+        {
+          "wire_hex_zero_based": "0x7558",
+          "wire_decimal_zero_based": 30040,
+          "vendor_number_one_based": 30041,
+          "vendor_reference_normalized": "4-30041"
+        },
+        {
+          "wire_hex_zero_based": "0x7559",
+          "wire_decimal_zero_based": 30041,
+          "vendor_number_one_based": 30042,
+          "vendor_reference_normalized": "4-30042"
+        },
+        {
+          "wire_hex_zero_based": "0x755A",
+          "wire_decimal_zero_based": 30042,
+          "vendor_number_one_based": 30043,
+          "vendor_reference_normalized": "4-30043"
+        },
+        {
+          "wire_hex_zero_based": "0x755B",
+          "wire_decimal_zero_based": 30043,
+          "vendor_number_one_based": 30044,
+          "vendor_reference_normalized": "4-30044"
+        },
+        {
+          "wire_hex_zero_based": "0x755C",
+          "wire_decimal_zero_based": 30044,
+          "vendor_number_one_based": 30045,
+          "vendor_reference_normalized": "4-30045"
+        },
+        {
+          "wire_hex_zero_based": "0x755D",
+          "wire_decimal_zero_based": 30045,
+          "vendor_number_one_based": 30046,
+          "vendor_reference_normalized": "4-30046"
+        },
+        {
+          "wire_hex_zero_based": "0x755E",
+          "wire_decimal_zero_based": 30046,
+          "vendor_number_one_based": 30047,
+          "vendor_reference_normalized": "4-30047"
+        },
+        {
+          "wire_hex_zero_based": "0x755F",
+          "wire_decimal_zero_based": 30047,
+          "vendor_number_one_based": 30048,
+          "vendor_reference_normalized": "4-30048"
+        },
+        {
+          "wire_hex_zero_based": "0x7560",
+          "wire_decimal_zero_based": 30048,
+          "vendor_number_one_based": 30049,
+          "vendor_reference_normalized": "4-30049"
+        },
+        {
+          "wire_hex_zero_based": "0x7561",
+          "wire_decimal_zero_based": 30049,
+          "vendor_number_one_based": 30050,
+          "vendor_reference_normalized": "4-30050"
+        },
+        {
+          "wire_hex_zero_based": "0x7562",
+          "wire_decimal_zero_based": 30050,
+          "vendor_number_one_based": 30051,
+          "vendor_reference_normalized": "4-30051"
+        },
+        {
+          "wire_hex_zero_based": "0x7563",
+          "wire_decimal_zero_based": 30051,
+          "vendor_number_one_based": 30052,
+          "vendor_reference_normalized": "4-30052"
+        },
+        {
+          "wire_hex_zero_based": "0x7564",
+          "wire_decimal_zero_based": 30052,
+          "vendor_number_one_based": 30053,
+          "vendor_reference_normalized": "4-30053"
+        },
+        {
+          "wire_hex_zero_based": "0x7565",
+          "wire_decimal_zero_based": 30053,
+          "vendor_number_one_based": 30054,
+          "vendor_reference_normalized": "4-30054"
+        },
+        {
+          "wire_hex_zero_based": "0x7566",
+          "wire_decimal_zero_based": 30054,
+          "vendor_number_one_based": 30055,
+          "vendor_reference_normalized": "4-30055"
+        },
+        {
+          "wire_hex_zero_based": "0x7567",
+          "wire_decimal_zero_based": 30055,
+          "vendor_number_one_based": 30056,
+          "vendor_reference_normalized": "4-30056"
+        },
+        {
+          "wire_hex_zero_based": "0x7568",
+          "wire_decimal_zero_based": 30056,
+          "vendor_number_one_based": 30057,
+          "vendor_reference_normalized": "4-30057"
+        },
+        {
+          "wire_hex_zero_based": "0x7569",
+          "wire_decimal_zero_based": 30057,
+          "vendor_number_one_based": 30058,
+          "vendor_reference_normalized": "4-30058"
+        },
+        {
+          "wire_hex_zero_based": "0x756A",
+          "wire_decimal_zero_based": 30058,
+          "vendor_number_one_based": 30059,
+          "vendor_reference_normalized": "4-30059"
+        },
+        {
+          "wire_hex_zero_based": "0x756B",
+          "wire_decimal_zero_based": 30059,
+          "vendor_number_one_based": 30060,
+          "vendor_reference_normalized": "4-30060"
+        },
+        {
+          "wire_hex_zero_based": "0x756C",
+          "wire_decimal_zero_based": 30060,
+          "vendor_number_one_based": 30061,
+          "vendor_reference_normalized": "4-30061"
+        },
+        {
+          "wire_hex_zero_based": "0x756D",
+          "wire_decimal_zero_based": 30061,
+          "vendor_number_one_based": 30062,
+          "vendor_reference_normalized": "4-30062"
+        },
+        {
+          "wire_hex_zero_based": "0x756E",
+          "wire_decimal_zero_based": 30062,
+          "vendor_number_one_based": 30063,
+          "vendor_reference_normalized": "4-30063"
+        },
+        {
+          "wire_hex_zero_based": "0x756F",
+          "wire_decimal_zero_based": 30063,
+          "vendor_number_one_based": 30064,
+          "vendor_reference_normalized": "4-30064"
+        },
+        {
+          "wire_hex_zero_based": "0x7570",
+          "wire_decimal_zero_based": 30064,
+          "vendor_number_one_based": 30065,
+          "vendor_reference_normalized": "4-30065"
+        },
+        {
+          "wire_hex_zero_based": "0x7571",
+          "wire_decimal_zero_based": 30065,
+          "vendor_number_one_based": 30066,
+          "vendor_reference_normalized": "4-30066"
+        },
+        {
+          "wire_hex_zero_based": "0x7572",
+          "wire_decimal_zero_based": 30066,
+          "vendor_number_one_based": 30067,
+          "vendor_reference_normalized": "4-30067"
+        },
+        {
+          "wire_hex_zero_based": "0x7573",
+          "wire_decimal_zero_based": 30067,
+          "vendor_number_one_based": 30068,
+          "vendor_reference_normalized": "4-30068"
+        },
+        {
+          "wire_hex_zero_based": "0x7574",
+          "wire_decimal_zero_based": 30068,
+          "vendor_number_one_based": 30069,
+          "vendor_reference_normalized": "4-30069"
+        },
+        {
+          "wire_hex_zero_based": "0x7575",
+          "wire_decimal_zero_based": 30069,
+          "vendor_number_one_based": 30070,
+          "vendor_reference_normalized": "4-30070"
+        },
+        {
+          "wire_hex_zero_based": "0x7576",
+          "wire_decimal_zero_based": 30070,
+          "vendor_number_one_based": 30071,
+          "vendor_reference_normalized": "4-30071"
+        },
+        {
+          "wire_hex_zero_based": "0x7577",
+          "wire_decimal_zero_based": 30071,
+          "vendor_number_one_based": 30072,
+          "vendor_reference_normalized": "4-30072"
+        },
+        {
+          "wire_hex_zero_based": "0x7578",
+          "wire_decimal_zero_based": 30072,
+          "vendor_number_one_based": 30073,
+          "vendor_reference_normalized": "4-30073"
+        },
+        {
+          "wire_hex_zero_based": "0x7579",
+          "wire_decimal_zero_based": 30073,
+          "vendor_number_one_based": 30074,
+          "vendor_reference_normalized": "4-30074"
+        },
+        {
+          "wire_hex_zero_based": "0x757A",
+          "wire_decimal_zero_based": 30074,
+          "vendor_number_one_based": 30075,
+          "vendor_reference_normalized": "4-30075"
+        },
+        {
+          "wire_hex_zero_based": "0x757B",
+          "wire_decimal_zero_based": 30075,
+          "vendor_number_one_based": 30076,
+          "vendor_reference_normalized": "4-30076"
+        },
+        {
+          "wire_hex_zero_based": "0x757C",
+          "wire_decimal_zero_based": 30076,
+          "vendor_number_one_based": 30077,
+          "vendor_reference_normalized": "4-30077"
+        },
+        {
+          "wire_hex_zero_based": "0x757D",
+          "wire_decimal_zero_based": 30077,
+          "vendor_number_one_based": 30078,
+          "vendor_reference_normalized": "4-30078"
+        },
+        {
+          "wire_hex_zero_based": "0x757E",
+          "wire_decimal_zero_based": 30078,
+          "vendor_number_one_based": 30079,
+          "vendor_reference_normalized": "4-30079"
+        },
+        {
+          "wire_hex_zero_based": "0x757F",
+          "wire_decimal_zero_based": 30079,
+          "vendor_number_one_based": 30080,
+          "vendor_reference_normalized": "4-30080"
+        },
+        {
+          "wire_hex_zero_based": "0x7580",
+          "wire_decimal_zero_based": 30080,
+          "vendor_number_one_based": 30081,
+          "vendor_reference_normalized": "4-30081"
+        },
+        {
+          "wire_hex_zero_based": "0x7581",
+          "wire_decimal_zero_based": 30081,
+          "vendor_number_one_based": 30082,
+          "vendor_reference_normalized": "4-30082"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Target IP 192.168.3.3"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "destination_port",
+      "name": "Destination server port",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7582",
+      "wire_decimal_zero_based": 30082,
+      "vendor_number_one_based": 30083,
+      "vendor_reference_normalized": "4-30083",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": [
+        1,
+        65535
+      ],
+      "default": 502,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7582 4-30083 Zone 4 1 1-65535 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30083",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7582",
+          "wire_decimal_zero_based": 30082,
+          "vendor_number_one_based": 30083,
+          "vendor_reference_normalized": "4-30083"
+        }
+      ],
+      "default_evidence": {
+        "source_id": "m31_non_u_en_v1_1",
+        "manual_page": 12,
+        "pdf_page_one_based": 16,
+        "section": "3.2",
+        "table_or_figure": null,
+        "quote": "Destination Port 502"
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "network_protocol",
+      "name": "Network Modbus protocol",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7583",
+      "wire_decimal_zero_based": 30083,
+      "vendor_number_one_based": 30084,
+      "vendor_reference_normalized": "4-30084",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "0": "Modbus RTU",
+        "1": "Modbus TCP"
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 52,
+          "pdf_page_one_based": 56,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7583 4-30084 Zone 4 1 when the network data W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30084",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7583",
+          "wire_decimal_zero_based": 30083,
+          "vendor_number_one_based": 30084,
+          "vendor_reference_normalized": "4-30084"
+        }
+      ],
+      "example_configuration": {
+        "value": 1,
+        "label": "Modbus TCP",
+        "manual_page": 55,
+        "pdf_page_one_based": 59,
+        "basis": "Visually inspected configuration screenshot; not asserted as a universal factory default."
+      },
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "negotiation_protection",
+      "name": "Address negotiation write-register protection",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7584",
+      "wire_decimal_zero_based": 30084,
+      "vendor_number_one_based": 30085,
+      "vendor_reference_normalized": "4-30085",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 command/protection",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "1": "Open write-protection registers before starting negotiation"
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 53,
+          "pdf_page_one_based": 57,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7584 4-30085 Zone 4 1 W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30085",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7584",
+          "wire_decimal_zero_based": 30084,
+          "vendor_number_one_based": 30085,
+          "vendor_reference_normalized": "4-30085"
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "negotiation_start",
+      "name": "Address negotiation command",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7585",
+      "wire_decimal_zero_based": 30085,
+      "vendor_number_one_based": 30086,
+      "vendor_reference_normalized": "4-30086",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 command",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "RW",
+      "value_range": {
+        "1": "Begin negotiation"
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 53,
+          "pdf_page_one_based": 57,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "negotiation 0X7585 4-30086 Zone 4 1 the address negotiation W："
+        }
+      ],
+      "vendor_reference_as_printed": "4-30086",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7585",
+          "wire_decimal_zero_based": 30085,
+          "vendor_number_one_based": 30086,
+          "vendor_reference_normalized": "4-30086"
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "negotiation_status",
+      "name": "Current negotiation status",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7586",
+      "wire_decimal_zero_based": 30086,
+      "vendor_number_one_based": 30087,
+      "vendor_reference_normalized": "4-30087",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": {
+        "0": "Not completed",
+        "1": "Completed"
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 53,
+          "pdf_page_one_based": 57,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "negotiation status 0X7586 4-30087 Zone 4 1 R：0x03"
+        }
+      ],
+      "vendor_reference_as_printed": "4-30087",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7586",
+          "wire_decimal_zero_based": 30086,
+          "vendor_number_one_based": 30087,
+          "vendor_reference_normalized": "4-30087"
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "device_exception",
+      "name": "Device exception code",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7587",
+      "wire_decimal_zero_based": 30087,
+      "vendor_number_one_based": 30088,
+      "vendor_reference_normalized": "4-30088",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enum",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": {
+        "0": "No abnormality",
+        "1": "Slave does not reply",
+        "2": "Expansion order wrong; device cannot work normally"
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 53,
+          "pdf_page_one_based": 57,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7587 4-30088 Zone 4 1 R：0x03"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 43,
+          "pdf_page_one_based": 47,
+          "section": "4.6",
+          "table_or_figure": "Online monitoring",
+          "quote": "0X7587 4-30088 Zone 4 1 R：0x03"
+        }
+      ],
+      "vendor_reference_as_printed": "4-30088",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7587",
+          "wire_decimal_zero_based": 30087,
+          "vendor_number_one_based": 30088,
+          "vendor_reference_normalized": "4-30088"
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "expansion_fault_bitmap",
+      "name": "Expansion module fault bitmap",
+      "kind": "singleton",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x7588",
+      "wire_decimal_zero_based": 30088,
+      "vendor_number_one_based": 30089,
+      "vendor_reference_normalized": "4-30089",
+      "word_count_per_value": 2,
+      "bit_count_per_value": 32,
+      "address_stride": null,
+      "type_encoding": "32-bit bitmap; two registers; bit 1 means corresponding expansion abnormal; register word order and first bit numbering not specified",
+      "read_function_codes": [
+        "0x03"
+      ],
+      "write_function_codes": [],
+      "access": "RO",
+      "value_range": {
+        "bits": 32,
+        "bit_set": "Expansion abnormal",
+        "documented_chain_limit": 16
+      },
+      "default": null,
+      "status": "documented",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "All non-U M31 hosts; host-wide parameter/status, not independently repeated per expansion.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 53,
+          "pdf_page_one_based": 57,
+          "section": "4.8.5",
+          "table_or_figure": "Module-related registers",
+          "quote": "0X7588 4-30089 Zone 4 2 R：0x03"
+        },
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 43,
+          "pdf_page_one_based": 47,
+          "section": "4.6",
+          "table_or_figure": "Online monitoring",
+          "quote": "0X7588 4-30089 Zone 4 2 R：0x03"
+        }
+      ],
+      "vendor_reference_as_printed": "4-30089",
+      "occupied_wire_words": [
+        {
+          "wire_hex_zero_based": "0x7588",
+          "wire_decimal_zero_based": 30088,
+          "vendor_number_one_based": 30089,
+          "vendor_reference_normalized": "4-30089"
+        },
+        {
+          "wire_hex_zero_based": "0x7589",
+          "wire_decimal_zero_based": 30089,
+          "vendor_number_one_based": 30090,
+          "vendor_reference_normalized": "4-30090"
+        }
+      ],
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "ao_range_prose",
+      "name": "AO output range [conflicting prose claim]",
+      "kind": "conflicting_base_claim",
+      "modbus_table": "holding_registers",
+      "wire_hex_zero_based": "0x0DAC",
+      "wire_decimal_zero_based": 3500,
+      "vendor_number_one_based": 3501,
+      "vendor_reference_normalized": "4-3501",
+      "word_count_per_value": 1,
+      "bit_count_per_value": 16,
+      "address_stride": null,
+      "type_encoding": "uint16 enumerated range selector",
+      "read_function_codes": [],
+      "write_function_codes": [
+        "0x06",
+        "0x10"
+      ],
+      "access": "write_documented_read_unspecified",
+      "value_range": {
+        "0": "0-20mA",
+        "1": "4-20mA"
+      },
+      "default": 0,
+      "status": "conflict",
+      "confidence": {
+        "document_extraction": 1.0,
+        "hardware_verified": false
+      },
+      "applicability": "AO channels; prose supplies base only; no separate alternative continuation instantiated.",
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 42,
+          "pdf_page_one_based": 46,
+          "section": "4.5.1",
+          "table_or_figure": null,
+          "quote": "(2) The AO channel output range parameter starts from 0x0DAC, the register type is the holding register, and"
+        }
+      ],
+      "conflict_ids": [
+        "ao_range_address"
+      ],
+      "read_access_note": "Prose only names write FC06/10; FC03 is documented for the incompatible table claim, not asserted here.",
+      "model_scope": "M31 non-U Ethernet/RS485 only; channel applicability remains as documented",
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false,
+      "conflict_policy": "Preserve both source claims; unresolved, no automatic correction or write authorization."
+    }
+  ],
+  "analog_profiles": [
+    {
+      "id": "single_ended_current",
+      "selector_values": {
+        "0": "0-20mA",
+        "1": "4-20mA"
+      },
+      "default_selector": 0,
+      "resolution_bits": 12,
+      "sampling_hz": 100,
+      "model_ids": [
+        "M31-AAAX4440G",
+        "M31-XAXX0800G",
+        "M31-XAXA0404G"
+      ],
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 38,
+          "pdf_page_one_based": 42,
+          "section": "4.4.1",
+          "table_or_figure": null,
+          "quote": "The acquisition range is 0~20mA or 4~20mA, the accuracy is 3‰, and the resolution is 12 bits. It adopts a"
+        }
+      ]
+    },
+    {
+      "id": "differential_current",
+      "selector_values": {
+        "0": "0-20mA",
+        "1": "4-20mA",
+        "2": "-20..+20mA"
+      },
+      "default_selector": 0,
+      "resolution_bits": 16,
+      "sampling_hz": 40,
+      "model_ids": [
+        "M31-XFXX0800G"
+      ],
+      "unresolved_model_ids": [
+        "M31-XGXX0800G"
+      ],
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 38,
+          "pdf_page_one_based": 42,
+          "section": "4.4.1",
+          "table_or_figure": null,
+          "quote": "The acquisition range is 0~20mA or 4~20mA or ±20mA, the accuracy is 1‰, and the resolution is 16 bits."
+        }
+      ]
+    },
+    {
+      "id": "differential_voltage",
+      "selector_values": {
+        "3": "0-5V",
+        "4": "-5..+5V",
+        "5": "0-10V",
+        "6": "-10..+10V"
+      },
+      "default_selector": 5,
+      "resolution_bits": 16,
+      "sampling_hz": 40,
+      "model_ids": [],
+      "unresolved_model_ids": [
+        "M31-XGXX0800G"
+      ],
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 38,
+          "pdf_page_one_based": 42,
+          "section": "4.4.1",
+          "table_or_figure": null,
+          "quote": "The acquisition range is 0~5V or 0~10V or ±5V or ±10V, the accuracy is 1‰, and the resolution is 16 bits."
+        }
+      ],
+      "note": "Voltage functionality is described, but primary model list labels XGXX current. No definitive voltage model assignment."
+    }
+  ],
+  "known_host_ranges_file": "known-host-ranges.csv",
+  "known_host_ranges_policy": "38 finite local host-only ranges from primary model counts and documented channel continuity; no guessed expansion endpoints.",
+  "analog_process_tables": [
+    {
+      "title": "Analog input (current: 0~20mA)",
+      "pages": [
+        39
+      ],
+      "family_id": "ai_process",
+      "encoding": "int16 two's-complement",
+      "details_file": "analog-process-values.csv",
+      "note": "Hex columns contain values, not register addresses."
+    },
+    {
+      "title": "Analog input (current-20~0mA)",
+      "pages": [
+        40
+      ],
+      "family_id": "ai_process",
+      "encoding": "int16 two's-complement",
+      "details_file": "analog-process-values.csv",
+      "note": "Hex columns contain values, not register addresses."
+    },
+    {
+      "title": "Analog input (current-20-20mA)",
+      "pages": [
+        40,
+        41
+      ],
+      "family_id": "ai_process",
+      "encoding": "int16 two's-complement",
+      "details_file": "analog-process-values.csv",
+      "note": "Hex columns contain values, not register addresses."
+    },
+    {
+      "title": "Analog input (voltage)",
+      "pages": [
+        41,
+        42
+      ],
+      "family_id": "ai_process",
+      "encoding": "int16 two's-complement",
+      "details_file": "analog-process-values.csv",
+      "note": "Hex columns contain values, not register addresses."
+    }
+  ],
+  "protocol_examples": [
+    {
+      "id": "do_single_on",
+      "modbus_table": "coils",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "0-0001",
+      "function_code": "0x05",
+      "value_count": 1,
+      "rtu_as_printed": "01 05 00 00 FF 00 8C 3A",
+      "tcp_as_printed": "01 00 00 00 00 06 01 05 00 00 FF 00",
+      "manual_page": 9,
+      "pdf_page_one_based": 13,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 9,
+          "pdf_page_one_based": 13,
+          "section": "2.4.2",
+          "table_or_figure": "RTU control instructions",
+          "quote": "The first coil is closed（0x05） 01 05 00 00 FF 00 8C 3A"
+        }
+      ],
+      "note": "Documentation only; never sent to hardware."
+    },
+    {
+      "id": "do_four_on",
+      "modbus_table": "coils",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "0-0001",
+      "function_code": "0x0F",
+      "value_count": 4,
+      "rtu_as_printed": "01 0F 00 00 00 04 01 0F 7E 92",
+      "tcp_as_printed": "02 00 00 00 00 08 01 0F 00 00 00 04 01 0F",
+      "manual_page": 9,
+      "pdf_page_one_based": 13,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 9,
+          "pdf_page_one_based": 13,
+          "section": "2.4.2",
+          "table_or_figure": "RTU control instructions",
+          "quote": "01 0F 00 00 00 04 01 0F 7E 92"
+        }
+      ],
+      "note": "Documentation only; never sent to hardware."
+    },
+    {
+      "id": "do_four_off",
+      "modbus_table": "coils",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "0-0001",
+      "function_code": "0x0F",
+      "value_count": 4,
+      "rtu_as_printed": "01 0F 00 00 00 04 01 00 3E 96",
+      "tcp_as_printed": "02 00 00 00 00 08 01 0F 00 00 00 04 01 00",
+      "manual_page": 9,
+      "pdf_page_one_based": 13,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 9,
+          "pdf_page_one_based": 13,
+          "section": "2.4.2",
+          "table_or_figure": "RTU control instructions",
+          "quote": "01 0F 00 00 00 04 01 00 3E 96"
+        }
+      ],
+      "note": "Documentation only; never sent to hardware."
+    },
+    {
+      "id": "di_four_read",
+      "modbus_table": "discrete_inputs",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "1-0001",
+      "function_code": "0x02",
+      "value_count": 4,
+      "rtu_as_printed": "01 02 00 00 00 04 79 C9",
+      "tcp_as_printed": "01 00 00 00 00 06 01 02 00 00 00 04",
+      "manual_page": 9,
+      "pdf_page_one_based": 13,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 9,
+          "pdf_page_one_based": 13,
+          "section": "2.4.2",
+          "table_or_figure": "RTU control instructions",
+          "quote": "Read 4-channel DI status（0x02） 01 02 00 00 00 04 79 C9"
+        }
+      ],
+      "note": "Documentation only; never sent to hardware."
+    },
+    {
+      "id": "do_four_read",
+      "modbus_table": "coils",
+      "wire_hex_zero_based": "0x0000",
+      "wire_decimal_zero_based": 0,
+      "vendor_number_one_based": 1,
+      "vendor_reference_normalized": "0-0001",
+      "function_code": "0x01",
+      "value_count": 4,
+      "rtu_as_printed": "01 01 00 00 00 04 3D C9",
+      "tcp_as_printed": "01 00 00 00 00 06 01 01 00 00 00 04",
+      "manual_page": 9,
+      "pdf_page_one_based": 13,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 9,
+          "pdf_page_one_based": 13,
+          "section": "2.4.2",
+          "table_or_figure": "RTU control instructions",
+          "quote": "Read 4-channel DO status（0x01） 01 01 00 00 00 04 3D C9"
+        }
+      ],
+      "note": "Documentation only; never sent to hardware."
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "ao_range_address",
+      "severity": "write_blocking",
+      "claims": [
+        {
+          "address": "0x1194",
+          "source": "§4.8.4 p51 table"
+        },
+        {
+          "address": "0x0DAC",
+          "source": "§4.5.1 p42 prose"
+        }
+      ],
+      "resolution": "Unresolved. Keep both; do not write or select a presumed correct address."
+    },
+    {
+      "id": "ao_process_vendor_zone",
+      "severity": "address_representation",
+      "claims": [
+        {
+          "table": "holding_registers",
+          "basis": "Zone 4, FC03/06/10, §4.5.2 p43"
+        },
+        {
+          "vendor_references": [
+            "3-0501",
+            "3-0502",
+            "3-0503",
+            "3-0504",
+            "3-0505"
+          ],
+          "basis": "p50 decimal column"
+        }
+      ],
+      "resolution": "Normalized holding reference 4-0501 is a computed representation, not silently substituted for printed 3-0501."
+    },
+    {
+      "id": "xgxx_current_voltage",
+      "severity": "model_applicability",
+      "claims": [
+        {
+          "source": "§1.3 p2",
+          "value": "M31-XGXX0800G 8AI(Differential Current)"
+        },
+        {
+          "source": "§4.4.1 p38",
+          "value": "Differential voltage capability described without explicit model mapping"
+        }
+      ],
+      "resolution": "Preserve primary label current; voltage association remains unconfirmed. Generic voltage wiring p5 is not model-specific proof."
+    },
+    {
+      "id": "unit_voltage_integer",
+      "severity": "encoding",
+      "claims": [
+        {
+          "source": "p39",
+          "value": "read -10000..10000 corresponds -10V..10V"
+        },
+        {
+          "source": "p39",
+          "value": "voltage = quantity value / 1000 (mV)"
+        }
+      ],
+      "resolution": "Scaling implies V after /1000 (integer mV), whereas printed formula labels mV. Do not hide discrepancy."
+    },
+    {
+      "id": "current_process_decimal_hex",
+      "severity": "value_conversion",
+      "claims": [
+        {
+          "source": "p40 and p41",
+          "decimal_as_printed": -27949,
+          "hex_as_printed": "0x93FF",
+          "computed_int16_from_hex": -27649
+        }
+      ],
+      "resolution": "Verified in rendered pages; decimal and hex conflict in original, not OCR. Keep both."
+    },
+    {
+      "id": "expansion_di_off_by_one",
+      "severity": "continuation_example",
+      "claims": [
+        {
+          "source": "§4.8 p44",
+          "value": "8DI host 0x0000..0x0007 followed by 8DI extension 0x0008..0x0010"
+        }
+      ],
+      "resolution": "Printed inclusive tail has 9 bits; arithmetic 8-channel continuation ends 0x000F. Preserve erroneous 0x0010 as a claim, not an extra DI."
+    },
+    {
+      "id": "modbus_address_range",
+      "severity": "address_configuration",
+      "claims": [
+        {
+          "source": "§3.5 p35",
+          "value": "device address 1..255, hardware 0..15, software <=240"
+        },
+        {
+          "source": "§4.7.1 p44",
+          "value": "address 1..247"
+        }
+      ],
+      "resolution": "No software offset register address supplied. Do not invent one or treat address negotiation as software address setting."
+    },
+    {
+      "id": "ai_range_scope",
+      "severity": "description_scope",
+      "claims": [
+        {
+          "source": "p38 range descriptions",
+          "value": "Set sampling range for all AI channels"
+        },
+        {
+          "source": "p38 note and p48 table",
+          "value": "Each channel has its own sampling range"
+        }
+      ],
+      "resolution": "Explicit per-channel addresses preserved; wording discrepancy recorded."
+    },
+    {
+      "id": "ai_example_vs_differential",
+      "severity": "model_scope",
+      "claims": [
+        {
+          "source": "p48 example",
+          "value": "selector 0/1, default0"
+        },
+        {
+          "source": "p38",
+          "value": "differential current 0..2 default0; voltage3..6 default5"
+        }
+      ],
+      "resolution": "Not one universal range: p48 is AAAX current example. Keep profiles without forcing differential voltage model assignment."
+    },
+    {
+      "id": "do_table_title",
+      "severity": "editorial",
+      "claims": [
+        {
+          "source": "§4.8.2 p45",
+          "value": "DI Status Registers title over DO rows"
+        }
+      ],
+      "resolution": "DO rows and FC01/05/0F unambiguous; title typo retained in evidence."
+    },
+    {
+      "id": "fault_bitmap_capacity",
+      "severity": "implementation_unknown",
+      "claims": [
+        {
+          "source": "p1 and §1.2",
+          "value": "up to16 expansion modules"
+        },
+        {
+          "source": "p43/p53",
+          "value": "2 registers/32-bit expansion bitmap"
+        }
+      ],
+      "resolution": "Not necessarily contradictory; upper bits, word order, first index unspecified. Do not infer32-module support."
+    },
+    {
+      "id": "ao_prose_ai_copy",
+      "severity": "editorial",
+      "claims": [
+        {
+          "source": "§4.5.1 p42",
+          "value": "AO paragraph refers to AI sampling range during write-clamping explanation"
+        }
+      ],
+      "resolution": "Preserve provenance; no guessed AO correction."
+    }
+  ],
+  "coverage": [
+    {
+      "section": "4.8.1",
+      "pages": [
+        45
+      ],
+      "tables": [
+        "DI Status Registers",
+        "DI Filter Registers"
+      ],
+      "definition_ids": [
+        "di_status",
+        "di_filter"
+      ],
+      "status": "complete"
+    },
+    {
+      "section": "4.8.2",
+      "pages": [
+        45,
+        46
+      ],
+      "tables": [
+        "DO status table (mislabeled DI)"
+      ],
+      "definition_ids": [
+        "do_status"
+      ],
+      "status": "complete"
+    },
+    {
+      "section": "4.8.3",
+      "pages": [
+        46,
+        47,
+        48
+      ],
+      "tables": [
+        "AI Quantity Shaping Value",
+        "AI floating-point",
+        "AI Process",
+        "AI Filter",
+        "AI Sampling Range"
+      ],
+      "definition_ids": [
+        "ai_integer",
+        "ai_float",
+        "ai_process",
+        "ai_filter",
+        "ai_range"
+      ],
+      "status": "complete"
+    },
+    {
+      "section": "4.8.4",
+      "pages": [
+        49,
+        50,
+        51
+      ],
+      "tables": [
+        "AO Integer",
+        "AO floating-point",
+        "AO Process Quantity",
+        "AO Output Range"
+      ],
+      "definition_ids": [
+        "ao_integer",
+        "ao_float",
+        "ao_process",
+        "ao_range_table"
+      ],
+      "status": "complete_with_conflicts"
+    },
+    {
+      "section": "4.8.5",
+      "pages": [
+        51,
+        52,
+        53
+      ],
+      "tables": [
+        "Module-related registers"
+      ],
+      "definition_ids": [
+        "serial_baud",
+        "serial_parity",
+        "network_mode",
+        "dhcp",
+        "mac",
+        "local_ip",
+        "subnet",
+        "gateway",
+        "dns",
+        "local_port",
+        "destination",
+        "destination_port",
+        "network_protocol",
+        "negotiation_protection",
+        "negotiation_start",
+        "negotiation_status",
+        "device_exception",
+        "expansion_fault_bitmap"
+      ],
+      "status": "complete"
+    },
+    {
+      "section": "2.4",
+      "pages": [
+        8,
+        9,
+        10
+      ],
+      "tables": [
+        "Modbus TCP instructions",
+        "Modbus RTU instructions"
+      ],
+      "definition_ids": [
+        "di_status",
+        "do_status"
+      ],
+      "status": "examples_checked_no_new_addresses"
+    },
+    {
+      "section": "3.2,3.5",
+      "pages": [
+        12,
+        35
+      ],
+      "status": "defaults_checked_software_address_not_mapped"
+    },
+    {
+      "section": "4.2,4.4,4.5",
+      "pages": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ],
+      "status": "all_prose_address_claims_and_four_process_value_tables_checked"
+    },
+    {
+      "section": "4.6",
+      "pages": [
+        43
+      ],
+      "tables": [
+        "Online monitoring"
+      ],
+      "definition_ids": [
+        "device_exception",
+        "expansion_fault_bitmap"
+      ],
+      "status": "duplicate_status_definitions_checked"
+    },
+    {
+      "section": "4.7,5.1,5.2,6",
+      "pages": [
+        44,
+        54,
+        55,
+        56,
+        57
+      ],
+      "status": "config_screenshots_and_firmware_info_checked_no_additional_wire_addresses"
+    }
+  ],
+  "unmapped_or_absent": [
+    {
+      "name": "AO failsafe/error output value",
+      "status": "not_documented_in_this_source",
+      "wire_address": null
+    },
+    {
+      "name": "AO power-on output value",
+      "status": "not_documented_in_this_source",
+      "wire_address": null,
+      "note": "AO table default0 is not proof of a separately configurable power-on register."
+    },
+    {
+      "name": "Modbus software offset/slave address",
+      "status": "configuration_documented_address_not_given",
+      "wire_address": null,
+      "evidence": [
+        {
+          "source_id": "m31_non_u_en_v1_1",
+          "manual_page": 35,
+          "pdf_page_one_based": 39,
+          "section": "3.5",
+          "table_or_figure": null,
+          "quote": "Software Address: This is achieved by the Offset Address set by the Configurator software (factory default is 1)."
+        }
+      ]
+    },
+    {
+      "name": "Data bits, stop bits",
+      "status": "defaults8_and1_documented_register_not_given",
+      "wire_address": null
+    },
+    {
+      "name": "Save, reboot, factory restore",
+      "status": "UI/button_operations_documented_register_not_given",
+      "wire_address": null
+    },
+    {
+      "name": "Host/expansion firmware version and module descriptors",
+      "status": "UI_information_documented_register_not_given",
+      "wire_address": null
+    },
+    {
+      "name": "Channel counts/module enumeration",
+      "status": "no_count_register_address_documented",
+      "wire_address": null
+    },
+    {
+      "name": "0x753F..0x7540",
+      "status": "unmapped_gap_not_a_register",
+      "wire_address": null
+    },
+    {
+      "name": "0x758A and later",
+      "status": "no_register_claim_in_this_source",
+      "wire_address": null
+    }
+  ],
+  "safety_and_limits": [
+    "No U/chinese/other-series register map merged.",
+    "No EXE execution, hardware I/O, network scanning, unknown writes or private uploads.",
+    "No address-gap inference. Explicit continuation is channel-stride only, bounded by actual negotiated chain.",
+    "Up to16 expansion modules; channel capacity per unlisted expansion remains unknown.",
+    "Host firmwareV1.1 incompatible with listed newer expansion modules; V1.2 described compatible (§6 p57).",
+    "Register table default states are not independently proven boot/persistence behavior.",
+    "Network setting modifications require save/restart in UI (§5.2 p55); save/restart wire commands not documented.",
+    "None of these claims has been verified against live firmware."
+  ],
+  "evidence_policy": {
+    "hardware_verified": false,
+    "runtime_enabled": false,
+    "automatic_probe_allowed": false,
+    "automatic_write_allowed": false,
+    "scope": "Offline evidence only; not a runtime address allowlist or hardware authorization."
+  },
+  "summary": {
+    "primary_register_tables": 13,
+    "table_definitions": 30,
+    "additional_conflicting_prose_claims": 1,
+    "total_claims": 31,
+    "explicit_table_rows": 70,
+    "explicit_rows_including_prose": 71,
+    "distinct_explicit_hex_addresses": 50,
+    "non_u_module_fields": 18,
+    "host_models": 12,
+    "derived_host_ranges": 38,
+    "analog_process_value_rows": 40
+  },
+  "runtime_catalog_aliases": {
+    "core": {
+      "di": "di_status",
+      "do": "do_status",
+      "ao_alternative": "ao_process",
+      "ao_range": "ao_range_table"
+    },
+    "device": {
+      "baudrate": "serial_baud",
+      "ip": "local_ip",
+      "target": "destination",
+      "target_port": "destination_port",
+      "protocol": "network_protocol",
+      "negotiation_lock": "negotiation_protection",
+      "exception_status": "device_exception",
+      "expansion_bitmap": "expansion_fault_bitmap",
+      "parity": "serial_parity"
+    }
+  }
+}

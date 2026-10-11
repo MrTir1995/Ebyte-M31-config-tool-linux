@@ -7,6 +7,9 @@ austauschen. IEEE754-Anzeige, lokale Clientprofile und Geräteparameterstatus
 ergänzen den Modbus-Explorer.
 Die Tkinter-Oberfläche startet ohne Gerätekommunikation oder Schreibzugriffe.
 Der Umsetzungs- und Abnahmeplan steht in [PLAN.md](PLAN.md).
+Das detaillierte, quellengebundene Registerinventar einschließlich
+Modellvergleich, GitHub-/Forenbefunden und getrennten Musterhypothesen
+steht unter [docs/registers](docs/registers/README.md).
 
 Dies ist **kein vollständiger Nachbau** der Windows-Anwendung. Der belegte
 Funktionsumfang, nicht eine uneingeschränkte Eins-zu-eins-Parität, ist das Ziel.
@@ -18,6 +21,51 @@ zur Beschreibung der Gerätekompatibilität verwendet.
 
 Der Vergleich basiert auf der bisherigen statischen EXE-Untersuchung und
 dem M31-Handbuch, nicht auf einem parallelen Windows-Testlauf.
+
+Der separate Feature-Commit `0109f9a` dokumentiert eine vom Prüfer berichtete
+Windows-UI-Sichtung von Config/IO Status ohne ausgewähltes Gerät. Suche,
+Save/Restore/Reboot/Export und Firmware wurden dabei nicht betätigt.
+Dies ergänzt die Oberflächenbeschreibung, belegt aber weder Gerätekommunikation
+noch Firmware-/Konfigurationsprotokolle. Die unten beschriebene blockierte
+Referenzprüfung in unserer VM bleibt davon getrennt.
+
+**Auto-refresh read only** aktualisiert optional nur den ausgewählten
+Modbus-Lesebereich, mit ausdrücklich gewähltem Intervall von 0,1 bis 5 Sekunden.
+Es ist zunächst aus, schreibt keine Gerätewerte und führt keine parallelen
+Anfragen aus. Fehler einschließlich ungültiger Adresse, Anzahl oder Intervall
+schalten es sichtbar aus; Trennen und Schließen entfernen den Timer.
+Dies ist keine vollständige modulare Hersteller-I/O-Ansicht.
+
+### Stand der Windows-Referenzprüfung
+
+Die erneut bereitgestellte `Configuration Tool V1.3.exe` ist laut lokalem
+SHA256-Vergleich identisch zur zuvor statisch untersuchten Datei:
+`c4473c9521020043f568d4ba7a2630b4cacb7a731a3635d6d4e8d594a387baee`.
+Windows Defender blockiert ihre Ausführung in der Windows-VM. Der Schutz
+bleibt aktiviert; es werden weder Ausnahmen gesetzt noch die Sperre umgangen.
+Diese Beobachtung ist keine eigene Malwareklassifizierung.
+
+Native Windows-Tests **unserer Python-Anwendung** sind davon zu unterscheiden:
+Sie wurden tatsächlich ausgeführt und haben XLSX-Dateisperren, Layoutfehler
+und einen Tcl-Abbruch bei der Thread-/Interpreterfreigabe aufgedeckt.
+Der korrigierte Stand 0.3.0 bestand am 11.10.2026 den vollständigen nativen
+Windows-Lauf: **185 Tests, 184 bestanden, ein Hardwaretest übersprungen**
+in 90,982 Sekunden, ohne Tcl-Abbruch; Großschriftprüfung, Kompilierung,
+Abhängigkeitsprüfung, Wheel-Build und GUI-Start/-Ende waren erfolgreich.
+Diese Abnahme galt zunächst nur für den damaligen eingefrorenen Stand.
+Anschließend bestand auch **0.4.0** den vollständigen nativen Windows-Lauf:
+**215 Tests, 214 bestanden, ein Hardwaretest übersprungen** in 107,764 Sekunden,
+ohne Tcl-Abbruch. Kompilierung, Abhängigkeiten, Wheel-Build und GUI-Start/-Ende
+waren ebenfalls erfolgreich. Laufzeit-Parität zur Hersteller-EXE bleibt
+unbestätigt. In der VM steht keine M31-Hardware zur Verfügung.
+
+Auch der frisch vom Hersteller geladene Download `id=3403` enthält dieselbe
+blockierte EXE, keinen anderen Build. ZIP: 25.539.169 Bytes,
+SHA256 `a2435952a97b4dfb7c6565e2b5b0594ebdc4b971ef036bb945b02353de7eaaa3`;
+EXE: 27.514.368 Bytes, SHA256 wie oben. Die statisch geprüfte PE-Datei enthält
+keine Authenticode-Signatur; File/ProductVersion ist `0.0.0.0`, während
+`V1.3` im Dateinamen steht. Herstellerherkunft ist damit belegt, nicht eine
+eigene Sicherheitsbewertung oder eine Freigabe zur Umgehung der Sperre.
 
 ### Öffentlich recherchierte Herstellerquellen
 
@@ -71,14 +119,18 @@ die Auswertung beruht auf sichtbaren Bildern und Einblendungen.
 | Einzelne Coils/Register schreiben (05/06) | Implementiert; Host-Coil 0 live mit Rückstellung geprüft, übrige Schreibtests am Simulator |
 | Mehrfachschreiben (0F/10) | Implementiert mit vollständiger Bestätigung und Rücklesen; am Simulator geprüft |
 | I/O-Ansicht | Rohregister-Explorer, Adresskatalog und IEEE754-Anzeige mit expliziter Wortreihenfolge; kein vollständiger modularer Gerätebaum |
+| Float-Ausgabewerte eingeben | IEEE754-Eingabe für Holdingregister, ausdrücklich gewählte Wortreihenfolge, zwei Rohworte je Wert, bestätigtes FC10-Schreiben und vollständiges Rücklesen; keine automatisch erkannten AO-Kanäle oder Einheiten |
+| AI-/AO-Messbereiche | Katalog bereitet Rohwert-Lesen vor; keine dedizierte Messbereich-Schreibfunktion ohne belegte Modellzuordnung, Kanalgrenzen und geklärten AO-Adresswiderspruch |
 | Messwerte speichern/laden | Lokaler CSV-/XLSX-Austausch; kein Geräte-Konfigurationsimport |
 | XLSX/QXlsx | Eigenes geprüftes Messwertschema; Windows-Konfigurationskompatibilität nicht bestätigt |
 | Clientprofile speichern/laden | Versioniertes JSON für Linux-Verbindungseinstellungen; kein Geräte-Konfigurationsformat |
-| Vollständiger Modbus-Assistent | Generischer Explorer bietet alle acht Standardfunktionscodes; vollständiges Windows-Verhalten nicht bestätigt |
+| Modbus-Assistent / Verkehrsprotokoll | Alle acht Standardfunktionscodes; tatsächliche pymodbus-Transportbeobachtungen lokal anzeigen, kopieren und löschen; keine beliebigen Telegramme, kein PCAP und kein bestätigtes vollständiges Windows-Verhalten |
 | Geräteparameter-/Fehlerstatus | Dokumentierte Holdingregister explizit lesbar, unsichere Byteinterpretationen bleiben roh |
 | Erweiterungsadressverhandlung | Dokumentierter Ablauf implementiert, separat bestätigt; am Fake-Gerät geprüft, nicht live ausgelöst |
 | Netzwerk-/Seriellparameter im Gerät speichern, Neustart | Nicht implementiert; Verbindungseinstellungen verändern nur den Linux-Client |
+| Werksreset, vollständige Modul-/Firmwareinfo, modularer Gerätebaum und Adresstabellen-Export | In Herstellerunterlagen/Video sichtbar; gerätespezifisches Protokoll bzw. vollständiges Datenmodell nicht verifiziert, nicht vollständig implementiert |
 | Proprietäre UDP-Erkennung, Firmware-Update | Aus Sicherheitsgründen ohne dokumentiertes Protokoll nicht implementiert |
+| BOOT-/Reload-Firmwarewiederherstellung | Im Video sichtbar; kein verifiziertes Recovery-Protokoll, nicht implementiert |
 
 Damit ist eine geprüfte Linux-Anwendung für den genannten Modbus-Umfang
 möglich, aber keine bestätigte vollständige Funktionsgleichheit zum
@@ -195,6 +247,28 @@ Nur aufeinanderfolgende Registerpaare werden interpretiert; die Rohdaten
 und Exporte bleiben unverändert. Das Programm unterstellt keine
 modellbezogene Wortreihenfolge oder Skalierung.
 
+Im Schreib-Tab kann **IEEE754 float32** als Werteformat gewählt werden.
+Es ist nur für Holdingregister zulässig; die Wortreihenfolge muss ausdrücklich
+ausgewählt werden (anfangs leer). Dezimal-/Exponentialwerte sind erlaubt,
+Kommas trennen mehrere Werte. Ein Wert belegt zwei Register, höchstens
+61 Werte/122 Register werden auf einmal vorbereitet. NaN, Unendlich,
+Float32-Überlauf und ungültige Werte werden vor der Gerätekommunikation
+abgewiesen. Die Bestätigung zeigt Eingabewerte, Reihenfolge, genaue Adressen
+und sämtliche kodierten Rohworte. Geschrieben wird mit FC10 und anschließend
+jedes Rohwort zurückgelesen. Der konkrete AO-Kanal, Bereich und dessen
+physikalische Einheit müssen aus dem passenden Modulhandbuch stammen.
+
+Der Tab **Modbus trace** zeigt nach ausdrücklichem Aktualisieren ausschließlich
+Bytes aus dem tatsächlichen pymodbus-Transport-Hook. `TX attempt` ist vor dem
+Senden beobachtet und kein Zustellnachweis; `RX buffer` kann Teilstücke oder
+kumulative Empfangspuffer enthalten, nicht zwingend ein vollständiges Telegramm
+je Zeile. Dies ist **kein Netzwerk-/RS485-Paketmitschnitt**. Zeitangaben sind
+monotone Sekunden, nicht Kalenderzeiten. Höchstens 500 Beobachtungen pro Session
+werden gehalten; verworfene ältere Einträge werden gezählt. Anzeigen, Kopieren
+in die lokale Zwischenablage und Löschen lösen keine Gerätekommunikation aus.
+Eine neue Verbindungssession beginnt ein neues lokales Protokoll; angezeigte
+Snapshots tragen Endpunkt und Unit-ID und werden nur auf Anforderung aktualisiert.
+
 Die Clientprofile speichern Transport, Host/Port, serielle Einstellungen,
 Unit-ID/Timeout und Leseauswahl in einem eigenen versionierten JSON-Format.
 Laden ist nur getrennt vom Gerät möglich und verbindet nicht automatisch.
@@ -245,6 +319,47 @@ Auftrag, alle Bereiche blind zu lesen oder Filter automatisch zu verändern.
 
 ## Geräteparameter und fehlende Herstellerprotokolle
 
+### Vollständigkeit des recherchierten Registers
+
+Das neue Inventar erfasst alle **13 Registertabellen des englischen
+nicht-U-Handbuchs V1.1**: 30 reguläre Definitionen und eine separat
+erhaltene widersprüchliche AO-Basisadressbehauptung. Das bedeutet nicht,
+dass sämtliche undokumentierten Firmwarebefehle bekannt wären.
+Belegte Kanalfolgen, Mehrwortfelder, Modellkanalzahlen und einbasierte
+Vendor-Referenzen sind von nullbasierten PDU-Adressen getrennt.
+
+Der Anwendungskatalog enthält die 12 bisherigen I/O-/Filter-/Bereichseinträge
+und nun auch die 17 bereits implementierten lesbaren Geräteparameterfelder.
+Die Auswahl bereitet ausschließlich einen Rohwert-Lesezugriff mit der
+richtigen Wortanzahl vor und führt keine Kommunikation aus.
+Der aktive Verhandlungsauslöser `0x7585` ist im Forschungsinventar erfasst,
+bleibt aber außerhalb dieser Lesevorbereitung; die bestehende ausdrücklich
+bestätigungspflichtige Verhandlung ist unverändert.
+Reservierte Lücken `0x753F..0x7540` werden nicht aufgefüllt.
+
+Chinesische Host-/Erweiterungshandbücher bestätigen wiederkehrende
+Kanalfortsetzung und Float-Stride 2, zeigen jedoch auch Gegenbeispiele:
+Nicht-U-DI/AI-Filter sind gemeinsame Register `0x0DA3`/`0x0DA2`, während
+M31-U andere kanalbezogene Register verwendet. U-Identifikation,
+Reset-/Neustart-, Puls-, PT100- und Fehlerausgaberegister sind deshalb
+**keine belegten Register unseres nicht-U-Moduls**.
+Dokumente, Übersetzungen oder Spiegel derselben Herstellerquelle zählen
+nicht als unabhängige Hardwarebestätigungen.
+
+Hypothesen aus solchen Mustern sind als getrennte Forschungsdaten mit
+Quellen, Alternativen, Gegenbelegen und fehlender Hardwarevalidierung
+erfasst, nicht in der operativen Registerliste. Sie lösen weder Reads noch
+Writes oder Scans aus. GitHub-Code und Forenberichte sind ausdrücklich
+berichtete Befunde, kein eigener Mitschnitt oder verifizierter Registertest.
+
+**Abnahme 0.5.0:** Unter Linux und nativem Windows bestanden jeweils
+228 von 229 Tests; ein Hardwaretest blieb ausdrücklich übersprungen.
+Der Windows-Lauf dauerte 103,377 Sekunden und lief mit normalem
+Windows-Textdefault ohne UTF-8-Override. Artefakte, Katalogauswahl,
+Kompilierung, Abhängigkeiten, Wheel-Build und GUI-Start/-Ende wurden geprüft.
+Eine gefundene Test-Artefaktlesestelle wurde auf explizites UTF-8 korrigiert.
+Das ist eine Software-/Inventarabnahme, keine Register-Hardwareverifikation.
+
 Der Geräteparameter-/Status-Tab liest ausdrücklich ausgewählte dokumentierte
 Holdingregister: Baudcode, Parität, Netzwerkmodus, DHCP, MAC/IP/Netzmaske/
 Gateway/DNS, lokale und Zielports, Zieladresse, Netzwerk-Protokoll,
@@ -272,7 +387,32 @@ Ebenso fehlen Discovery-Port/Payload und ein Windows-XLSX-Exportbeispiel.
 Für diesen Restumfang werden Herstellerprotokolle oder nachvollziehbare
 Windows-Referenzmitschnitte und Beispieldateien benötigt; ohne sie kann
 keine vollständige Funktionsgleichheit bestätigt oder sicher implementiert
-werden. Ein Windows-Gegenlauf und reale RS485-Abnahme stehen ebenfalls aus.
+werden. Die native Windows-Abnahme unserer Anwendung ist davon getrennt;
+eine reale RS485-Abnahme und Hersteller-Laufzeitvergleiche stehen weiterhin aus.
+
+### Messbereichsregister: belegte Lesevorbereitung, offene Schreibsemantik
+
+Das primäre M31-Handbuch §4.8.3, S.47–48 nennt AI-Messbereiche ab
+`0x0DAC` (3500, nullbasiert), jeweils ein Register je Kanal.
+Die Codes 0–6 hängen von der elektrischen Modellklasse ab. Eine passende
+Modellzuordnung und die tatsächliche Host-/Erweiterungskanalzahl werden
+nicht aus einer Geräte-ID oder dem Fehlerbitmap geraten.
+
+Für AO nennt die Tabelle in §4.8.4, S.50–51 `0x1194` (4500), während
+§4.5.1 im Fließtext widersprüchlich `0x0DAC` nennt. Das ist ein offener
+Dokumentationswiderspruch, **keine bestätigte Herstellerkorrektur**.
+Der Katalog kennzeichnet ihn und bereitet lediglich einen einzelnen Rohwert-
+Lesezugriff vor. Keine dedizierte AI-/AO-Messbereich-Schreiboption wird als
+fertige Funktion ausgegeben. Unbekannte Kanal- oder Expansionsoffsets
+werden nicht automatisch angesprochen.
+
+Auch die statisch gelesene DOCX-Anleitung aus dem offiziellen
+[Upgrade-Notes-Archiv](https://www.cdebyte.com/pdf-down.aspx?id=3509)
+beschreibt nur GUI-Schritte, keine Ports, Telegramme, Prüfsummen oder
+Speicher-/Neustartregister. Sie warnt, dass nach einem Host-Firmwareupgrade
+Geräteinformationen und gespeicherte Parameter gelöscht werden und neu
+konfiguriert/verhandelt werden müssen. Enthaltene EXE-/Firmwaredateien werden
+nicht ausgeführt oder mit dieser Anwendung verteilt.
 
 ## Sicherheit und Hardware-Abnahme
 
@@ -374,7 +514,7 @@ Das gebaute Wheel in einer **separaten Umgebung** prüfen:
 
 ```sh
 python3 -m venv .wheel-venv
-.wheel-venv/bin/python -m pip install dist/m31tool-0.3.0-py3-none-any.whl
+.wheel-venv/bin/python -m pip install dist/m31tool-0.5.0-py3-none-any.whl
 .wheel-venv/bin/python -m pip check
 (cd .wheel-venv && bin/python -c "import m31tool.core; import m31tool.__main__; print('Wheel-Import OK')")
 ```

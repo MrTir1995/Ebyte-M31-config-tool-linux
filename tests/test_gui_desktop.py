@@ -1,6 +1,5 @@
 """Real Tk widget and async application tests against a loopback Modbus peer."""
 
-import os
 from pathlib import Path
 import shutil
 import unittest
@@ -9,6 +8,7 @@ from unittest.mock import patch
 
 from m31tool.app import M31App
 from tests.modbus_simulator import running_simulator
+from tests.tk_lifecycle import release_tk_fixture
 
 try:
     import tkinter as tk
@@ -16,9 +16,7 @@ except ModuleNotFoundError:
     tk = None
 
 
-HAS_DISPLAY = tk is not None and bool(
-    os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
-)
+HAS_DISPLAY = tk is not None
 
 
 @unittest.skipUnless(HAS_DISPLAY, "A graphical display is required for Tk tests.")
@@ -28,6 +26,7 @@ class DesktopGUITests(unittest.TestCase):
             self.root = tk.Tk()
         except tk.TclError as exc:
             self.skipTest(f"Tk display is unavailable: {exc}")
+        self.addCleanup(release_tk_fixture, self)
         self.simulator_context = running_simulator()
         self.simulator = self.simulator_context.__enter__()
         self.app = M31App(self.root)
@@ -74,6 +73,116 @@ class DesktopGUITests(unittest.TestCase):
         self.app.connect_button.invoke()
         self.wait_for(lambda: not self.app.busy)
         self.assertTrue(self.app.connected, self.app.status.get())
+
+    def test_worker_error_chain_does_not_retain_tk_frames(self):
+        def fail():
+            try:
+                raise OSError("closed connection")
+            except OSError as exc:
+                raise ValueError("bad response") from exc
+
+        self.app._run("Read", fail, lambda _: self.fail("Failure ran success callback"))
+        self.app.worker_thread.join()
+        event = self.app.events.get_nowait()
+        error = event[2]
+        self.assertIsInstance(error, ValueError)
+        self.assertEqual(str(error), "bad response")
+        self.assertIsInstance(error.__cause__, OSError)
+        self.assertIsNone(error.__traceback__)
+        self.assertIsNone(error.__cause__.__traceback__)
+        self.assertIsNone(error.__context__.__traceback__)
+        self.app.events.put(event)
+        self.wait_for(lambda: not self.app.busy)
+        self.assertIn("ValueError: bad response", self.app.status.get())
+        self.messagebox.showerror.assert_called_once()
+        self.assertEqual(self.simulator.requests, [])
+
+    def test_destroy_removes_owned_timer_and_focus_binding(self):
+        import time
+
+        self.app._run(
+            "Read", lambda: time.sleep(0.03),
+            lambda _: self.fail("Destroyed frame ran a queued callback"),
+        )
+        worker = self.app.worker_thread
+        callback = self.app._poll_after
+        focus_binding = self.app._focus_binding
+        self.app.auto_refresh_after = self.root.after(
+            1000, lambda: self.fail("Destroyed frame ran auto-refresh"),
+        )
+        refresh_callback = self.app.auto_refresh_after
+        self.assertIn(callback, self.root.tk.call("after", "info"))
+        self.assertIn(focus_binding, self.root.bind("<FocusIn>"))
+        self.app.destroy()
+        self.assertFalse(worker.is_alive())
+        self.assertIsNone(self.app.worker_thread)
+        self.assertTrue(self.app.events.empty())
+        self.assertNotIn(callback, self.root.tk.call("after", "info"))
+        self.assertNotIn(refresh_callback, self.root.tk.call("after", "info"))
+        self.assertIsNone(self.app.auto_refresh_after)
+        self.assertNotIn(focus_binding, self.root.bind("<FocusIn>"))
+        self.assertIsNone(self.app._poll_after)
+        self.assertIsNone(self.app._focus_binding)
+        self.app.destroy()
+        # The frame is disposed, but the embedding root is still usable.
+        self.root.update()
+        self.root.destroy()
+        self.app.closing = True
+
+    def test_auto_refresh_polls_selected_range_read_only_and_stops_when_disabled(self):
+        import time
+
+        self.assertFalse(self.app.auto_refresh.get())
+        self.connect()
+        self.app.refresh_interval.set("0.1")
+        self.app.auto_refresh_button.invoke()
+        self.wait_for(lambda: len(self.simulator.requests) >= 2 and not self.app.busy)
+        self.assertTrue(self.app.auto_refresh.get())
+        self.assertTrue(all(request[1] == bytes.fromhex("0300000001")
+                            for request in self.simulator.requests))
+        self.assertIn("Auto-refresh read", self.app.source.get())
+        self.app.auto_refresh_button.invoke()
+        count = len(self.simulator.requests)
+        deadline = time.monotonic() + 0.2
+        while time.monotonic() < deadline:
+            self.root.update()
+            time.sleep(0.01)
+        self.assertFalse(self.app.auto_refresh.get())
+        self.assertEqual(len(self.simulator.requests), count)
+
+    def test_auto_refresh_failure_disables_without_retry(self):
+        import time
+
+        self.connect()
+        self.simulator.forced_exception = 2
+        self.app.refresh_interval.set("0.1")
+        self.app.auto_refresh_button.invoke()
+        self.wait_for(lambda: not self.app.busy and not self.app.auto_refresh.get())
+        self.assertIn("Auto refresh failed", self.app.status.get())
+        self.messagebox.showerror.assert_called_once()
+        deadline = time.monotonic() + 0.2
+        while time.monotonic() < deadline:
+            self.root.update()
+            time.sleep(0.01)
+        self.assertEqual(len(self.simulator.requests), 1)
+        self.assertIsNone(self.app.auto_refresh_after)
+
+    def test_auto_refresh_invalid_settings_unchecks_and_disconnect_cancels(self):
+        self.connect()
+        self.app.auto_refresh.set(True)
+        self.app._schedule_auto_refresh()
+        self.app.address.set("bad")
+        self.app._read(automatic=True)
+        self.assertFalse(self.app.auto_refresh.get())
+        self.assertIsNone(self.app.auto_refresh_after)
+        self.assertEqual(self.simulator.requests, [])
+        self.app.address.set("0")
+        self.app.auto_refresh.set(True)
+        self.app._schedule_auto_refresh()
+        self.app._disconnect()
+        self.wait_for(lambda: not self.app.busy)
+        self.assertFalse(self.app.auto_refresh.get())
+        self.assertIsNone(self.app.auto_refresh_after)
 
     def test_initial_window_has_no_io_and_transport_switch_is_real(self):
         self.assertTrue(self.root.winfo_exists())
