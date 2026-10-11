@@ -96,6 +96,102 @@ class Float32Tests(unittest.TestCase):
                     formats.encode_float32(0.0, order)
 
 
+class Float32WriteTests(unittest.TestCase):
+    def test_exact_vectors_and_pair_order(self):
+        text = "1, -2.5, 123.25, 0.1"
+        big = [0x3F80, 0, 0xC020, 0, 0x42F6, 0x8000, 0x3DCC, 0xCCCD]
+        little = [0, 0x3F80, 0, 0xC020, 0x8000, 0x42F6, 0xCCCD, 0x3DCC]
+        self.assertEqual(formats.parse_float32_write(text, "big"), big)
+        self.assertEqual(formats.parse_float32_write(text, "little"), little)
+
+    def test_signed_zero_is_preserved(self):
+        for order, expected in (
+            ("big", [0, 0, 0x8000, 0, 0x8000, 0]),
+            ("little", [0, 0, 0, 0x8000, 0, 0x8000]),
+        ):
+            with self.subTest(order=order):
+                self.assertEqual(formats.parse_float32_write("+0, -0, -0.0", order), expected)
+
+    def test_decimal_fractions_exponents_and_whitespace(self):
+        self.assertEqual(
+            formats.parse_float32_write(" \t+.5, -.25 , 1., 1.25e+2, 1E-1\n", "big"),
+            [0x3F00, 0, 0xBE80, 0, 0x3F80, 0, 0x42FA, 0, 0x3DCC, 0xCCCD],
+        )
+
+    def test_commas_are_only_value_separators(self):
+        self.assertEqual(
+            formats.parse_float32_write("1,25", "big"), [0x3F80, 0, 0x41C8, 0],
+        )
+
+    def test_finite_float32_extremes(self):
+        self.assertEqual(
+            formats.parse_float32_write("1.401298464324817e-45,3.4028234663852886e38", "big"),
+            [0, 1, 0x7F7F, 0xFFFF],
+        )
+
+    def test_rejects_malformed_or_empty_literals(self):
+        for text in (
+            "", " \t\n", ",", ",1", "1,", "1,,2", "1, ,2",
+            "0x10", "0x1.0p0", "True", "False", "true", "false",
+            "1_000", "1 2", "1;2", "1.2.3", ".", "+", "--1",
+            "1e", "1e+", "１", "1,0x10", "1,False",
+        ):
+            with self.subTest(text=text):
+                with self.assertRaises(ValueError):
+                    formats.parse_float32_write(text, "big")
+
+    def test_rejects_nonfinite_and_float32_overflow(self):
+        for literal in (
+            "nan", "NaN", "+nan", "inf", "-inf", "Infinity", "-Infinity",
+            "1e9999", "-1e9999", "3.5e38", "-3.5e38",
+        ):
+            for text in (literal, "1," + literal):
+                with self.subTest(text=text):
+                    with self.assertRaises(ValueError):
+                        formats.parse_float32_write(text, "big")
+
+    def test_rejects_wrong_text_types(self):
+        for text in (None, True, False, 1, 1.0, [], ["1"], ("1",), b"1", iter(["1"])):
+            with self.subTest(text=repr(text)):
+                with self.assertRaises(ValueError):
+                    formats.parse_float32_write(text, "big")
+
+    def test_requires_explicit_strict_word_order(self):
+        for order in ("", " ", "BIG", "Little", "ABCD", None, 1, [], True):
+            with self.subTest(order=order):
+                with self.assertRaises(ValueError):
+                    formats.parse_float32_write("1", order)
+        with self.assertRaises(TypeError):
+            formats.parse_float32_write("1")
+
+    def test_61_values_accepts_122_words_in_both_orders(self):
+        for order, pair in (("big", [0x42F6, 0x8000]), ("little", [0x8000, 0x42F6])):
+            with self.subTest(order=order):
+                words = formats.parse_float32_write(",".join(["123.25"] * 61), order)
+                self.assertEqual(len(words), 122)
+                self.assertEqual(words, pair * 61)
+                self.assertTrue(all(type(word) is int and 0 <= word <= 65535 for word in words))
+
+    def test_62_values_rejects_before_any_encoding(self):
+        with patch.object(formats, "encode_float32") as encode:
+            for text in (",".join(["1"] * 62), ",".join(["1"] * 10000)):
+                with self.subTest(count=text.count(",") + 1):
+                    with self.assertRaises(ValueError):
+                        formats.parse_float32_write(text, "big")
+            encode.assert_not_called()
+
+    def test_invalid_input_is_atomic_and_all_parsing_is_local(self):
+        with patch("builtins.open", side_effect=AssertionError("unexpected file I/O")), \
+                patch("socket.socket", side_effect=AssertionError("unexpected network I/O")):
+            valid = formats.parse_float32_write("123.25", "big")
+            for suffix in ("", "bad", "nan", "3.5e38"):
+                with self.subTest(suffix=suffix):
+                    with self.assertRaises(ValueError):
+                        formats.parse_float32_write(",".join(["1"] * 60) + "," + suffix, "big")
+                    self.assertEqual(valid, [0x42F6, 0x8000])
+            self.assertEqual(formats.parse_float32_write("123.25", "little"), [0x8000, 0x42F6])
+
+
 class XLSXTests(LocalFilesTestCase):
     def test_all_object_types_round_trip_with_exact_schema(self):
         rows = [
@@ -236,6 +332,52 @@ class XLSXTests(LocalFilesTestCase):
                 target.writestr(name, data)
         with self.assertRaises(ValueError):
             formats.load_xlsx(self.xlsx)
+
+    def test_source_closed_when_loader_raises_before_returning_workbook(self):
+        self.workbook([formats.XLSX_FIELDS])
+        handles = []
+
+        def tracked_open(*args, **kwargs):
+            handle = open(*args, **kwargs)
+            handles.append(handle)
+            return handle
+
+        retained_error = None
+        with patch.object(formats, "open", side_effect=tracked_open, create=True):
+            with patch.object(formats, "load_workbook", side_effect=ValueError("bad XML")):
+                try:
+                    formats.load_xlsx(self.xlsx)
+                except ValueError as exc:
+                    retained_error = exc
+        self.assertIsNotNone(retained_error)
+        self.assertEqual(len(handles), 1)
+        self.assertTrue(handles[0].closed)
+        self.xlsx.unlink()
+
+    def test_invalid_xml_closes_source_with_traceback_retained(self):
+        self.workbook([formats.XLSX_FIELDS])
+        with ZipFile(self.xlsx) as source:
+            entries = {name: source.read(name) for name in source.namelist()}
+        entries["xl/worksheets/sheet1.xml"] = b"<worksheet><unclosed>"
+        with ZipFile(self.xlsx, "w") as target:
+            for name, data in entries.items():
+                target.writestr(name, data)
+        handles = []
+
+        def tracked_open(*args, **kwargs):
+            handle = open(*args, **kwargs)
+            handles.append(handle)
+            return handle
+
+        retained_error = None
+        with patch.object(formats, "open", side_effect=tracked_open, create=True):
+            try:
+                formats.load_xlsx(self.xlsx)
+            except ValueError as exc:
+                retained_error = exc
+        self.assertIsNotNone(retained_error)
+        self.assertTrue(all(handle.closed for handle in handles))
+        self.xlsx.unlink()
 
     def test_falsely_narrow_dimensions_do_not_hide_extra_columns(self):
         self.workbook([formats.XLSX_FIELDS, ("Coils", 0, 1, "hidden extra")])

@@ -1,6 +1,5 @@
 """Independent native Tk layout/keyboard checks; device traffic is loopback only."""
 
-import os
 import threading
 import time
 import unittest
@@ -9,22 +8,23 @@ from unittest.mock import patch
 from m31tool.app import INTERPRETATIONS, M31App
 from m31tool.core import M31_REGISTERS
 from tests.modbus_simulator import running_simulator
+from tests.tk_lifecycle import release_tk_fixture
 
 try:
     import tkinter as tk
-    from tkinter import ttk
+    from tkinter import font, ttk
 except ModuleNotFoundError:
     tk = ttk = None
 
 
-@unittest.skipUnless(tk is not None and os.environ.get("DISPLAY"),
-                     "A graphical X display is required for native Tk layout tests.")
+@unittest.skipUnless(tk is not None, "Tk is required for native layout tests.")
 class NativeLayoutTests(unittest.TestCase):
     def setUp(self):
         try:
             self.root = tk.Tk()
         except tk.TclError as exc:
             self.skipTest(f"Tk display is unavailable: {exc}")
+        self.addCleanup(release_tk_fixture, self)
         self.addCleanup(self._close)
         self.simulator_context = running_simulator()
         self.simulator = self.simulator_context.__enter__()
@@ -141,6 +141,8 @@ class NativeLayoutTests(unittest.TestCase):
                             if widget.winfo_ismapped() and isinstance(
                                 widget, (ttk.Button, ttk.Entry, ttk.Combobox)
                             ):
+                                widget.focus_force()
+                                self.root.update()
                                 self.assert_visible_bounds(widget)
                                 if isinstance(widget, ttk.Button):
                                     self.assertGreaterEqual(
@@ -150,10 +152,128 @@ class NativeLayoutTests(unittest.TestCase):
                             elif widget.winfo_ismapped() and isinstance(
                                 widget, (ttk.Treeview, tk.Text)
                             ):
+                                widget.focus_force()
+                                self.root.update()
                                 self.assert_visible_bounds(widget)
                                 self.assertGreaterEqual(widget.winfo_height(), 48,
                                                         "Data viewport collapsed")
                         self.assert_visible_bounds(self.app.status_label)
+        self.assertEqual(self.simulator.requests, [])
+
+    def test_enlarged_native_fonts_keep_all_actions_reachable_and_footer_fixed(self):
+        self.root.geometry("850x680")
+        normal_scaling = float(self.root.tk.call("tk", "scaling"))
+        normal_fonts = {
+            name: font.nametofont(name, root=self.root).actual()
+            for name in ("TkDefaultFont", "TkHeadingFont", "TkTextFont")
+        }
+        normal_status = self.app.status.get()
+        expected_tabs = (
+            "Register explorer", "M31 catalog", "Interpretation", "Device status",
+            "Device writes", "Local files", "Device list", "Modbus trace",
+        )
+        self.assertEqual(
+            tuple(self.app.notebook.tab(tab, "text") for tab in self.app.notebook.tabs()),
+            expected_tabs,
+        )
+        baseline_height = self.app.notebook.winfo_reqheight()
+        for pixels, scaling in ((20, 1.75), (24, 2.0)):
+            self.root.tk.call("tk", "scaling", scaling)
+            for name in ("TkDefaultFont", "TkHeadingFont", "TkTextFont"):
+                font.nametofont(name, root=self.root).configure(size=-pixels)
+            if pixels == 24:
+                self.app.status.set(
+                    "Read failed: The peer closed the connection before a complete response "
+                    "was received. Verify the host, port and network; displayed values are "
+                    "unchanged and have not been refreshed."
+                )
+            self.root.update()
+            self.assertGreater(self.app.notebook.winfo_reqheight(), baseline_height)
+            self.assertEqual((self.root.winfo_width(), self.root.winfo_height()), (850, 680))
+            canvas = self.app.content_canvas
+            self.assertLess(canvas.xview()[1] - canvas.xview()[0], 1)
+            self.assertLess(canvas.yview()[1] - canvas.yview()[0], 1)
+            self.assertTrue(all(scroll.winfo_ismapped() for scroll in canvas.master.winfo_children()
+                                if isinstance(scroll, ttk.Scrollbar)))
+            for transport in ("TCP", "RTU"):
+                self.app.transport.set(transport)
+                self.app._show_transport()
+                for tab in self.app.notebook.tabs():
+                    self.app.notebook.select(tab)
+                    self.root.update()
+                    for widget in self.widgets():
+                        if isinstance(widget, (ttk.Button, ttk.Entry, ttk.Combobox)):
+                            if self.notebook_tab(widget) not in (None, tab):
+                                continue
+                            if widget.master in (self.app.tcp_frame, self.app.rtu_frame):
+                                if widget.master != (
+                                    self.app.tcp_frame if transport == "TCP" else self.app.rtu_frame
+                                ):
+                                    continue
+                            with self.subTest(pixels=pixels, transport=transport,
+                                              tab=self.app.notebook.tab(tab, "text"),
+                                              widget=str(widget)):
+                                self.assertTrue(widget.winfo_ismapped())
+                                # Exercise actual keyboard focus/viewport scrolling, not
+                                # coordinates cached for hidden notebook pages.
+                                widget.focus_force()
+                                self.root.update()
+                                self.assertEqual(self.root.focus_get(), widget)
+                                self.assert_visible_bounds(widget)
+                                if isinstance(widget, ttk.Button):
+                                    self.assertGreaterEqual(widget.winfo_width(),
+                                                            widget.winfo_reqwidth() - 2)
+                                self.assert_visible_bounds(self.app.status_label)
+                                self.assert_visible_bounds(self.app.progress)
+            canvas.xview_moveto(1)
+            canvas.yview_moveto(self.app.notebook.winfo_y() /
+                               self.app.content_body.winfo_height())
+            self.root.update()
+            notebook = self.app.notebook
+            x = canvas.winfo_rootx() + canvas.winfo_width() - notebook.winfo_rootx() - 10
+            self.assertEqual(notebook.index(f"@{x},10"), 7)
+            self.assertGreaterEqual(notebook.winfo_rooty(), canvas.winfo_rooty() - 1)
+            notebook.select(0)
+            notebook.event_generate("<ButtonPress-1>", x=x, y=10)
+            notebook.event_generate("<ButtonRelease-1>", x=x, y=10)
+            self.root.update()
+            self.assertEqual(notebook.select(), notebook.tabs()[-1])
+            canvas.yview_moveto(1)
+            self.root.update()
+            self.assert_visible_bounds(self.app.status_label)
+            self.assert_visible_bounds(self.app.progress)
+            self.assertLessEqual(self.app.status_label.winfo_reqheight(),
+                                 self.app.status_label.winfo_height() + 2)
+        # Recover the normal layout, not an assumed 1600x1200 desktop with
+        # oversized fonts: Windows may clamp geometry to the display work area.
+        self.root.tk.call("tk", "scaling", normal_scaling)
+        for name, settings in normal_fonts.items():
+            font.nametofont(name, root=self.root).configure(**settings)
+        self.app.status.set(normal_status)
+        normal_maxsize = self.root.maxsize()
+        self.root.maxsize(1280, 800)
+        self.root.geometry("1600x1200")
+        self.root.update()
+        self.assertEqual((self.root.winfo_width(), self.root.winfo_height()), (1280, 800))
+        self.assertEqual(canvas.xview(), (0.0, 1.0))
+        self.assertEqual(canvas.yview(), (0.0, 1.0))
+        self.assertTrue(all(not scroll.winfo_ismapped()
+                            for scroll in canvas.master.winfo_children()
+                            if isinstance(scroll, ttk.Scrollbar)))
+        self.show_tab(self.app.write_button)
+        self.assert_visible_bounds(self.app.write_button)
+        self.root.maxsize(*normal_maxsize)
+        self.root.geometry("1600x1200")
+        self.root.update()
+        self.assertEqual(canvas.xview(), (0.0, 1.0))
+        self.assertEqual(canvas.yview(), (0.0, 1.0))
+        self.root.geometry("850x680")
+        self.root.update()
+        self.assertLess(self.app.content_body.winfo_width(), 1600)
+        self.app.write_button.focus_force()
+        self.root.update()
+        self.assert_visible_bounds(self.app.write_button)
+        self.assert_visible_bounds(self.app.status_label)
         self.assertEqual(self.simulator.requests, [])
 
     def test_summary_identity_survives_errors_but_not_disconnect(self):
@@ -189,8 +309,13 @@ class NativeLayoutTests(unittest.TestCase):
         self.assertLessEqual(self.app.status_label.winfo_reqheight(),
                              self.app.status_label.winfo_height() + 2)
         for widget in (self.app.status_label, self.app.connect_button, self.app.read_button):
+            if isinstance(widget, ttk.Button):
+                widget.focus_force()
+                self.root.update()
             self.assert_visible_bounds(widget)
         self.show_tab(self.app.write_button)
+        self.app.write_button.focus_force()
+        self.root.update()
         self.assert_visible_bounds(self.app.write_button)
 
     def test_return_connect_and_read_use_existing_callback_guards(self):

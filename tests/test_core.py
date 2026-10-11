@@ -1,6 +1,6 @@
 import struct
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 from m31tool.core import (
     M31_REGISTERS,
@@ -390,6 +390,7 @@ class RTUConfigurationTests(unittest.TestCase):
         factory.assert_called_once_with(
             "unused-test-port", baudrate=19200, bytesize=8, parity="E",
             stopbits=2, timeout=0.2, retries=0,
+            trace_packet=ANY,
         )
         client.write_coil.assert_not_called()
         client.write_register.assert_not_called()

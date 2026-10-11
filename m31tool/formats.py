@@ -11,11 +11,12 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import struct
+from contextlib import ExitStack
 from zipfile import BadZipFile
 
-from openpyxl import Workbook
-from openpyxl.reader.excel import ExcelReader
+from openpyxl import Workbook, load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
 
 
@@ -29,27 +30,8 @@ PROFILE_FIELDS = (
     "stopbits", "unit_id", "timeout", "object_type", "address", "count",
 )
 _MAX_PROFILE_BYTES = 65_536
-
-
-class _TrackedZipArchive:
-    def __init__(self, archive):
-        self.archive = archive
-        self.opened_files = []
-
-    def open(self, *args, **kwargs):
-        handle = self.archive.open(*args, **kwargs)
-        self.opened_files.append(handle)
-        return handle
-
-    def close(self):
-        try:
-            for handle in self.opened_files:
-                handle.close()
-        finally:
-            self.archive.close()
-
-    def __getattr__(self, name):
-        return getattr(self.archive, name)
+_MAX_FLOAT32_WRITE_VALUES = 61
+_FLOAT32_LITERAL = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
 
 
 def _integer(value, name: str, minimum: int, maximum: int) -> int:
@@ -96,6 +78,29 @@ def encode_float32(value: float, word_order: str = "big") -> list[int]:
     return words if order == "big" else words[::-1]
 
 
+def parse_float32_write(text: str, word_order: str) -> list[int]:
+    """Validate 1–61 decimal float literals and return holding-register words.
+
+    Commas separate values, never decimal fractions; surrounding whitespace is
+    allowed. Explicit big/little word order is required, with big-endian bytes
+    within each word. Nonfinite values and float32 overflow are rejected.
+    No I/O occurs and no partial result is returned on invalid input.
+    """
+    order = _word_order(word_order)
+    if type(text) is not str:
+        raise ValueError("float32 write text must be a comma-separated string.")
+    tokens = text.split(",", _MAX_FLOAT32_WRITE_VALUES)
+    if len(tokens) > _MAX_FLOAT32_WRITE_VALUES:
+        raise ValueError("float32 writes require at most 61 values (122 registers).")
+    words: list[int] = []
+    for token in tokens:
+        literal = token.strip()
+        if _FLOAT32_LITERAL.fullmatch(literal) is None:
+            raise ValueError("float32 writes require nonempty decimal float literals.")
+        words.extend(encode_float32(float(literal), order))
+    return words
+
+
 def _row(row, line: int, *, excel: bool = False) -> tuple[str, int, int]:
     if not isinstance(row, (tuple, list)) or len(row) != 3:
         raise ValueError(f"Row {line} must have exactly three columns.")
@@ -116,14 +121,13 @@ def load_xlsx(path) -> list[tuple[str, int, int]]:
     """Load a strictly validated workbook without evaluating formulas or links."""
     workbook = None
     iterator = None
-    reader = None
+    resources = ExitStack()
     try:
-        reader = ExcelReader(
-            path, read_only=True, data_only=False, keep_links=False,
+        # Own the file even when openpyxl raises before returning a workbook.
+        source = resources.enter_context(open(path, "rb"))
+        workbook = load_workbook(
+            source, read_only=True, data_only=False, keep_links=False,
         )
-        reader.archive = _TrackedZipArchive(reader.archive)
-        reader.read()
-        workbook = reader.wb
         if len(workbook.sheetnames) != 1 or len(workbook.worksheets) != 1:
             raise ValueError("XLSX must contain exactly one worksheet.")
         sheet = workbook.worksheets[0]
@@ -151,10 +155,11 @@ def load_xlsx(path) -> list[tuple[str, int, int]]:
             if iterator is not None:
                 iterator.close()
         finally:
-            if workbook is not None:
-                workbook.close()
-            elif reader is not None:
-                reader.archive.close()
+            try:
+                if workbook is not None:
+                    workbook.close()
+            finally:
+                resources.close()
 
 
 def save_xlsx(path, rows) -> None:

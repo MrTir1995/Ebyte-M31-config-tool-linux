@@ -5,11 +5,13 @@ The catalog records starting addresses only; channel counts, float word order,
 scaling, and model-specific ranges must be verified against the actual device.
 """
 
+from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 import math
-from threading import RLock
-from typing import Any
+from threading import Lock, RLock
+from time import monotonic
+from typing import Any, Callable, Literal
 
 from pymodbus.client import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ModbusException as PymodbusException
@@ -35,6 +37,25 @@ class RegisterKind(str, Enum):
     DISCRETE_INPUTS = "discrete_inputs"
     HOLDING_REGISTERS = "holding_registers"
     INPUT_REGISTERS = "input_registers"
+
+
+@dataclass(frozen=True)
+class TransportTraceRecord:
+    """One genuine pymodbus callback observation, not a physical capture.
+
+    TX attempt is observed before sending and does not prove successful TX.
+    RX buffer may be cumulative receive/parser data, not a frame boundary.
+    Endpoint and unit_id describe the configured session, not decoded bytes.
+    timestamp is a local monotonic observation time, not a wire timestamp.
+    """
+
+    sequence: int
+    timestamp: float
+    direction: str
+    transport: str
+    endpoint: str
+    unit_id: int
+    data: bytes
 
 
 @dataclass(frozen=True)
@@ -70,18 +91,32 @@ M31_REGISTER_CATALOG = (
     RegisterSpec("do", "Digitale Ausgänge", "coils", DO_START,
                  "DO ab Adresse 0; Anzahl und Lastgrenzen modellabhängig."),
     RegisterSpec("ai_integer", "AI Ganzzahl", "input_registers", 0x0000,
-                 "Ganzzahl-Messwerte; Kanalanzahl und Skalierung nicht festgelegt."),
+                 "§4.8.3 S.46: ein Register je Kanal, Stride 1. "
+                 "Strom-Engineeringwert in µA; differentielle Werte sind signed int16. "
+                 "Spannungs-Einheitenformel ist widersprüchlich; keine automatische Skalierung.",
+                 words_per_value=1),
     RegisterSpec("ai_float", "AI IEEE754", "input_registers", 0x03E8,
-                 "IEEE754 über zwei Register; Wortreihenfolge nicht festgelegt.",
+                 "§4.8.3 S.47: IEEE754 über zwei Register, Kanal-Stride 2; "
+                 "Stromwert in mA. Wortreihenfolge nicht festgelegt.",
                  words_per_value=2),
     RegisterSpec("ai_process", "AI Prozesswert", "input_registers", 0x0BB8,
-                 "Prozesswerte; Layout, Skalierung und Einheiten nicht festgelegt."),
+                 "§4.8.3 S.47: ein signed-int16-Prozesswert je Kanal, Stride 1; "
+                 "nominal ±27648, Bereichszuordnung modellabhängig. "
+                 "Überbereich-/Fehlerwerte und Quellenkonflikte siehe docs/registers.",
+                 words_per_value=1),
     RegisterSpec("ao_integer", "AO Ganzzahl", "holding_registers", 0x0000,
-                 "AO-Basisadresse; Kanalanzahl, Skalierung und Bereich nicht festgelegt."),
+                 "§4.8.4 S.49: ein Register je Kanal, Stride 1; "
+                 "0–20000 µA entspricht 0–20 mA. Keine Kanal-/Lastfreigabe durch den Katalog.",
+                 words_per_value=1),
     RegisterSpec("ao_float", "AO 0x03E8", "holding_registers", 0x03E8,
-                 "Dokumentierte AO-Adresse; Layout und Wortreihenfolge nicht festgelegt."),
+                 "IEEE754 über zwei Register laut §4.8.4 S.49; "
+                 "Wortreihenfolge und Kanalzuordnung am konkreten Modul prüfen.",
+                 words_per_value=2),
     RegisterSpec("ao_alternative", "AO 0x01F4", "holding_registers", 0x01F4,
-                 "Dokumentierte AO-Adresse; Layout und Wertebereich nicht festgelegt."),
+                 "§4.8.4 S.50: AO-Prozesswert 0–27648 entspricht 0–20 mA; Stride 1. "
+                 "Holdingregister laut Tabelle/FC03, gedrucktes Präfix 3-0501 widerspricht "
+                 "der Zone 4; normalisierte Referenz 4-0501. Rohadresse bleibt 0x01F4.",
+                 words_per_value=1),
     RegisterSpec("di_filter", "DI Filter", "holding_registers", FILTER_DI_ADDRESS,
                  "DI-Filterwert 1–16, Standardwert 6; wird nicht automatisch gesetzt.",
                  words_per_value=1, min_value=FILTER_MIN, max_value=FILTER_MAX,
@@ -90,6 +125,16 @@ M31_REGISTER_CATALOG = (
                  "AI-Filterwert 1–16, Standardwert 6; wird nicht automatisch gesetzt.",
                  words_per_value=1, min_value=FILTER_MIN, max_value=FILTER_MAX,
                  default=FILTER_DEFAULT),
+    RegisterSpec("ai_range", "AI Messbereich (lesen)", "holding_registers", 0x0DAC,
+                 "Startadresse laut §4.8.3 S.47–48; Codes 0–6 modellabhängig. "
+                 "Keine automatische Modell-/Kanal-/Expansionserkennung; "
+                 "dieser Katalogeintrag bereitet nur einen Rohwert-Lesezugriff vor.",
+                 words_per_value=1),
+    RegisterSpec("ao_range", "AO Messbereich (Tabelle, lesen)", "holding_registers", 0x1194,
+                 "§4.8.4 S.50–51 nennt 0x1194, §4.5.1 nennt widersprüchlich 0x0DAC. "
+                 "Adresse am konkreten Modell klären; nur Rohwert-Lesevorbereitung, "
+                 "keine freigegebene Messbereich-Schreibfunktion.",
+                 words_per_value=1),
 )
 REGISTER_CATALOG = M31_REGISTER_CATALOG
 M31_REGISTERS = M31_REGISTER_CATALOG
@@ -127,6 +172,49 @@ class ModbusSession:
         self._timeout = float(timeout)
         self._client: ModbusTcpClient | ModbusSerialClient | None = None
         self._lock = RLock()
+        self._trace_lock = Lock()
+        self._trace_records: deque[TransportTraceRecord] = deque(maxlen=500)
+        self._trace_sequence = 0
+        self._trace_dropped = 0
+
+    def trace_snapshot(self) -> tuple[TransportTraceRecord, ...]:
+        """Return bounded callback observations; not PCAP or wire frames."""
+        with self._trace_lock:
+            return tuple(self._trace_records)
+
+    def clear_trace(self) -> None:
+        """Clear local observations and dropped count only; never perform I/O."""
+        with self._trace_lock:
+            self._trace_records.clear()
+            self._trace_dropped = 0
+
+    @property
+    def trace_dropped(self) -> int:
+        """Number of oldest observations evicted since the last local clear."""
+        with self._trace_lock:
+            return self._trace_dropped
+
+    def _trace_hook(
+        self, transport: Literal["TCP", "RTU"], endpoint: str,
+    ) -> Callable[[bool, bytes], bytes]:
+        unit_id = self.unit_id
+
+        def trace_packet(sending: bool, data: bytes) -> bytes:
+            with self._trace_lock:
+                self._trace_sequence += 1
+                record = TransportTraceRecord(
+                    sequence=self._trace_sequence,
+                    timestamp=monotonic(),
+                    direction="TX attempt" if sending else "RX buffer",
+                    transport=transport, endpoint=endpoint, unit_id=unit_id,
+                    data=bytes(data),
+                )
+                if len(self._trace_records) == self._trace_records.maxlen:
+                    self._trace_dropped += 1
+                self._trace_records.append(record)
+            return data
+
+        return trace_packet
 
     @property
     def unit_id(self) -> int:
@@ -149,6 +237,7 @@ class ModbusSession:
             self.close()
             client = ModbusTcpClient(
                 host, port=port, timeout=self.timeout, retries=0,
+                trace_packet=self._trace_hook("TCP", f"{host}:{port}"),
             )
             self._connect(client, f"TCP {host}:{port}")
 
@@ -166,6 +255,7 @@ class ModbusSession:
             client = ModbusSerialClient(
                 port, baudrate=baudrate, bytesize=8, parity=parity.upper(),
                 stopbits=stopbits, timeout=self.timeout, retries=0,
+                trace_packet=self._trace_hook("RTU", port),
             )
             self._connect(client, f"RTU {port}")
 

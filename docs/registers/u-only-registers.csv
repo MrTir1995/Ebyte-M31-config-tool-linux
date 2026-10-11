@@ -1,0 +1,65 @@
+name,model_scope,source,section,pdf_pages,printed_pages,table,address_hex,address_decimal,width_words,stride_words,access,function_codes,type,unit_or_range,short_evidence,caveat
+DI status,U1/U compatible DI,U1,4.10.1,52,48,discrete_input,0x0000,0,bit,1,R,02,bit,0/1,DI1 主机 0x0000 1-0001,Bit table; channel existence depends on hardware
+DI filter,U1/U compatible DI,U1,4.10.1,52,48,holding_register,0x1388,5000,1,1,RW,03/06/10,uint16,1-65535 samples,每个通道单独占1个寄存器;0x1388,Prose range differs from table
+DI clear mode,U1/U compatible DI,U1,4.10.1,52,48,holding_register,0x2710,10000,1,1,RW,03/06/10,enum16,0 auto-read-clear;1 manual,0:自动清零（读计数值清零）,Reading counts may clear them
+DI count,U1/U compatible DI,U1,4.10.1,52-53,48-49,holding_register,0x2CEC,11500,2,2,RW,03/06/10,int32,count,每个通道单独占2个寄存器;32位有符号整数,Word order controlled by device; reads may clear in auto mode
+DI counting edge,U1/U compatible DI,U1,4.10.1,53,49,holding_register,0x1F40,8000,1,1,RW,03/06/10,enum16,0 rising;1 falling;2 both,0:上升沿计数 1:下降沿计数,Not documented for non-U
+DO status,U1/U compatible DO,U1,4.10.2,53,49,coil,0x0000,0,bit,1,RW,01/05/0F,bit,0/1,DO1 主机 0x0000,Not holding-register address0
+DO fault state,U1/U compatible DO,U1,4.10.2,53,49,holding_register,0x1B58,7000,1,1,RW,03/06/10,enum16,0 hold;1 off;2 on,DO故障输出状态 0x1B58,Requires fault configuration
+DO power-on state,U1/U compatible DO,U1,4.10.2,54,50,holding_register,0x2904,10500,1,1,RW,03/06/10,uint16,0 off;1 on,DO上电状态 0x2904,Not non-U evidence
+DO work mode,U1/U compatible DO,U1,4.10.2,54,50,holding_register,0x32C8,13000,1,1,RW,03/06/10,enum16,0 level;1 pulse,DO工作模式 0x32C8,Not non-U evidence
+DO pulse width,U1/U compatible DO,U1,4.10.2,54,50,holding_register,0x30D4,12500,1,1,RW,03/06/10,uint16,transistor1-65535ms;relay50-65535ms,DO脉冲输出宽度 0x30D4,Model-dependent minimum
+DO pulse count,U1/U compatible DO,U1,4.10.2,54,50,holding_register,0x2AF8,11000,1,1,RW,03/06/10,uint16,0 continuous;1-65535 pulses,DO脉冲输出数量 0x2AF8,Not listed in old U0 table
+DO pulse enable,U1/U compatible DO,U1,4.10.2,54,50,holding_register,0x34BC,13500,1,1,RW,03/06/10,uint16,0 off;1 on,仅在对应DO的工作模式设置为脉冲输出时生效,Not listed in old U0 table
+AI integer,U1/U compatible AI,U1,4.10.3,55,51,input_register,0x0000,0,1,1,R,04,16bit integer,uA/mV,2字节整型数 单位uA/mv,Signed for differential input; hardware determines unit
+AI float,U1/U compatible AI,U1,4.10.3,55,51,input_register,0x03E8,1000,2,2,R,04,float32,mA/V,每个通道单独占2个寄存器,Check byte order and hardware
+AI process,U1/U compatible AI,U1,4.10.3,56,52,input_register,0x0BB8,3000,1,1,R,04,16bit integer,raw counts,AI过程量寄存器 0x0BB8,Signed according to configured range
+AI filter,U1/U compatible AI,U1,4.10.3,56,52,holding_register,0x0FA0,4000,1,1,RW,03/06/10,uint16,0-4 default0,每个通道单独占1个寄存器;0xFA0,Prose4.5.3 PDF47 still names0x0DA2
+AI range,U1/U compatible AI,U1,4.10.3,56-57,52-53,holding_register,0x0DAC,3500,1,1,RW,03/06/10,enum16,0-6 hardware-dependent,0:0-20mA;1:4-20mA;2:+/-20mA;3:0-5V;4:+/-5V;5:0-10V;6:+/-10V,Not all enums valid for all models
+AO integer,U1/U compatible AO,U1,4.10.4,57,53,holding_register,0x0000,0,1,1,RW,03/06/10,uint16,uA/mV,AO1 主机 0x0000 4-0000,Decimal reference conflicts with manual plus-one note; prose lists W10 only
+AO float,U1/U compatible AO,U1,4.10.4,58,54,holding_register,0x03E8,1000,2,2,RW,03/06/10,float32,mA/V,AO浮点值 每个通道单独占2个寄存器,No AO process table in U1
+AO range,U1/U compatible AO,U1,4.10.4,58-59,54-55,holding_register,0x1194,4500,1,1,RW,03/06/10,enum16,current0=0-20mA1=4-20mA;voltage0=0-10V1=0-5V,AO1输出范围0x1194,Same address but hardware-dependent semantics
+AO fault value,U1/U compatible AO,U1,4.10.4,59,55,holding_register,0x2328,9000,1,1,RW,03/06/10,uint16,uA/mV according to hardware,AO1故障输出值0x2328,Decimal reference4-9000 off by one; gated by0x0C36 and0x36B0
+AO power-on value,U1/U compatible AO,U1,4.10.4,59-60,55-56,holding_register,0x251C,9500,1,1,RW,03/06/10,uint16,uA/mV according to hardware,AO1上电输出值0x251C,Decimal reference4-9500 off by one
+AO fault enable,U1/U compatible AO,U1,4.10.4,60-61,56-57,holding_register,0x36B0,14000,1,1,RW,03/06/10,uint16,0 disabled;1 enabled,AO1故障输出开关0x36b0,Requires global0x0C36; decimal reference4-14000 off by one
+PT100 integer,U1 M31-XDXX0600G-U and compatible PT100 expansion,U1,4.10.5,61,57,input_register,0x0DAC,3500,1,1,R,04,int16,0.1 degree selected unit plus diagnostic sentinels,PT100-1 0x0DAC;2字节整型数,Same numeric base as AI-range but different table; decimal column off by one
+PT100 float,U1 PT100 hardware,U1,4.10.5,61-62,57-58,input_register,0x0EAC,3756,2,2,R,04,float32,selected temperature unit,PT100浮点型值0x0EAC,Table rows mislabeled AI1; decimal column off by one
+PT100 compensation,U1 PT100 hardware,U1,4.10.5,62,58,holding_register,0x38A4,14500,1,1,RW,03/06/10,int16,-200..200 in0.1degree,PT100-1温度补偿0x38A4,Decimal column off by one
+PT100 unit,U1 PT100 hardware,U1,4.10.5,62-63,58-59,holding_register,0x39A4,14756,1,1,RW,03/06/10,enum16,0 C;1 F;2 K,PT100-1单位转换0x39A4,Duplicated and inconsistent decimal rows; use hexadecimal PDU base
+PT100 filter,U1 PT100 hardware,U1,4.10.5,63,59,holding_register,0x3AA4,15012,1,1,RW,03/06/10,uint16,1-16 default6,PT100-1滤波参数0x3AA4,Decimal column off by one
+PT100 disable,U1 PT100 hardware,U1,4.10.5,64,60,holding_register,0x3BA4,15268,1,1,RW,03/06/10,uint16,0 enabled;1 disabled,PT100-1通道禁用0x3BA4,Not inferred for non-U
+Modbus offset address,U1 host,U1,4.10.6,64,60,holding_register,0x0C1C,3100,1,1,RW,03/06/10,uint16,1-240,Modbus从机偏移地址0X0C1C,Register name does not establish per-expansion independent slave IDs
+Restart,U1 host,U1,4.10.6,64,60,holding_register,0x0C1D,3101,1,1,W,06,uint16,magic0x5BB5,写0X5BB5重启,Never tested or written; non-U mapping unverified
+Factory reset,U1 host,U1,4.10.6,64,60,holding_register,0x0C1E,3102,1,1,W,06,uint16,magic0x5BB5,写0X5BB5恢复出厂设置,Never tested or written
+Host firmware version,U1 host,U1,4.10.6,64,60,holding_register,0x0C1F,3103,1,1,R,03,uint16 packed major/minor,high-byte major low-byte minor,如v1.5 高字节0x01低字节0x05,No minimum firmware; no non-U proof
+Host model,U1 host,U1,4.10.6,64,60,holding_register,0x0C20,3104,12,12,R,03,string,24bytes,主机设备型号0X0C20个数12字符串,Character packing/NUL policy not specified here
+Full host firmware identifier,U1 host,U1,4.10.6,64,60,holding_register,0x0C2C,3116,8,8,R,03,string,16bytes,主机完整固件编号0X0C2C个数8,Not a firmware payload or update address
+32bit reply byte order,U1 host,U1,4.10.6,65,61,holding_register,0x0C34,3124,1,1,RW,03/06/10,enum16,0AB-CD1BA-DC2CD-AB3DC-BA,Modbus32位寄存器回复字节序,Do not invent fourth ordering typo from prose
+Offline time,U1 host,U1,4.10.6,65,61,holding_register,0x0C35,3125,1,1,RW,03/06/10,uint16,1-65535 in0.1second default100,离线时间到后所有IO输出故障状态,Global fault behavior
+Offline fault enable,U1 host,U1,4.10.6,65,61,holding_register,0x0C36,3126,1,1,RW,03/06/10,uint16,0disabled1enabled,离线IO故障输出功能使能,Global prerequisite for AO fault behavior
+Fault flag,U1 host,U1,4.10.6,65,61,holding_register,0x0C37,3127,1,1,RW,03/06/10,uint16,0no fault1fault output,故障输出标志,RW is explicitly in table even if flag name suggests RO
+Expansion storage capability,U1 host,U1,4.10.6,65,61,holding_register,0x0C60,3168,16,1,R,03,uint16 array,0unsupported1supported,从机n是否支持存储功能个数16,16 entries versus32 model entries unresolved
+Expansion storage enable,U1 host,U1,4.10.6,65,61,holding_register,0x0C70,3184,16,1,RW,03/06/10,uint16 array,0disabled1enabled default1,从机n存储功能使能个数16,NOT a host save-parameters trigger
+Expansion model array,U1 host,U1,4.10.6,65,61,holding_register,0x0C80,3200,256,8,R,03,string array,32slots each16bytes;NONE absent,从机n型号个数8*32,Physical maximum16 includes host; slot origin/internal host module unresolved
+Expansion firmware array,U1 host,U1,4.10.6,65,61,holding_register,0x0D80,3456,32,1,R,03,packed major/minor array,32slots,从机n固件版本个数1*32,No complete per-expansion firmware identifier table
+Serial baud code,U1 host,U1,4.10.7,65-66,61-62,holding_register,0x7530,30000,1,1,RW,03/06/10,enum16,1:2400 through8:230400,串口波特率代码0X7530,Eight mapped codes; some older prose says nine choices
+Serial parity,U1 host,U1,4.10.7,66,62,holding_register,0x7531,30001,1,1,RW,03/06/10,enum16,0NONE1ODD2EVEN,串口校验位0X7531,No stop-bit or data-bit register specified
+Network mode,U1 host,U1,4.10.7,66,62,holding_register,0x7532,30002,1,1,RW,03/06/10,enum16,0TCPS1TCPC2UDPS3UDPC,网络工作模式0X7532,NOT UDP discovery specification
+DHCP,U1 host,U1,4.10.7,66,62,holding_register,0x7533,30003,1,1,RW,03/06/10,uint16,0off1on,DHCP0X7533,No hardware testing
+MAC,U1 host,U1,4.10.7,66,62,holding_register,0x7534,30004,3,3,R,03,6byte sequence,MAC address,设备MAC地址个数3,Byte packing should be confirmed with actual capture
+Local IP,U1 host,U1,4.10.7,66,62,holding_register,0x7537,30007,2,2,RW,03/06/10,4byte sequence,IPv4,本机IP地址个数2,No changes made
+Subnet,U1 host,U1,4.10.7,66,62,holding_register,0x7539,30009,2,2,RW,03/06/10,4byte sequence,IPv4 mask,子网掩码个数2,No changes made
+Gateway,U1 host,U1,4.10.7,66,62,holding_register,0x753B,30011,2,2,RW,03/06/10,4byte sequence,IPv4,网关地址个数2,No changes made
+DNS,U1 host,U1,4.10.7,66,62,holding_register,0x753D,30013,2,2,RW,03/06/10,4byte sequence,IPv4,DNS服务器地址个数2,0x753F-0x7540 omitted; semantics unknown
+Local port,U1 host,U1,4.10.7,66,62,holding_register,0x7541,30017,1,1,RW,03/06/10,uint16,0-65535,本机端口0X7541,Not a discovery-port constant
+Destination hostname/IP,U1 host,U1,4.10.7,66,62,holding_register,0x7542,30018,64,64,RW,03/06/10,string,128bytes,最大128字节字符串,No arbitrary UTF8/ASCII assumptions
+Destination port,U1 host,U1,4.10.7,66,62,holding_register,0x7582,30082,1,1,RW,03/06/10,uint16,1-65535,目标服务器端口0X7582,No changes made
+Network Modbus protocol,U1 host,U1,4.10.7,66,62,holding_register,0x7583,30083,1,1,RW,03/06/10,enum16,1TCP data0RTU data,网络Modbus协议0X7583,NOT same enum as socket work mode
+Negotiation protection,U1 host,U1,4.10.7,67,63,holding_register,0x7584,30084,1,1,RW,03/06,uint16,write1 before negotiation,写入1代表打开写保护寄存器,U table only W06; non-U table includes W10
+Negotiation trigger,U1 host,U1,4.10.7,67,63,holding_register,0x7585,30085,1,1,RW,03/06,uint16,write1 starts negotiation,写入1代表开始地址协商,Never written
+Negotiation status,U1 host,U1,4.10.7,67,63,holding_register,0x7586,30086,1,1,R,03,uint16,0incomplete1complete,当前协商状态寄存器,No changes made
+Device exception,U1 host,U1,4.10.7,67,63,holding_register,0x7587,30087,1,1,R,03,uint16,0none1expansion-no-reply2wrong-order,设备异常码0X7587,Online-monitoring decimal column typo
+Expansion fault bitmap,U1 host,U1,4.10.7,67,63,holding_register,0x7588,30088,2,2,R,03,32bit bitmap,bit1 means corresponding ordered expansion abnormal,共计两个寄存器32bit,32bits does not guarantee32 physical modules
+Pending negotiation,U1 host,U1,4.10.7,67,63,holding_register,0x758A,30090,1,1,R,03,uint16,0normal1needs negotiation,扩展模块待协商状态,Not in non-U table
+Web username,U1 host,U1,4.10.7,67,63,holding_register,0x758B,30091,5,5,RW,03/06/10,string,10bytes,网页登录用户名个数5,Credentials not read; U only
+Web password,U1 host,U1,4.10.7,67,63,holding_register,0x7590,30096,3,3,RW,03/06/10,string,6bytes,网页登录密码个数3,Credentials not read; U only

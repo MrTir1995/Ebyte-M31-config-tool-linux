@@ -1,0 +1,230 @@
+{
+  "policy": "Candidates are research hypotheses, not non-U facts, not enabled runtime registers, and not authorized hardware probes.",
+  "support_count_policy": "Count distinct manual families/revisions separately from truly independent devices. Translation, mirror and copied host/expansion text do not add independent hardware support. No device experiments were performed.",
+  "candidates": [
+    {
+      "id": "H1",
+      "target": "Non-U M31 host firmware/model identity",
+      "status": "candidate",
+      "proposed_table": "holding_register",
+      "proposed_addresses": [
+        {
+          "base": "0x0C1F",
+          "words": 1,
+          "semantic": "packed major/minor host firmware"
+        },
+        {
+          "base": "0x0C20",
+          "words": 12,
+          "semantic": "24-byte host model string"
+        },
+        {
+          "base": "0x0C2C",
+          "words": 8,
+          "semantic": "16-byte firmware identifier"
+        }
+      ],
+      "proposed_access": "R03 only, unverified on non-U",
+      "derivation": "U0 and U1 both document this contiguous identity layout. Non-U shares detailed networking/negotiation block 0x7530..0x7589 with U, and N1 p52 demonstrates host and expansion firmware information in official UI. This establishes existence of information, NOT its transport/address.",
+      "citations": [
+        "U0 PDF31 printed28",
+        "U1 PDF64 printed60",
+        "N1 PDF52 printed49"
+      ],
+      "support_counts": {
+        "U_manual_revisions": 2,
+        "independent_U_manual_lineages": 1,
+        "confirmed_nonU_address_sources": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "Non-U uses UDP discovery metadata, a private binary command, different registers, or unsupported U-style identity.",
+      "conflicts": [
+        "N1 and E1 omit identity table.",
+        "Known DI/AI filter differences show that related M31 generations do not preserve all configuration addresses."
+      ],
+      "validation_needed": "Prefer vendor confirmation or offline interpretation of already-captured official-tool traffic showing exact non-U model/firmware. Require matching address, FC, lengths and response text before promoting. No active probe was performed.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "H2",
+      "target": "Non-U expansion model/firmware arrays",
+      "status": "candidate",
+      "proposed_table": "holding_register",
+      "proposed_addresses": [
+        {
+          "base": "0x0C80",
+          "words": 256,
+          "stride_words": 8,
+          "semantic": "32 model-text slots"
+        },
+        {
+          "base": "0x0D80",
+          "words": 32,
+          "stride_words": 1,
+          "semantic": "32 firmware-version slots"
+        }
+      ],
+      "proposed_access": "R03 only, unverified on non-U",
+      "derivation": "U model array footprint 32*8=256 ends at0x0D7F and firmware array starts immediately at0x0D80. N1 screenshot shows a model tree and separate host/expansion firmware, but no Modbus addresses.",
+      "citations": [
+        "U0 PDF31-32 printed28-29",
+        "U1 PDF65 printed61",
+        "N1 PDF52 printed49"
+      ],
+      "support_counts": {
+        "U_manual_revisions": 2,
+        "independent_U_manual_lineages": 1,
+        "confirmed_nonU_address_sources": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "Model tree comes from discovery frames; fewer slots; different packing; model string without M31 prefix; built-in host IO slot changes ordering.",
+      "conflicts": [
+        "U supports16 modules including host, yet table reserves32 models/versions and16 storage flags.",
+        "U example model MF-AAAX4440 is not current M31-G naming.",
+        "N1 screenshot embedded host IO uses GAXAX8080 while top host is M31-AXAX8080G."
+      ],
+      "validation_needed": "Obtain official slot-index definition and real non-U protocol trace. Confirm where internal host IO appears, physical order, absent marker NONE, byte packing and count limits. Never issue one256-word read: FC03 normal maximum125 words.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "H3",
+      "target": "Non-U restart/factory-reset mapping",
+      "status": "candidate; dangerous unverified transfer",
+      "proposed_table": "holding_register",
+      "proposed_addresses": [
+        {
+          "base": "0x0C1D",
+          "words": 1,
+          "semantic": "restart with0x5BB5"
+        },
+        {
+          "base": "0x0C1E",
+          "words": 1,
+          "semantic": "factory reset with0x5BB5"
+        }
+      ],
+      "proposed_access": "W06, NEVER execute based on hypothesis",
+      "derivation": "Explicit U0/U1 command pair; non-U official UI shows restart function but transport not specified.",
+      "citations": [
+        "U0 PDF31 printed28",
+        "U1 PDF64 printed60",
+        "N1 PDF50-51 printed47-48"
+      ],
+      "support_counts": {
+        "independent_U_manual_lineages": 1,
+        "confirmed_nonU_address_sources": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "Non-U restart/factory reset are private tool/UDP commands or other registers.",
+      "conflicts": [
+        "No non-U address or magic-value evidence.",
+        "Different generations have demonstrated parameter-map changes."
+      ],
+      "validation_needed": "Vendor documentation or passive official-tool command capture on disposable/approved test equipment; do not write or send discovery frames in this research.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "H4",
+      "target": "Undetermined words0x753F-0x7540 in non-U/U network parameter block",
+      "status": "unknown; no semantic candidate",
+      "proposed_addresses": [
+        {
+          "base": "0x753F",
+          "words": 2,
+          "semantic": null
+        }
+      ],
+      "derivation": "DNS two-word field0x753D..0x753E followed by local port0x7541 leaves two omitted words.",
+      "citations": [
+        "N1 PDF47 printed44",
+        "U1 PDF66 printed62",
+        "L1 PDF56 printed53"
+      ],
+      "support_counts": {
+        "document_variant_families_with_gap": 3,
+        "independent_vendor_lineages": 1,
+        "sources_assigning_semantics": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "Reserved padding; legacy parameter; private configuration; invalid addresses.",
+      "conflicts": [
+        "Regular alignment/gaps do not establish any semantic definition."
+      ],
+      "validation_needed": "Leave undefined until official map or passive request/response identifies field. Do not label as stop bits, device address, save, UDP port or timeout.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "H5",
+      "target": "Save-to-flash register",
+      "status": "unknown; no address candidate justified",
+      "proposed_addresses": [],
+      "derivation": "N1 and U1 describe UI save then restart; U0/U1 storage-capability and enable arrays concern expansions, not host save command.",
+      "citations": [
+        "N1 PDF50-51 printed47-48",
+        "U1 PDF71 printed67",
+        "U1 PDF65 printed61"
+      ],
+      "support_counts": {
+        "sources_describing_UI_save": 2,
+        "sources_identifying_save_register": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "Writes are automatically persisted; special tool command commits; reload commits; different handling between network and IO fields.",
+      "conflicts": [
+        "Existence of storage-enable0x0C70 does not establish save trigger semantics."
+      ],
+      "validation_needed": "Official persistence semantics and passive Save traffic capture required; reboot persistence not tested.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "id": "H6",
+      "target": "UDP discovery and firmware transport",
+      "status": "unknown; no register/port/payload candidate justified",
+      "proposed_addresses": [],
+      "derivation": "Official UI supports network Search and upgrade package explicitly requires Ethernet; neither defines discovery packet format, port, or firmware wire command.",
+      "citations": [
+        "N1 PDF49 printed46",
+        "U1 PDF68-69 printed64-65",
+        "F1 DOCX upgrade steps"
+      ],
+      "support_counts": {
+        "sources_providing_discovery_wire_spec": 0,
+        "sources_providing_firmware_wire_spec": 0,
+        "independent_device_observations": 0
+      },
+      "alternative": "UDP broadcast/unicast discovery, TCP probing, proprietary framing, separate bootloader protocol.",
+      "conflicts": [
+        "Socket mode UDPS/UDPC0x7532 is not evidence of discovery protocol.",
+        "Private firmware identifiers are not firmware payload addresses."
+      ],
+      "validation_needed": "Vendor protocol spec or lawful passive pcap from official tool; no actual packets sent by this research.",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    }
+  ],
+  "schema_version": 1,
+  "evidence_policy": {
+    "hardware_verified": false,
+    "runtime_enabled": false,
+    "automatic_probe_allowed": false,
+    "automatic_write_allowed": false,
+    "scope": "Offline evidence only; not a runtime address allowlist or hardware authorization."
+  }
+}

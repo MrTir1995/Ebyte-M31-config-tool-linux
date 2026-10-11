@@ -1,0 +1,696 @@
+{
+  "schema": "m31-community-evidence-v1",
+  "researched_on": "2026-10-11",
+  "scope": "Public GitHub/OpenSource and community/forum evidence for EBYTE non-U M31 Ethernet/RS485 distributed IO. No repository changes, device probes, writes, software execution, or EXE downloads.",
+  "classification_policy": {
+    "communityreported": "An inspectable community source reports behavior or implements a mapping. This is not an independent hardware verification by the researcher.",
+    "verifiedmanufacturer": "Reserved for directly inspected manufacturer evidence. None of the register claims in this report use this category; official manuals are covered by the other research streams.",
+    "hypothesis": "A register assignment derived from code layout, or an interpretation not backed by a capture or directly reported value.",
+    "important": "Public non-fork repositories are separately attributable sources, not necessarily independent derivations of the manufacturer manual. Never promote community write calls to device-safe write permission."
+  },
+  "sources": [
+    {
+      "id": "github-m31config",
+      "category": "communityreported",
+      "url": "https://github.com/PVKonovalov/m31config",
+      "commit": "7d356b5fe1c8be61d0e800b1cd55e7e656a55b84",
+      "commit_date": "2025-01-11T14:55:15Z",
+      "repository_created": "2025-01-10T21:14:41Z",
+      "model": "M31-AAAX4440G",
+      "firmware": null,
+      "evidence_kind": "Real Go implementation plus README console outputs, no raw capture",
+      "citations": {
+        "model_and_reason": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/README.md#L3-L7",
+        "reported_read_output": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/README.md#L27-L48",
+        "reported_changed_network_output": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/README.md#L50-L75",
+        "serialized_layout": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/main.go#L28-L47",
+        "ipv4_setters": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/main.go#L81-L116",
+        "read_and_decoder": "https://github.com/PVKonovalov/m31config/blob/7d356b5fe1c8be61d0e800b1cd55e7e656a55b84/main.go#L119-L141"
+      },
+      "reported_observation": "README shows MAC, DHCP disabled, TCP server, IP 192.168.3.7, port 502, mask 255.255.255.0, gateway/DNS 192.168.3.1, 9600 baud, NONE parity; another output shows IP/gateway/DNS changed to 192.168.2.x.",
+      "address_convention": "Literal zero-based PDU addresses passed to goburrow/modbus. 30000 is a holding-register PDU address 0x7530, NOT a 3xxxx input-reference label; no minus-one adjustment.",
+      "transport": "Modbus TCP",
+      "access": "FC03 read plus FC06 WriteSingleRegister calls for IPv4 settings. Device persistence and permitted firmware/model ranges not independently established.",
+      "red_flags": [
+        "ReadHoldingRegisters(30000,89) requests 178 bytes, but binary.Read Config consumes only 176 bytes/88 registers. Address 30088 is unexplained.",
+        "30085 is derived as AddressNegotiationRegister, not save/reset. Layout derivation is not a captured operation.",
+        "No firmware version, packet capture, reboot/power-cycle confirmation, reset/save implementation, or exact UDP discovery payload.",
+        "SlaveId is assigned from the local slaveId variable before flag.Parse; the README -s 1 invocation does not prove runtime slave=1.",
+        "The baud display guard excludes code 8 although the eight-element list includes 230400.",
+        "The statement that all configuration parameters are registers is the author's claim, not universal non-U model confirmation."
+      ],
+      "rank": "Strongest available community register source, but not hardware-verified by this research"
+    },
+    {
+      "id": "github-gunio-m31",
+      "category": "communityreported",
+      "url": "https://github.com/Gunio2322/M31",
+      "commit": "00f6e9f4f0fc435ecd6a522951f68c2f293521ac",
+      "commit_date": "2026-08-22T22:15:27Z",
+      "repository_created": "2026-08-22T22:15:42Z",
+      "model": "M31-AAAX4440G",
+      "firmware": null,
+      "evidence_kind": "JavaScript Express/modbus-serial implementation; explicitly says addresses are copied from the Ebyte manual",
+      "citations": {
+        "declared_map": "https://github.com/Gunio2322/M31/blob/00f6e9f4f0fc435ecd6a522951f68c2f293521ac/server.js#L1-L32",
+        "digital_reads": "https://github.com/Gunio2322/M31/blob/00f6e9f4f0fc435ecd6a522951f68c2f293521ac/server.js#L58-L91",
+        "digital_writes": "https://github.com/Gunio2322/M31/blob/00f6e9f4f0fc435ecd6a522951f68c2f293521ac/server.js#L93-L129",
+        "analog_integer": "https://github.com/Gunio2322/M31/blob/00f6e9f4f0fc435ecd6a522951f68c2f293521ac/server.js#L131-L145",
+        "analog_float": "https://github.com/Gunio2322/M31/blob/00f6e9f4f0fc435ecd6a522951f68c2f293521ac/server.js#L147-L163"
+      },
+      "address_convention": "Literal zero-based PDU addresses passed to modbus-serial, not 1-based reference labels",
+      "reported_observation": null,
+      "red_flags": [
+        "No README, tests, raw response, firmware version or hardware result in the inspected repository.",
+        "Manual-derived map is not an independent confirmation of the manual.",
+        "Float high-word-first assumption appears in code, not a known-value measurement."
+      ],
+      "rank": "Useful IO implementation cross-reference, weaker than a measured capture"
+    },
+    {
+      "id": "github-hacs",
+      "category": "communityreported",
+      "url": "https://github.com/bartosz-777/ebyte-m31-hacs",
+      "commit": "0ce6215f406f4d34417840d5a14e7b75bb96b14f",
+      "commit_date": "2026-07-15T09:38:16Z",
+      "repository_created": "2026-07-01T18:22:54Z",
+      "model": "M31 series; selectable suffixes include AAAX4440G, AXXXA000G, XAXA0404G, XXXA0008G and others",
+      "firmware": null,
+      "evidence_kind": "Home Assistant DI integration source with fake-client tests",
+      "citations": {
+        "base_and_counts": "https://github.com/bartosz-777/ebyte-m31-hacs/blob/0ce6215f406f4d34417840d5a14e7b75bb96b14f/custom_components/ebyte_m31/const.py#L13-L15",
+        "model_list": "https://github.com/bartosz-777/ebyte-m31-hacs/blob/0ce6215f406f4d34417840d5a14e7b75bb96b14f/custom_components/ebyte_m31/const.py#L43-L56",
+        "read_call": "https://github.com/bartosz-777/ebyte-m31-hacs/blob/0ce6215f406f4d34417840d5a14e7b75bb96b14f/custom_components/ebyte_m31/hub.py#L34-L53",
+        "count_bug": "https://github.com/bartosz-777/ebyte-m31-hacs/blob/0ce6215f406f4d34417840d5a14e7b75bb96b14f/custom_components/ebyte_m31/coordinator.py#L30-L33",
+        "fake_test": "https://github.com/bartosz-777/ebyte-m31-hacs/blob/0ce6215f406f4d34417840d5a14e7b75bb96b14f/tests/run_component_test.py#L12-L42"
+      },
+      "address_convention": "Pymodbus PDU base=0, slave=1, default count=8; validation reads 1 discrete input",
+      "reported_observation": null,
+      "red_flags": [
+        "Mock test synthesizes alternating bits; it is not a device capture.",
+        "Coordinator passes CONF_INPUTS, the string 'Inputs number', as Modbus count.",
+        "Several model channel counts look like copy/paste errors: AXAX4040G is given 4 AI, AXAX8080G 8 AI, AXXX8000G 8 DO and 8 AI, XAXA0404G has AO=0.",
+        "Model dropdown membership does not prove support or successful operation on every listed model.",
+        "No IO expansion allocation, analog decoding, identity register, firmware register, save/reset or UDP discovery code."
+      ],
+      "rank": "Weak implementation evidence for DI base only; do not import channel inventory"
+    },
+    {
+      "id": "community-modbus-cn",
+      "category": "communityreported",
+      "url": "https://www.modbus.cn/28388.html",
+      "title": "Smart-building control system innovation - M31 distributed IO",
+      "author_as_published": "modbus technical team",
+      "publication_date": "2024-08-16",
+      "screenshot_log_date": "2024-08-11",
+      "model": "M31-AAAX4440G",
+      "firmware": "1.1, displayed in screenshot; not derived from a raw register",
+      "tool_version": "Ebyte Distributed IO Configtool v1.1",
+      "evidence_kind": "Reported physical setup plus GUI/device-info screenshot",
+      "citations": {
+        "article": "https://www.modbus.cn/28388.html",
+        "device_info_and_io": "https://image.modbus.cn/wp-content/uploads/2024/08/20240816120313885.png",
+        "serial_settings": "https://image.modbus.cn/wp-content/uploads/2024/08/20240816120304844.png"
+      },
+      "reported_observation": "Author describes proximity-switch DI1 changes and LED controlled by DO1, 12V supply and serial adapter. Screenshot displays model, IP 192.168.3.7, Modbus address 1, ETH+485, firmware 1.1, 4 DI, 4 AI, 4 relay DO. Serial dialog shows COM4, 9600, 8 data bits, 1 stop bit, NONE parity and specified search address 1.",
+      "address_convention": "No Modbus PDU/register addresses displayed in the inspected article or the two GUI screenshots",
+      "access": "User reports IO monitoring and DO GUI control, but no underlying function code, address or payload shown",
+      "identity_and_discovery": "GUI identifies a device and logs a completed search with one device; screenshot has Reboot, Restore and Negotiation buttons. This does not identify the transport or opcode of any of these operations; SerialPort is selected, so it is not UDP discovery evidence.",
+      "red_flags": [
+        "Author explicitly says AI could not be tested because no signal generator/analog device was available; borrowed analog example is not this device's measured AI behavior.",
+        "Screenshots bear a CSDN watermark. Original CSDN URL/author not located; provenance/repost lineage remains unknown, so count as one evidence family, not independent duplicates.",
+        "Article includes manufacturer promotion and sample/giveaway information; independence from vendor sponsorship is not established.",
+        "GUI-reported firmware 1.1 supports only this shown device, not all M31 models or a firmware-register address."
+      ],
+      "rank": "Strongest model+firmware-associated community hardware report, but provides no new register addresses"
+    }
+  ],
+  "register_evidence": [
+    {
+      "source": "github-m31config",
+      "category": "communityreported",
+      "address_dec": 30000,
+      "address_hex": "0x7530",
+      "count": 89,
+      "table": "holding",
+      "function": "FC03",
+      "type": "raw block of uint16 registers",
+      "access": "read call",
+      "semantic": "configuration read block",
+      "basis": "explicit API call main.go L124",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30000,
+      "address_hex": "0x7530",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "SerialPortRateCode",
+      "basis": "serialized Config field order; code list maps 1..8 to 2400..230400",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30001,
+      "address_hex": "0x7531",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "SerialPortParityCheck: code indexes NONE, ODD, EVEN",
+      "basis": "serialized Config field order and code list",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30002,
+      "address_hex": "0x7532",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "NetworkMode: code indexes TCP server, TCP client, UDP server, UDP client",
+      "basis": "serialized Config field order and code list; UDP mode does not imply discovery",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30003,
+      "address_hex": "0x7533",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "DHCP: code checks value 1 for enabled",
+      "basis": "serialized Config field order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30004,
+      "address_hex": "0x7534",
+      "count": 3,
+      "table": "holding",
+      "function": "FC03",
+      "type": "6 bytes in returned order",
+      "access": "read decoder",
+      "semantic": "MAC address",
+      "basis": "serialized Config field order; README shows a MAC but no raw bytes",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "communityreported",
+      "address_dec": 30007,
+      "address_hex": "0x7537",
+      "count": 2,
+      "table": "holding",
+      "function": "FC03 / FC06",
+      "type": "IPv4: two uint16, first octet in high byte",
+      "access": "read decoder / two single-register writes in source",
+      "semantic": "device IPv4 address",
+      "basis": "explicit setter and README changed output; persistence unverified",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "communityreported",
+      "address_dec": 30009,
+      "address_hex": "0x7539",
+      "count": 2,
+      "table": "holding",
+      "function": "FC03 / FC06",
+      "type": "IPv4: two uint16, first octet in high byte",
+      "access": "read decoder / two single-register writes in source",
+      "semantic": "subnet mask",
+      "basis": "explicit setter; example mask is unchanged, so does not demonstrate an actual mask change",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "communityreported",
+      "address_dec": 30011,
+      "address_hex": "0x753B",
+      "count": 2,
+      "table": "holding",
+      "function": "FC03 / FC06",
+      "type": "IPv4: two uint16, first octet in high byte",
+      "access": "read decoder / two single-register writes in source",
+      "semantic": "gateway",
+      "basis": "explicit setter and README changed output; persistence unverified",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "communityreported",
+      "address_dec": 30013,
+      "address_hex": "0x753D",
+      "count": 2,
+      "table": "holding",
+      "function": "FC03 / FC06",
+      "type": "IPv4: two uint16, first octet in high byte",
+      "access": "read decoder / two single-register writes in source",
+      "semantic": "DNS",
+      "basis": "explicit setter and README changed output; persistence unverified",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30015,
+      "address_hex": "0x753F",
+      "count": 2,
+      "table": "holding",
+      "function": "FC03",
+      "type": "4 bytes",
+      "access": "read decoder",
+      "semantic": "Free: unspecified/reserved field",
+      "basis": "serialized Config field order; do not assign invented semantics",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30017,
+      "address_hex": "0x7541",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "local network port",
+      "basis": "serialized Config field order; README reports 502",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30018,
+      "address_hex": "0x7542",
+      "count": 64,
+      "table": "holding",
+      "function": "FC03",
+      "type": "128 bytes; encoding/termination unknown",
+      "access": "read decoder",
+      "semantic": "DestinationDomainName",
+      "basis": "serialized Config field order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30082,
+      "address_hex": "0x7582",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "DestinationPort",
+      "basis": "serialized Config field order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30083,
+      "address_hex": "0x7583",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "ProtocolType; code displays TCP for 1, RTU otherwise",
+      "basis": "serialized Config field order; else branch does not prove every other value valid",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30084,
+      "address_hex": "0x7584",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder only; no negotiation write implemented",
+      "semantic": "AddressNegotiationWriteRegister",
+      "basis": "serialized Config field name/order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30085,
+      "address_hex": "0x7585",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "AddressNegotiationRegister, not save/reset",
+      "basis": "serialized Config field name/order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30086,
+      "address_hex": "0x7586",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "NegotiationStatus",
+      "basis": "serialized Config field name/order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30087,
+      "address_hex": "0x7587",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uint16 BE",
+      "access": "read decoder",
+      "semantic": "ExceptionCode",
+      "basis": "serialized Config field name/order",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-m31config",
+      "category": "hypothesis",
+      "address_dec": 30088,
+      "address_hex": "0x7588",
+      "count": 1,
+      "table": "holding",
+      "function": "FC03",
+      "type": "uninterpreted extra word",
+      "access": "included in read call, not decoded",
+      "semantic": "unknown; not evidence for an 89th configuration field",
+      "basis": "difference between requested block length and decoded layout",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-gunio-m31",
+      "category": "communityreported",
+      "address_dec": 0,
+      "address_hex": "0x0000",
+      "count": 4,
+      "table": "discrete inputs",
+      "function": "FC02",
+      "type": "bool bits",
+      "access": "read API call",
+      "semantic": "DI1..DI4",
+      "basis": "server.js map and readDiscreteInputs",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-gunio-m31",
+      "category": "communityreported",
+      "address_dec": 0,
+      "address_hex": "0x0000",
+      "count": 4,
+      "table": "coils",
+      "function": "FC01 / FC05 / FC0F",
+      "type": "bool bits",
+      "access": "read/write API calls; not a permission recommendation",
+      "semantic": "DO1..DO4; single-channel addresses 0..3",
+      "basis": "server.js map and readCoils/writeCoil/writeCoils",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-gunio-m31",
+      "category": "communityreported",
+      "address_dec": 0,
+      "address_hex": "0x0000",
+      "count": 4,
+      "table": "input registers",
+      "function": "FC04",
+      "type": "uint16, code divides by 1000",
+      "access": "read API call",
+      "semantic": "AI1..AI4 raw 0..20000 corresponds to 0..20 mA according to source comment",
+      "basis": "server.js L131-L145, explicitly manual-derived",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-gunio-m31",
+      "category": "communityreported",
+      "address_dec": 1000,
+      "address_hex": "0x03E8",
+      "count": 8,
+      "table": "input registers",
+      "function": "FC04",
+      "type": "4 IEEE754 float32, 2 registers/channel, BE high-word first assumed by code",
+      "access": "read API call",
+      "semantic": "AI1..AI4 in mA; channel starts 1000,1002,1004,1006",
+      "basis": "server.js L147-L163, no known-value capture",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    },
+    {
+      "source": "github-hacs",
+      "category": "communityreported",
+      "address_dec": 0,
+      "address_hex": "0x0000",
+      "count": 8,
+      "table": "discrete inputs",
+      "function": "FC02",
+      "type": "bool bits",
+      "access": "read implementation; validation uses count 1",
+      "semantic": "DI base, default 8 bits, slave 1; model-specific counts not trusted",
+      "basis": "const.py L13-L15 and hub.py L34-L53, mocked tests only",
+      "hardware_verified": false,
+      "runtime_enabled": false,
+      "automatic_probe_allowed": false,
+      "automatic_write_allowed": false
+    }
+  ],
+  "explicit_unknowns": {
+    "0x0DAC_3500": "No model-specific public community register/code/capture evidence located in bounded searches.",
+    "0x1194_4500": "No model-specific public community register/code/capture evidence located in bounded searches.",
+    "udp_discovery": "No public non-U M31 discovery datagram payload, port, opcode, request/response capture or protocol parser located. UDP mode enum is not discovery evidence; inspected GUI screenshot is SerialPort.",
+    "identity": "README and GUI display MAC/model; no independently established model-ID register/function was located.",
+    "firmware_register": "Firmware 1.1 visible in the community GUI screenshot, but raw register/address/type/count/function unknown.",
+    "save": "No identified save opcode/register/value sequence or persistence-after-power-cycle report in inspected community code.",
+    "reset_reboot_restore": "GUI buttons exist in screenshot, but their underlying registers/commands/values are unknown.",
+    "expansion_assignment": "No independent GXAAAX4440/GXXXA0008 allocation captures or code located. Do not extrapolate per-slot strides from these sources.",
+    "other_models": "No hardware-associated register capture located for M31-AXXXA000G, M31-XAXA0404G or the expansion models. HACS dropdown is not measured support."
+  },
+  "excluded_or_not_independent": [
+    {
+      "url": "https://github.com/MrTir1995/Ebyte-M31-config-tool-linux",
+      "reason": "User's current project, explicitly excluded as independent evidence. Not downloaded or inspected."
+    },
+    {
+      "url": "https://github.com/PVKonovalov/awesome-smartgrid",
+      "reason": "Directory merely links to m31config; same author and same evidence family."
+    },
+    {
+      "url": "https://github.com/daanlangelaan/Fairino-robotcel-hmi-v1/pull/1",
+      "date": "2026-08-10T10:00:03Z",
+      "reason": "PR mentions M31-U Configtool v1.3 and hardware commissioning. Exact non-U model not established from inspected PR; segregated variant-ambiguous/U-associated evidence, not imported into non-U map."
+    },
+    {
+      "url": "https://github.com/Koenkk/zigbee-herdsman/issues/97",
+      "reason": "EBYTE E18-M31 Zigbee radio, not M31 distributed IO."
+    },
+    {
+      "url": "https://www.cnblogs.com/ebyte/p/18578378",
+      "reason": "Manufacturer-account LoRa M31 overview, not an independent Ethernet/RS485 non-U register experiment; no inspected register map."
+    },
+    {
+      "url": "https://www.manualslib.com/products/Ebyte-M31-Series-13824396.html",
+      "reason": "Manufacturer-manual mirror; official stream should establish revision/model and register values, not an independent forum observation."
+    },
+    {
+      "url": "https://www.modbus.cn/43929.html",
+      "reason": "Generic Modbus capture guide does not establish M31-specific addresses."
+    },
+    {
+      "url": "https://wenku.csdn.net/doc/29qtx4xyze",
+      "reason": "Search-only configuration-tool download listing, not an inspectable M31 register capture. No binary downloaded."
+    }
+  ],
+  "negative_coverage": {
+    "qualification": "Not found means no usable evidence was located in these bounded public/indexed searches, not proof no post or private implementation exists. Search-engine synthesized examples are not treated as sources.",
+    "github_repositories": [
+      {
+        "query": "m31 modbus",
+        "total": 3,
+        "relevant_external": [
+          "PVKonovalov/m31config",
+          "bartosz-777/ebyte-m31-hacs"
+        ],
+        "excluded": [
+          "MrTir1995/Ebyte-M31-config-tool-linux"
+        ]
+      },
+      {
+        "query": "ebyte m31",
+        "total": 2,
+        "relevant_external": [
+          "bartosz-777/ebyte-m31-hacs"
+        ],
+        "excluded": [
+          "MrTir1995/Ebyte-M31-config-tool-linux"
+        ]
+      },
+      {
+        "query": "M31-AAAX4440G",
+        "total": 1,
+        "relevant_external": [
+          "PVKonovalov/m31config"
+        ]
+      },
+      {
+        "query": "M31 GXAAAX",
+        "total": 0
+      }
+    ],
+    "github_code": [
+      {
+        "query": "\"M31-AAAX4440G\"",
+        "total": 2,
+        "results": [
+          "PVKonovalov/awesome-smartgrid README link",
+          "Gunio2322/M31 server.js"
+        ]
+      },
+      {
+        "query": "\"M31-AXXXA000G\" OR \"M31-XAXA0404G\" OR \"GXAAAX4440\" OR \"GXXXA0008\"",
+        "total": 0
+      },
+      {
+        "query": "\"30085\" repo:PVKonovalov/m31config OR repo:bartosz-777/ebyte-m31-hacs OR repo:Gunio2322/M31",
+        "total": 0,
+        "qualification": "Absence of the literal number does not exclude the field: m31config derives 30085 through struct order."
+      }
+    ],
+    "github_issues": [
+      {
+        "query": "\"M31-AAAX4440G\"",
+        "total": 0
+      },
+      {
+        "query": "\"EBYTE\" \"M31\"",
+        "total": 2,
+        "results": [
+          "Fairino U-associated/variant-ambiguous PR",
+          "Unrelated E18-M31 Zigbee issue"
+        ]
+      },
+      {
+        "query": "\"M31-AXXXA000G\" OR \"M31-XAXA0404G\"",
+        "total": 0
+      },
+      {
+        "query": "\"GXAAAX4440\" OR \"GXXXA0008\"",
+        "total": 0
+      }
+    ],
+    "candidate_repository_issues_and_discussions": "Public issue lists state=all were empty in all three candidate repositories; GitHub metadata has_discussions=false for all three. No separate global Discussion search API was available; broad indexed searches yielded no usable non-U Discussion.",
+    "forums_and_community_searches": [
+      "Exact models on community.home-assistant.io, mikrocontroller.net, plcforum, elektroda.pl, CSDN and cnblogs: no register-specific independent thread located.",
+      "Chinese 亿佰特 M31 分布式IO 寄存器 searches including elecfans.com, 51hei.com, amobbs.com, oshwhub.com: manufacturer/LoRa and unrelated MCU content, no additional matching map.",
+      "Exact addresses 0x7530, 0x7585, 0x0DAC, 0x1194 and decimal 30000,30085,3500,4500: no usable new forum register capture.",
+      "Russian model/Modbus register searches: no usable matching forum report located.",
+      "Reddit and English/German/Polish PLC/electronics searches: no usable exact non-U model thread located.",
+      "Original CSDN article for watermarked modbus.cn screenshots: not located; repost lineage remains unresolved."
+    ],
+    "rejected_search_synthesis": "Some web-search summaries invented unattributed 30001/40001 IO examples or incorrectly called literal 30000 an input-register reference. Underlying cited pages did not show those examples. These claims are explicitly excluded."
+  },
+  "evidence_policy": {
+    "hardware_verified": false,
+    "runtime_enabled": false,
+    "automatic_probe_allowed": false,
+    "automatic_write_allowed": false,
+    "scope": "Offline evidence only; not a runtime address allowlist or hardware authorization."
+  }
+}

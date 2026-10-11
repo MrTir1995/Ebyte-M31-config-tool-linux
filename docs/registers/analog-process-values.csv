@@ -1,0 +1,41 @@
+family_id,table,manual_page,pdf_page_one_based,source_row,decimal_as_printed,hex_value_as_printed,int16_computed_from_hex,status,is_register_address
+ai_process,current_0_20mA,39,43,>23.52 32767 7FFF Overflow,32767,0x7FFF,32767,documented,False
+ai_process,current_0_20mA,39,43,23.52 32511 7EFF,32511,0x7EFF,32511,documented,False
+ai_process,current_0_20mA,39,43,>20 27649 6C01,27649,0x6C01,27649,documented,False
+ai_process,current_0_20mA,39,43,20 27648 6C00,27648,0x6C00,27648,documented,False
+ai_process,current_0_20mA,39,43,10 13824 3600 Rated range,13824,0x3600,13824,documented,False
+ai_process,current_0_20mA,39,43,-3.52 -4864 ED00,-4864,0xED00,-4864,documented,False
+ai_process,current_0_20mA,39,43,<-3.52 -32768 8000 underflow,-32768,0x8000,-32768,documented,False
+ai_process,current_0_20mA,39,43,0 0 0,0,0x0000,0,documented,False
+ai_process,current_0_20mA,39,43,<0 0 0,0,0x0000,0,documented,False
+ai_process,current_minus20_0mA,40,44,>3.52 32767 7FFF Overflow,32767,0x7FFF,32767,documented,False
+ai_process,current_minus20_0mA,40,44,3.52 4864 1300,4864,0x1300,4864,documented,False
+ai_process,current_minus20_0mA,40,44,-10 -13824 CA00 Rated range,-13824,0xCA00,-13824,documented,False
+ai_process,current_minus20_0mA,40,44,-20 -27648 9400,-27648,0x9400,-27648,documented,False
+ai_process,current_minus20_0mA,40,44,<-20 -27949 93FF,-27949,0x93FF,-27649,conflict,False
+ai_process,current_minus20_0mA,40,44,-23.52 -32511 8101,-32511,0x8101,-32511,documented,False
+ai_process,current_minus20_0mA,40,44,<-23.52 -32768 8000 underflow,-32768,0x8000,-32768,documented,False
+ai_process,current_minus20_0mA,40,44,>0 0 0,0,0x0000,0,documented,False
+ai_process,current_minus20_0mA,40,44,0 0 0,0,0x0000,0,documented,False
+ai_process,current_minus20_plus20mA,40,44,>23.52 32767 7FFF Overflow,32767,0x7FFF,32767,documented,False
+ai_process,current_minus20_plus20mA,40,44,23.52 32511 7EFF,32511,0x7EFF,32511,documented,False
+ai_process,current_minus20_plus20mA,40,44,>20 27649 6C01,27649,0x6C01,27649,documented,False
+ai_process,current_minus20_plus20mA,40,44,20 27648 6C00 Rated range,27648,0x6C00,27648,documented,False
+ai_process,current_minus20_plus20mA,41,45,10 13824 3600,13824,0x3600,13824,documented,False
+ai_process,current_minus20_plus20mA,41,45,-10 -13824 CA00,-13824,0xCA00,-13824,documented,False
+ai_process,current_minus20_plus20mA,41,45,-20 -27648 9400,-27648,0x9400,-27648,documented,False
+ai_process,current_minus20_plus20mA,41,45,<-20 -27949 93FF,-27949,0x93FF,-27649,conflict,False
+ai_process,current_minus20_plus20mA,41,45,-23.52 -32511 8101,-32511,0x8101,-32511,documented,False
+ai_process,current_minus20_plus20mA,41,45,<-23.52 -32768 8000 underflow,-32768,0x8000,-32768,documented,False
+ai_process,current_minus20_plus20mA,41,45,0 0 0,0,0x0000,0,documented,False
+ai_process,voltage,41,45,>5.06 >10.12 >5.06 >10.12 32767 0x7FFF,32767,0x7FFF,32767,documented,False
+ai_process,voltage,41,45,5.06 10.12 5.06 10.12 27979 0x6D4B Exceed,27979,0x6D4B,27979,documented,False
+ai_process,voltage,41,45,5V+0.1808mv 5V+0.1808mv 10V+0.3617mv 27649 0x6C01,27649,0x6C01,27649,documented,False
+ai_process,voltage,41,45,5 10 5 10 27648 0x6C00,27648,0x6C00,27648,documented,False
+ai_process,voltage,41,45,2.5 5 2.5 5 13824 0x3600,13824,0x3600,13824,documented,False
+ai_process,voltage,41,45,0 0 0 0 0 0x0000,0,0x0000,0,documented,False
+ai_process,voltage,41,45,/ / -2.5 -5 -13824 0XCA00,-13824,0xCA00,-13824,documented,False
+ai_process,voltage,41,45,/ / -5 -10 -27648 0x9400,-27648,0x9400,-27648,documented,False
+ai_process,voltage,41,45,/ / -5V-0.1808mv -10V-0.3617mv -27649 0x93FF Exceed,-27649,0x93FF,-27649,documented,False
+ai_process,voltage,42,46,/ / -5.06 -10.12 -27979 0x92B5 lower,-27979,0x92B5,-27979,documented,False
+ai_process,voltage,42,46,/ / -5.06< -10.12< -32768 0x8000,-32768,0x8000,-32768,documented,False

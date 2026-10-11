@@ -69,7 +69,10 @@ DEVICE_REGISTER_CATALOG = (
                       (2, "UDP server"), (3, "UDP client")),
         decode_note=_ENUM,
     ),
-    DeviceRegisterSpec("dhcp", "DHCP", 0x7533),
+    DeviceRegisterSpec(
+        "dhcp", "DHCP", 0x7533,
+        enumerations=((0, "Disabled"), (1, "Enabled")), decode_note=_ENUM,
+    ),
     DeviceRegisterSpec("mac", "MAC address", 0x7534, 3,
                        decode_note=_RAW_BYTES),
     DeviceRegisterSpec("ip", "IP address", 0x7537, 2,
