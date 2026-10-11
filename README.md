@@ -36,6 +36,33 @@ Das Handbuch nennt außerdem Einschränkungen älterer Host-Firmware beim
 Zusammenspiel mit einigen Erweiterungen einschließlich GXAXX0800 (V2.0);
 Firmwarekompatibilität muss für die tatsächlichen Geräte bestätigt werden.
 
+### Ergänzende Video-Beobachtungen
+
+Das vom Nutzer bereitgestellte, etwa 3:47 Minuten lange M31-Video zeigt
+einen **Firmware-Upgrade-Lehrgang**, keinen vollständigen Funktionsvergleich.
+Die lokal geprüften Bildsequenzen und eingeblendeten Texte ergänzen das
+Inventar:
+
+- Um 0:55 zeigt die Modulinfo Firmwareversion, Modbus-Adresse,
+  Schnittstellentyp und I/O-Ausstattung. Außerdem sind Neustart, Werksreset,
+  automatische Adressverhandlung und Adresstabellen-Export sichtbar.
+- Der Upgrade-Ablauf verwendet einen eigenen Netzwerk-Upgrade-Assistenten:
+  passende Netzwerkkarte auswählen, Firmwaredatei auswählen, Gerät suchen,
+  Upgrade auslösen und Fortschritt beobachten. Im Beispiel wird eine
+  `.ebin`-Datei für Host-Firmware V1.2 ausgewählt.
+- Später wird ein Wiederherstellungsfall mit der physischen Reload-Taste
+  und einem im Assistenten als `BOOT` angezeigten Gerät dargestellt.
+  Das ist keine Freigabe oder vollständige Wiederherstellungsanleitung
+  für beliebige Hardware-/Firmwareversionen.
+
+Die Beobachtungen bestätigen zusätzliche Windows-Bedienoberflächen, liefern
+aber weder Discovery-/Firmware-Telegramme noch Firmwaredateiformat,
+Prüfsummen, Versionskompatibilität oder eine sichere Recovery-Spezifikation.
+Deshalb wird kein Firmwareupdate aus Bildbeobachtungen heraus implementiert
+oder am Gerät ausprobiert. Die Videodatei und Einzelbilder werden nicht
+im Repository veröffentlicht. Ton wurde nicht automatisch transkribiert;
+die Auswertung beruht auf sichtbaren Bildern und Einblendungen.
+
 | Funktion | Linux-Implementierung / Nachweisgrenze |
 | --- | --- |
 | Modbus TCP, Lesen von DI/DO/Registern | Implementiert; Simulatorprüfungen, Hardware-Lesetest separat |

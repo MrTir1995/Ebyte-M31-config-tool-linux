@@ -287,3 +287,17 @@ Abhängigkeiten, Wheel 0.3.0 und installierte Tk-Anwendung geprüft.
 Die neue Suche fand das freigegebene Ziel 192.168.3.7/Unit 1 mit einer
 gültigen Leseantwort; GUI-Auswahl übernahm TCP-Endpunkt und ID korrekt.
 Keine breite Netzwerksuche, RS485-Drahtabnahme oder Geräte-Schreibzugriffe.
+
+## Ergänzende Videoquelle
+
+Der Nutzer hat ein 226,815 Sekunden langes M31-Upgradevideo bereitgestellt.
+Lokale Sichtung anhand einer zeitlichen Bildübersicht und Detailframes:
+Modulinfo/Firmwareversion, eigene Netzwerk-Upgradeoberfläche,
+Netzwerkkartenauswahl, Firmwaredatei, Gerätesuche und Upgradefortschritt
+sowie ein Reload-/BOOT-Recoveryfall sind sichtbar.
+Das Video ergänzt die Funktionsbaseline, enthält in den geprüften
+Bildsequenzen jedoch keine verifizierbaren Drahtprotokolle.
+Keine Firmwareaktion, kein Hardware-Reset, keine Änderung aus geratenen
+Telegrammen. Datei und Frames bleiben außerhalb des öffentlichen Projekts.
+README dokumentiert die Beobachtungen und deren Grenzen; keine neue
+Funktionsgleichheit oder automatische Tontranskription wird behauptet.
