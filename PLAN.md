@@ -251,3 +251,39 @@ Herstellerprogramme, Fotos, lokale Umgebungen, Messwerte und Builds werden
 nicht in das öffentliche Git-Repository aufgenommen.
 Vollständige Windows-Parität bleibt wegen fehlender Herstellerprotokolle
 und Referenzdateiformate unbestätigt.
+
+## Mehrgerätebetrieb im Netzwerk und auf RS485
+
+Der Nutzer verlangt Anzeige und Bearbeitung mehrerer Geräte ohne Bindung
+an eine einzige vorbelegte ID. Modbus-Zielidentität bleibt dabei erhalten:
+auf RTU wird jede Anfrage an die konkrete Slave-ID adressiert; ID 0
+(Broadcast) wird nicht zur Bearbeitung verwendet.
+
+- Sub-Agent Domain: ausdrücklich gestartete, begrenzte TCP-/RTU-Suche
+  an vom Nutzer vorgegebenen Hosts/CIDR und IDs, ausschließlich Leseprobes,
+  Abbruchmöglichkeit und dokumentierte Fehler; keine Erfolgserkennung nur
+  anhand eines TCP-Handshakes.
+- Sub-Agent GUI: Geräteliste mit logischen Endpunkten und IDs, Suche,
+  Abbruch und Auswahl zum Vorbereiten der vorhandenen Geräteverbindung.
+  Keine automatischen Scans, Verbindungen oder Schreibaktionen.
+- Integration: Simulator-/GUI-Prüfung, Build und kleine Hardware-Leseprobe
+  am ausdrücklich freigegebenen Host; bestätigte Geräteaktionen bleiben
+  an das ausgewählte Ziel gebunden.
+
+Die generische Modbus-Suche ist kein Nachbau der proprietären
+Hersteller-UDP-Erkennung. Mehrere TCP-IDs können dasselbe physische Gerät
+ansprechen; Einträge sind daher logische Ziele, keine gesicherte Hardwarezählung.
+Geräte-ID-Änderung selbst bleibt ohne dokumentiertes gerätespezifisches
+Verfahren ausgeschlossen. Defekte/offline oder nicht mit Modbus sprechende
+Teilnehmer können mit dieser Suche nicht garantiert gefunden werden.
+
+### Mehrgeräte-Abnahme
+
+Beide Sub-Agent-Beiträge integriert; gefundene Transport-Normalisierung
+zwischen Domain und GUI sowie Tk-Variablen-/Worker-Lebenszyklusfehler
+mit Regressionstests behoben. Finale Suite: 179 ausgeführt, 178 bestanden,
+ein expliziter Hardwaretest standardmäßig übersprungen. Kompilierung,
+Abhängigkeiten, Wheel 0.3.0 und installierte Tk-Anwendung geprüft.
+Die neue Suche fand das freigegebene Ziel 192.168.3.7/Unit 1 mit einer
+gültigen Leseantwort; GUI-Auswahl übernahm TCP-Endpunkt und ID korrekt.
+Keine breite Netzwerksuche, RS485-Drahtabnahme oder Geräte-Schreibzugriffe.

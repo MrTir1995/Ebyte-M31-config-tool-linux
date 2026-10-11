@@ -17,6 +17,9 @@ except ModuleNotFoundError as exc:
 
 from m31tool.core import M31_REGISTERS, ModbusSession, RegisterKind
 from m31tool.device import negotiate_addresses, read_device_info
+from m31tool.discovery import (
+    DeviceTarget, discover_rtu, discover_tcp, parse_hosts, parse_unit_ids,
+)
 from m31tool.formats import (
     PROFILE_FIELDS, decode_float32, load_profile, load_xlsx, save_profile, save_xlsx,
 )
@@ -147,6 +150,7 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.closing = False
         self.close_started = False
         self.events: queue.Queue = queue.Queue()
+        self.worker_thread = None
         self.rows: list[tuple[str, int, int]] = []
         self.controls: list[tuple[ttk.Widget, str]] = []
         self.transport = tk.StringVar(value="TCP")
@@ -173,11 +177,30 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.source = tk.StringVar(value="No reads displayed.")
         self.device_source = tk.StringVar(value="No device parameters/status read performed.")
         self.negotiation_result = tk.StringVar(value="No address negotiation requested.")
+        self.device_targets = {}
+        self.prepared_target_item = ""
+        self.scan_cancel = None
+        self.scan_hosts = tk.StringVar(value="")
+        self.scan_units = tk.StringVar(value="1-247")
+        self.scan_timeout = tk.StringVar(value="0.3")
+        self.scan_status = tk.StringVar(value="No search performed. Device list is local to this window.")
         self.pack(fill="both", expand=True)
         self._build()
         self._refresh_controls()
         self.root.protocol("WM_DELETE_WINDOW", self._request_close)
         self.root.after(75, self._poll)
+
+    def destroy(self) -> None:
+        """Release owned Tk objects on Tk's thread, not later worker-thread GC."""
+        super().destroy()
+        self.controls.clear()
+        self.connection_controls.clear()
+        self.discovery_controls.clear()
+        for name, value in tuple(vars(self).items()):
+            if isinstance(value, tk.Variable) or (
+                isinstance(value, tk.Misc) and name not in ("master", "root")
+            ):
+                delattr(self, name)
 
     def _entry(self, parent, variable, width=14):
         widget = ttk.Entry(parent, textvariable=variable, width=width)
@@ -320,6 +343,9 @@ class M31App(ttk.Frame if ttk is not None else object):
         notebook.enable_traversal()
         self.notebook = notebook
         self.explorer = explorer
+        devices_tab = ttk.Frame(notebook, padding=8)
+        notebook.add(devices_tab, text="Device list")
+        self._build_device_list(devices_tab)
 
         read_bar = ttk.Frame(explorer)
         read_bar.pack(fill="x")
@@ -578,6 +604,197 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.rtu_frame.grid_remove()
         (self.tcp_frame if self.transport.get() == "TCP" else self.rtu_frame).grid()
 
+    def _build_device_list(self, parent) -> None:
+        self._wrapped_label(
+            parent, text="READ ONLY search — explicit targets only; never automatic. "
+            "The Unit ID addresses EVERY Modbus command, not just discovery. "
+            "TCP unit aliases may refer to the same hardware; RTU devices need distinct IDs.",
+        )
+        self._wrapped_label(
+            parent, text="TCP: enter hosts (comma-separated) or CIDR, using the connection port. "
+            "RTU: uses the current serial settings. Maximum 256 hosts / 1,024 host×ID attempts. "
+            "Narrow the unit range for larger networks. Disconnect before searching or selecting. "
+            "No readable response does not prove a device is absent.",
+        )
+        first = len(self.controls)
+        fields = ttk.Frame(parent)
+        fields.pack(fill="x", pady=(0, 6))
+        ttk.Label(fields, text="TCP hosts / CIDR").grid(row=0, column=0, sticky="w")
+        self._entry(fields, self.scan_hosts, 32).grid(row=0, column=1, sticky="ew", padx=5)
+        fields.columnconfigure(1, weight=1)
+        ttk.Label(fields, text="Unit IDs").grid(row=1, column=0, sticky="w")
+        self._entry(fields, self.scan_units, 20).grid(row=1, column=1, sticky="w", padx=5)
+        ttk.Label(fields, text="Probe timeout (s)").grid(row=1, column=2, padx=5)
+        self._entry(fields, self.scan_timeout, 6).grid(row=1, column=3)
+        self.discovery_controls = {widget for widget, _ in self.controls[first:]}
+        buttons = ttk.Frame(parent)
+        buttons.pack(fill="x", pady=(0, 6))
+        self.search_button = ttk.Button(
+            buttons, text="Search devices", command=self._search_devices, style="Primary.TButton",
+        )
+        self.search_button.pack(side="left")
+        self.cancel_search_button = ttk.Button(
+            buttons, text="Cancel search", command=self._cancel_search,
+        )
+        self.cancel_search_button.pack(side="left", padx=5)
+        self.add_target_button = ttk.Button(
+            buttons, text="Add current target (unverified)", command=self._add_current_target,
+        )
+        self.add_target_button.pack(side="left")
+        self._wrapped_label(parent, textvariable=self.scan_status)
+        self.device_tree = self._tree(
+            parent, ("endpoint", "unit", "verification"),
+            ("Endpoint / serial settings", "Unit ID", "Detection"), horizontal=True,
+        )
+        self.device_tree.configure(height=4, selectmode="browse")
+        for column, width in (("endpoint", 400), ("unit", 80), ("verification", 150)):
+            self.device_tree.column(column, width=width)
+        self.device_tree.bind("<<TreeviewSelect>>", self._select_device_target)
+        self.device_tree.bind(
+            "<Button-1>",
+            lambda event: "break" if self.connected or self.busy or self.closing else None,
+        )
+        self._bind_action(self.device_tree, self._select_device_target)
+
+    def _remember_device_target(self, target, verified=False) -> None:
+        for item, previous in self.device_targets.items():
+            if previous == target:
+                if verified:
+                    self.device_tree.set(item, "verification", "Found (read response)")
+                return
+        if target.transport.lower() == "tcp":
+            endpoint = f"TCP {target.host}:{target.port}"
+        else:
+            endpoint = (
+                f"RTU {target.serial_port}, {target.baudrate} "
+                f"8{target.parity}{target.stopbits}"
+            )
+        item = self.device_tree.insert(
+            "", "end", values=(
+                endpoint, target.unit_id,
+                "Found (read response)" if verified else "Unverified (manual)",
+            ),
+        )
+        self.device_targets[item] = target
+
+    def _select_device_target(self, event=None) -> None:
+        if self.connected or self.busy or self.closing:
+            selected = self.device_tree.selection()
+            prepared = getattr(self, "prepared_target_item", "")
+            expected = (prepared,) if prepared else ()
+            if selected != expected:
+                if prepared:
+                    self.device_tree.selection_set(prepared)
+                elif selected:
+                    self.device_tree.selection_remove(*selected)
+            return
+        selected = self.device_tree.selection()
+        if not selected:
+            return
+        target = self.device_targets[selected[0]]
+        self.prepared_target_item = selected[0]
+        self.transport.set(target.transport.upper())
+        self.unit_id.set(str(target.unit_id))
+        if target.transport.lower() == "tcp":
+            self.host.set(target.host)
+            self.tcp_port.set(str(target.port))
+        else:
+            self.serial_port.set(target.serial_port)
+            self.baudrate.set(str(target.baudrate))
+            self.parity.set(target.parity)
+            self.stopbits.set(str(target.stopbits))
+        self.destination = ""
+        self._show_transport()
+        self._refresh_controls()
+        self.status.set("Target prepared locally — press Connect. No device I/O performed.")
+
+    def _add_current_target(self) -> None:
+        if self.connected or self.busy or self.closing:
+            return
+        try:
+            unit = _integer(self.unit_id.get(), "Unit ID", 1, 247)
+            if self.transport.get() == "TCP":
+                host = self.host.get().strip()
+                if not host:
+                    raise ValueError("TCP host is required.")
+                target = DeviceTarget(
+                    transport="tcp", host=host,
+                    port=_integer(self.tcp_port.get(), "TCP port", 1, 65535), unit_id=unit,
+                )
+            else:
+                port = self.serial_port.get().strip()
+                if not port:
+                    raise ValueError("Serial device is required.")
+                target = DeviceTarget(
+                    transport="rtu", serial_port=port, unit_id=unit,
+                    baudrate=_integer(self.baudrate.get(), "Baud rate", 1, 4_000_000),
+                    parity=self.parity.get(), stopbits=int(self.stopbits.get()),
+                )
+            self._remember_device_target(target)
+        except (ValueError, OverflowError) as exc:
+            self._error("Add target", exc)
+            return
+        self.scan_status.set("Added unverified target locally. No device I/O performed.")
+
+    def _search_devices(self) -> None:
+        if self.connected or self.busy or self.closing:
+            return
+        try:
+            units = parse_unit_ids(self.scan_units.get())
+            timeout = float(self.scan_timeout.get())
+            if not 0 < timeout <= 2:
+                raise ValueError("Probe timeout must be greater than zero and at most 2 seconds.")
+            if self.transport.get() == "TCP":
+                hosts = parse_hosts(self.scan_hosts.get())
+                if len(hosts) * len(units) > 1024:
+                    raise ValueError("Search exceeds 1,024 attempts. Narrow the hosts or unit range.")
+                port = _integer(self.tcp_port.get(), "TCP port", 1, 65535)
+                kwargs = dict(port=port, timeout=timeout)
+                discover, args = discover_tcp, (hosts, units)
+            else:
+                port = self.serial_port.get().strip()
+                if not port:
+                    raise ValueError("Serial device is required.")
+                kwargs = dict(
+                    baudrate=_integer(self.baudrate.get(), "Baud rate", 1, 4_000_000),
+                    parity=self.parity.get(), stopbits=int(self.stopbits.get()), timeout=timeout,
+                )
+                discover, args = discover_rtu, (port, units)
+        except (ValueError, OverflowError) as exc:
+            self._error("Search devices", exc)
+            return
+        self.scan_cancel = threading.Event()
+        kwargs["cancel_event"] = self.scan_cancel
+        self.scan_status.set("Searching read-only… Cancel keeps partial results. No writes performed.")
+        self._run("Search devices", lambda: discover(*args, **kwargs), self._discovery_complete)
+
+    def _cancel_search(self) -> None:
+        if self.scan_cancel is not None:
+            self.scan_cancel.set()
+            self.scan_status.set("Cancelling after the current probe — partial results will be kept.")
+
+    def _discovery_complete(self, result) -> None:
+        self.scan_cancel = None
+        for target in result.devices:
+            self._remember_device_target(target, verified=True)
+        state = "Cancelled (partial results kept)" if result.cancelled else "Completed"
+        summary = (
+            f"{state}: {len(result.devices)} responding targets, "
+            f"{result.attempted} attempts, {len(result.errors)} errors. No writes performed."
+        )
+        self.scan_status.set(summary)
+        self.status.set(summary)
+        if result.errors:
+            details = "\n".join(
+                f"{error.target.transport} "
+                f"{error.target.host or error.target.serial_port}, "
+                f"unit {error.target.unit_id}: {error.operation}: {error.message}"
+                for error in result.errors[:10]
+            )
+            if len(result.errors) > 10:
+                details += f"\n… {len(result.errors) - 10} further probe errors."
+            messagebox.showwarning("Search devices — probe errors", details, parent=self.root)
+
     def _refresh_controls(self) -> None:
         blocked = self.busy or self.closing
         if self.connected:
@@ -595,7 +812,9 @@ class M31App(ttk.Frame if ttk is not None else object):
             self.progress.stop()
             self.progress.configure(value=0)
         for widget, state in self.controls:
-            disabled = blocked or (self.connected and widget in self.connection_controls)
+            disabled = blocked or (
+                self.connected and widget in self.connection_controls | self.discovery_controls
+            )
             widget.configure(state="disabled" if disabled else state)
         self.connect_button.configure(state="disabled" if blocked or self.connected else "normal")
         self.disconnect_button.configure(state="disabled" if blocked or not self.connected else "normal")
@@ -611,9 +830,18 @@ class M31App(ttk.Frame if ttk is not None else object):
         self.load_profile_button.configure(
             state="disabled" if blocked or self.connected else "normal"
         )
+        for button in (self.search_button, self.add_target_button):
+            button.configure(state="disabled" if blocked or self.connected else "normal")
+        self.cancel_search_button.configure(
+            state="normal" if self.scan_cancel is not None and self.busy else "disabled"
+        )
+        self.device_tree.state(["disabled"] if blocked or self.connected else ["!disabled"])
 
     def _error(self, title: str, error: Exception) -> None:
         detail = f"{type(error).__name__}: {error}"
+        if title == "Search devices":
+            self.scan_cancel = None
+            self.scan_status.set(f"Search FAILED — existing targets kept. {detail}")
         if title == "Read device parameters/status":
             self.device_source.set(
                 "Device read FAILED — any displayed snapshot is unchanged, not refreshed."
@@ -642,7 +870,10 @@ class M31App(ttk.Frame if ttk is not None else object):
                 error = exc
             self.events.put((label, result, error, bool(self.session.connected), success))
 
-        threading.Thread(target=worker, name="m31-device-io", daemon=True).start()
+        self.worker_thread = threading.Thread(
+            target=worker, name="m31-device-io", daemon=True,
+        )
+        self.worker_thread.start()
 
     def _poll(self) -> None:
         try:
@@ -650,6 +881,11 @@ class M31App(ttk.Frame if ttk is not None else object):
         except queue.Empty:
             pass
         else:
+            # The event is the worker's final statement; join its short cleanup
+            # tail before a callback can destroy Tk or release the last owner.
+            if self.worker_thread is not None:
+                self.worker_thread.join()
+                self.worker_thread = None
             self.busy = False
             self.connected = connected
             self._refresh_controls()
@@ -1064,6 +1300,8 @@ class M31App(ttk.Frame if ttk is not None else object):
         if self.closing:
             return
         self.closing = True
+        if self.scan_cancel is not None:
+            self.scan_cancel.set()
         self._refresh_controls()
         if self.busy:
             self.status.set("Closing — waiting for the current operation to finish safely…")

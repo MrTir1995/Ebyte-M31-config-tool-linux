@@ -40,6 +40,7 @@ Firmwarekompatibilität muss für die tatsächlichen Geräte bestätigt werden.
 | --- | --- |
 | Modbus TCP, Lesen von DI/DO/Registern | Implementiert; Simulatorprüfungen, Hardware-Lesetest separat |
 | Modbus RTU | Implementiert; Mock-Konfiguration geprüft, kein RS485-Aufbau |
+| Mehrgerätebetrieb | Explizite generische Modbus-Suche und Auswahl logischer Endpunkte; keine proprietäre UDP-Erkennung |
 | Einzelne Coils/Register schreiben (05/06) | Implementiert; Host-Coil 0 live mit Rückstellung geprüft, übrige Schreibtests am Simulator |
 | Mehrfachschreiben (0F/10) | Implementiert mit vollständiger Bestätigung und Rücklesen; am Simulator geprüft |
 | I/O-Ansicht | Rohregister-Explorer, Adresskatalog und IEEE754-Anzeige mit expliziter Wortreihenfolge; kein vollständiger modularer Gerätebaum |
@@ -98,6 +99,32 @@ Betriebssysteminstallation korrigieren, nicht `pip install tkinter` versuchen.
 Ein erfolgreicher Tkinter-Import allein bestätigt noch keine grafische Sitzung.
 
 ## Verbindung und Bedienung
+
+### Mehrere Geräte auswählen
+
+Eine Modbus-ID ist nicht nur ein Suchmerkmal: insbesondere auf RS485 trägt
+**jede Anfrage die Slave-ID ihres Zielgeräts**. Unterschiedliche IDs auf
+demselben Bus können unabhängig ausgewählt werden. Broadcast-ID 0 wird
+nicht für Geräteschreibzugriffe verwendet.
+
+Die Geräteliste bietet eine ausdrücklich gestartete generische Lese-Suche.
+Für TCP werden bekannte Hosts oder ein begrenztes IPv4-Netz sowie der
+gewünschte ID-Bereich angegeben; RTU durchsucht die IDs auf dem konfigurierten
+seriellen Port mit passenden Busparametern. Keine automatische Netzwerksuche
+beim Start. Die Suche kann abgebrochen werden und verändert keine Ausgänge
+oder Geräteadressen.
+
+Ein gefundenes Ziel wird ausgewählt und in die Verbindungseinstellungen
+übernommen. Zum Wechseln zunächst trennen, dann das andere Ziel verbinden.
+Die vorhandenen Lese-/Schreibfunktionen arbeiten anschließend mit dessen
+Endpunkt und ID; Bestätigungen nennen weiterhin das konkrete Ziel.
+
+Ein TCP-Gerät kann mehrere IDs beantworten oder ignorieren. Die Liste
+zeigt deshalb **logische Modbus-Ziele**, nicht zwingend verschiedene
+physische Geräte. Modbus-Leseprobes garantieren keine Erkennung aller
+offline, inkompatiblen oder nur über Herstellerprotokolle erreichbaren
+Geräte. Geräte-IDs werden nicht automatisch verändert oder neu zugeteilt.
+ID-Konflikte auf RS485 müssen vor sicherer Gerätebearbeitung behoben werden.
 
 Die neue Oberfläche trennt Lesen, **Device writes** und **Local files** in
 eigene Arbeitsbereiche. Verbindungszustand und Ziel bleiben auch bei
@@ -320,7 +347,7 @@ Das gebaute Wheel in einer **separaten Umgebung** prüfen:
 
 ```sh
 python3 -m venv .wheel-venv
-.wheel-venv/bin/python -m pip install dist/m31tool-0.2.0-py3-none-any.whl
+.wheel-venv/bin/python -m pip install dist/m31tool-0.3.0-py3-none-any.whl
 .wheel-venv/bin/python -m pip check
 (cd .wheel-venv && bin/python -c "import m31tool.core; import m31tool.__main__; print('Wheel-Import OK')")
 ```
