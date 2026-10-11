@@ -534,6 +534,26 @@ Wheel-Build und diff check jeweils Exitcode 0. Das separat installierte
 Wheel bestand den realen Tk-/Loopback-Smoke mit deaktiviertem Startzustand,
 read-only Wiederholung, Invalid-Input-Abschaltung und sauberer Timerfreigabe.
 Die Runtime-Dateien im Wheel stimmen mit den geprüften Quellen überein.
-Erneute native Windows-Abnahme dieses Auto-refresh-Stands steht aus.
-Keine Hardwareaktion, kein Commit und kein Push; vor Veröffentlichung wird
-die vollständige Liste einschließlich der älteren lokalen Arbeit vorgelegt.
+Zum Zeitpunkt dieser Linux-Prüfung stand die erneute native Windows-Abnahme
+noch aus. Es erfolgte keine Hardwareaktion; die vollständige Dateiliste
+einschließlich der älteren lokalen Arbeit wurde vor Veröffentlichung vorgelegt.
+
+Der frische native Windows-Gegenlauf bestand anschließend: 236 Tests in
+120,555 Sekunden, 235 bestanden und ein Hardware-Skip; Tests, pip check,
+Kompilierung, Wheel und GUI jeweils Exitcode 0. Gastquelle:
+`C:\M31Tests\frozen-source-20261011-142708`, Quellbundle-SHA256
+`4c0043bbd0a1dc86413ce5406effe7d76e8cacf64e3239df7115c3119bbe7e28`.
+app.py entspricht dem oben geprüften Stand, SHA256
+`d7fbada157a7c61aff01a33995481a8f2063aaf2d8b7a2b05de3226faaf43469`.
+Windows-Wheel: 51.462 Bytes, SHA256
+`77491ac777927f97ed55f1bba8f5f26315fa4d7e6725782615afbf400b1e242e`.
+Keine Bytegleichheit zum Linux-Wheel und keine Hersteller-/Hardwareparität
+behauptet. Zusätzlich bestanden unter Linux 130 wiederholte GUI-Tests mit
+paralleler Worker-GC in 65,891 Sekunden.
+
+Auf zusätzlichen Nutzerauftrag wurde die eigenständige deutsche
+`docs/windows-copilot-analysis-guide.md` erstellt: Windows-Werkzeuge,
+Quellen-/UI-Provenanz, Sicherheitsvertrag, Funktionsmatrix, Registermapping
+mit H1–H6/Konflikten, zulässige passive Evidenz und Implementierungsabnahme.
+Keine Schutzumgehung, kein automatischer Registerscan und keine
+Geräte-/Firmwarefreigabe durch diese Anleitung.

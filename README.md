@@ -10,6 +10,9 @@ Der Umsetzungs- und Abnahmeplan steht in [PLAN.md](PLAN.md).
 Das detaillierte, quellengebundene Registerinventar einschließlich
 Modellvergleich, GitHub-/Forenbefunden und getrennten Musterhypothesen
 steht unter [docs/registers](docs/registers/README.md).
+Ein ausführlicher Windows-Copilot-Auftrag für sichere Herstelleranalyse,
+Registermapping und evidenzbasierte Ergänzungen steht in der
+[Analyseanleitung](docs/windows-copilot-analysis-guide.md).
 
 Dies ist **kein vollständiger Nachbau** der Windows-Anwendung. Der belegte
 Funktionsumfang, nicht eine uneingeschränkte Eins-zu-eins-Parität, ist das Ziel.
@@ -58,6 +61,13 @@ Anschließend bestand auch **0.4.0** den vollständigen nativen Windows-Lauf:
 ohne Tcl-Abbruch. Kompilierung, Abhängigkeiten, Wheel-Build und GUI-Start/-Ende
 waren ebenfalls erfolgreich. Laufzeit-Parität zur Hersteller-EXE bleibt
 unbestätigt. In der VM steht keine M31-Hardware zur Verfügung.
+
+Der neue Auto-refresh-Stand bestand anschließend ebenfalls nativ unter
+Windows: **236 Tests in 120,555 Sekunden, 235 bestanden und ein Hardwaretest
+übersprungen**. Tests, Abhängigkeiten, Kompilierung, Wheel-Build und
+GUI-Start/-Ende jeweils Exitcode 0; geprüfter app.py-SHA256:
+`d7fbada157a7c61aff01a33995481a8f2063aaf2d8b7a2b05de3226faaf43469`.
+Dies ist weiterhin keine Hersteller-EXE-/Protokoll- oder Hardwareabnahme.
 
 Auch der frisch vom Hersteller geladene Download `id=3403` enthält dieselbe
 blockierte EXE, keinen anderen Build. ZIP: 25.539.169 Bytes,
