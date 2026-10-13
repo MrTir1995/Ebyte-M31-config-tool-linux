@@ -60,6 +60,25 @@ class PumpControllerTests(unittest.TestCase):
         self.session.write_coil.assert_called_once_with(DO_PUMP, False)
         self.assertFalse(status.output_on)
 
+    def test_uses_configured_thresholds_and_disables_automation(self):
+        self.session.read_input_registers.return_value = [process_value_for_pressure(2.1)]
+        self.session.read_coils.side_effect = [[False], [True]]
+        status = self.controller.scan(start_pressure_bar=2.2, stop_pressure_bar=4.0)
+        self.session.write_coil.assert_called_once_with(DO_PUMP, True)
+        self.assertTrue(status.output_on)
+
+        self.session.reset_mock()
+        self.session.read_discrete_inputs.return_value = [True, False]
+        self.session.read_input_registers.return_value = [process_value_for_pressure(1.5)]
+        self.session.read_coils.side_effect = [[True], [False]]
+        status = self.controller.scan(enabled=False)
+        self.session.write_coil.assert_called_once_with(DO_PUMP, False)
+        self.assertFalse(status.output_on)
+
+    def test_rejects_invalid_pressure_thresholds(self):
+        with self.assertRaises(ValueError):
+            self.controller.scan(start_pressure_bar=3.0, stop_pressure_bar=3.0)
+
     def test_motor_fault_stops_pump_at_any_pressure(self):
         self.session.read_discrete_inputs.return_value = [False, True]
         self.session.read_coils.side_effect = [[True], [False]]

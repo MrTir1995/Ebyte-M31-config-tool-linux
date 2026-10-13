@@ -276,8 +276,8 @@ Das veröffentlichte Repository heißt `Ebyte-M31-config-tool-linux`;
 nach dem Klonen entsprechend in diesen Ordner wechseln.
 
 Alternativ startet der installierte Konsolenbefehl `m31tool` dieselbe GUI.
-`pymodbus>=3.10,<4`, `pyserial>=3.5,<4` und `openpyxl>=3.1,<4` werden durch die
-Projektmetadaten installiert. Bei „No module named tkinter“ die
+`pymodbus>=3.10,<4`, `pyserial>=3.5,<4`, `openpyxl>=3.1,<4` und
+`paho-mqtt>=2.1,<3` werden durch die Projektmetadaten installiert. Bei „No module named tkinter“ die
 Betriebssysteminstallation korrigieren, nicht `pip install tkinter` versuchen.
 Ein erfolgreicher Tkinter-Import allein bestätigt noch keine grafische Sitzung.
 
@@ -675,6 +675,7 @@ das Wheel bündelt deren Quellcode nicht:
 | pymodbus | 3.15.0 | BSD-3-Clause |
 | pyserial | 3.5 | BSD-3-Clause; vollständigen Release-Lizenztext bei Bündelung mitliefern |
 | openpyxl | 3.1.5 | MIT |
+| paho-mqtt | 2.1.0 | EPL-2.0 OR BSD-3-Clause |
 | et_xmlfile (indirekt) | 2.0.0 | MIT sowie Python-/PSF-Hinweise für übernommenen Python-Code |
 
 Bei künftiger Bündelung von Abhängigkeiten müssen die zugehörigen Copyright-,

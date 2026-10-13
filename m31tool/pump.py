@@ -282,24 +282,24 @@ def _safe_stop(session: ModbusSession, host: str, port: int) -> None:
 def _run(args: argparse.Namespace, stop: Event) -> None:
     session = ModbusSession(unit_id=args.unit_id, timeout=args.timeout)
     controller = PumpController(session, ai_address=args.ai_address)
-    settings = PumpSettings(
-        enabled=True,
-        start_pressure_bar=args.start_pressure,
-        stop_pressure_bar=args.stop_pressure,
-        path=args.settings_file,
-    )
     home_assistant = None
-    if args.mqtt_host:
-        home_assistant = HomeAssistantMqtt(
-            settings,
-            host=args.mqtt_host,
-            port=args.mqtt_port,
-            discovery_prefix=args.mqtt_discovery_prefix,
-            device_id=args.device_id,
-            credentials=(args.mqtt_username, args.mqtt_password),
-        )
-        home_assistant.start()
     try:
+        settings = PumpSettings(
+            enabled=True,
+            start_pressure_bar=args.start_pressure,
+            stop_pressure_bar=args.stop_pressure,
+            path=args.settings_file,
+        )
+        if args.mqtt_host:
+            home_assistant = HomeAssistantMqtt(
+                settings,
+                host=args.mqtt_host,
+                port=args.mqtt_port,
+                discovery_prefix=args.mqtt_discovery_prefix,
+                device_id=args.device_id,
+                credentials=(args.mqtt_username, args.mqtt_password),
+            )
+            home_assistant.start()
         while not stop.is_set():
             try:
                 if not session.connected:
@@ -378,8 +378,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.mqtt_host == "":
         args.mqtt_host = None
     args.mqtt_password = os.environ.get("M31_MQTT_PASSWORD")
+    if args.mqtt_host is None and (args.mqtt_username or args.mqtt_password):
+        parser.error("--mqtt-host is required when MQTT credentials are configured")
     if not 1 <= args.mqtt_port <= 65535:
         parser.error("--mqtt-port must be in 1..65535")
+    if (not args.mqtt_discovery_prefix.strip("/")
+            or any(char in args.mqtt_discovery_prefix for char in "+#")):
+        parser.error("--mqtt-discovery-prefix must be a valid topic prefix")
     if args.mqtt_username and not args.mqtt_password:
         parser.error("M31_MQTT_PASSWORD is required when an MQTT username is set")
     if args.mqtt_password and not args.mqtt_username:
