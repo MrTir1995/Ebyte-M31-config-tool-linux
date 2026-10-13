@@ -17,8 +17,13 @@ Registermapping und evidenzbasierte Ergänzungen steht in der
 ## Brunnenpumpe druckabhängig steuern
 
 Das zusätzliche Ubuntu-Kommando `m31-pump` steuert DO1 mit einer Hysterese:
-unter **1,6 bar** einschalten, ab **3,0 bar** ausschalten, dazwischen den
-bisherigen Zustand halten. DI1 muss high sein; bei Motorstörung (DI1 low),
+standardmäßig unter **1,6 bar** einschalten, ab **3,0 bar** ausschalten,
+dazwischen den bisherigen Zustand halten. Mit MQTT verbindet sich die
+Steuerung automatisch über Home Assistant Discovery: ein Schalter aktiviert
+oder deaktiviert die Pumpenautomation, zwei Zahlenfelder stellen den Ein- und
+Ausschaltdruck ein. Änderungen werden lokal gespeichert und nach einem
+Neustart wiederverwendet. Ohne MQTT bleibt der bisherige Kommandozeilenbetrieb
+erhalten. DI1 muss high sein; bei Motorstörung (DI1 low),
 ungültigem AI-Signal oder Modbusfehler wird DO1 ausgeschaltet beziehungsweise
 die Abschaltung bestmöglich versucht. DI2 wird als Betriebsmeldung mitgeloggt.
 Beim Beenden (SIGINT/SIGTERM) wird ebenfalls versucht, DO1 auszuschalten und
@@ -41,9 +46,21 @@ m31-pump --host 192.168.3.7
 ```
 
 Optionen: `--port` (Standard 502), `--unit-id` (1), `--ai-address` (3000),
-`--interval` (1 Sekunde) und `--timeout` (2 Sekunden). Zwischen 1,6 und 3 bar
-wird der zuletzt gelesene DO1-Zustand beibehalten, auch nach einem Neustart des
-Programms.
+`--interval` (1 Sekunde), `--timeout` (2 Sekunden), `--start-pressure` (1,6 bar),
+`--stop-pressure` (3,0 bar) sowie `--settings-file` (lokale persistente
+Einstellungen). Drücke müssen in 0,1-bar-Schritten und im Bereich 0–10 bar
+liegen; der Einschaltdruck muss niedriger als der Ausschaltdruck sein.
+
+Für Home Assistant muss ein MQTT-Broker erreichbar und MQTT Discovery aktiviert
+sein. Broker-Zugangsdaten können über `M31_MQTT_USERNAME` und
+`M31_MQTT_PASSWORD` als Umgebungsvariablen bereitgestellt werden. Starte den
+Dienst mit `--mqtt-host <Broker-IP>`; optional sind `--mqtt-port` (1883),
+`--mqtt-discovery-prefix` (`homeassistant`) und `--device-id` (`m31_pump`).
+Der Automationsschalter startet standardmäßig eingeschaltet, damit ein Aufruf
+ohne MQTT das bisherige Betriebsverhalten beibehält. Ausschalten in Home
+Assistant schaltet DO1 beim nächsten Regelzyklus aus. MQTT-Ausfall deaktiviert
+die lokale Druckregelung nicht; die aktuelle Einstellung bleibt aktiv und die
+Home-Assistant-Entitäten zeigen den Broker-Ausfall an.
 
 Für einen Systemdienst `/opt/m31tool` als Installationspfad verwenden, das
 Projekt dort in einer virtuellen Umgebung installieren und den Benutzer
@@ -65,7 +82,15 @@ M31_PORT=502
 M31_UNIT_ID=1
 M31_AI_ADDRESS=3000
 M31_INTERVAL=1
+M31_MQTT_HOST=
+# Optional, nur setzen wenn der Broker Anmeldung verlangt:
+# M31_MQTT_USERNAME=...
+# M31_MQTT_PASSWORD=...
 ```
+
+Für Home Assistant `M31_MQTT_HOST` auf die Broker-Adresse setzen. Die
+systemd-Unit speichert Druckgrenzen und Automationsschalter geschützt unter
+`/var/lib/m31-pump/settings.json`. Ohne Broker bleibt der MQTT-Teil deaktiviert.
 
 Anschließend den Dienst aktivieren:
 
